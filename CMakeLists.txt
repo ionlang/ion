@@ -9,8 +9,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(PROJECT_URL "https://github.com/ionlang/ionlang")
 
 # Setup source and build directories.
-set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Scan dependencies.
 find_package(ionshared REQUIRED)
@@ -34,8 +34,9 @@ set(VERSION "$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)")
 # Set source file(s).
 file(
     GLOB_RECURSE SOURCES
-    "src/*.h"
+    "include/${PROJECT_NAME}/*.h"
     "src/*.cpp"
+    "src/*.h"
 )
 
 # Setup LLVM include directories.
@@ -48,7 +49,7 @@ include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
 # Specify that this project is a library.
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_library("${PROJECT_NAME}" ${SOURCES})
 
 llvm_map_components_to_libnames(llvm_libs all)
 
@@ -56,22 +57,32 @@ llvm_map_components_to_libnames(llvm_libs all)
 target_link_libraries("${PROJECT_NAME}" PRIVATE LLVM ionir::ionir ionshared::ionshared)
 
 # Provide include directories to be used in the build command. Position in file matters.
-target_include_directories(${PROJECT_NAME} PUBLIC "src" "include" "libs")
+target_include_directories("${PROJECT_NAME}" PUBLIC "src" "include" "libs")
 
 # Setup unit testing using Google Test (GTest) if applicable. This binds the CMakeLists.txt on the test project.
 option(BUILD_TESTS "Build tests" OFF)
 
-# TODO
-if (BUILD_TESTS)
-    add_subdirectory(libs/googletest)
-    # add_subdirectory(test)
-endif ()
+# TODO: Make an option for building tests.
+add_subdirectory(libs/googletest)
+add_subdirectory(test)
 
-# Add install target.
+# Setup install target.
 install(
-    TARGETS ${LIBRARY_TARGET_NAME}
-    EXPORT ${PROJECT_NAME}
-    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT bin
+    TARGETS "${PROJECT_NAME}"
+    EXPORT ${PROJECT_NAME}-config LIBRARY
+    DESTINATION ${CMAKE_INSTALL_LIBDIR} # Destination is relative to ${CMAKE_INSTALL_PREFIX}.
+)
+
+install(
+    EXPORT ${PROJECT_NAME}-config
+    NAMESPACE ${PROJECT_NAME}::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+install(
+    DIRECTORY include/${PROJECT_NAME}/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+    FILES_MATCHING PATTERN "*.h" PATTERN "LICENSE" # Match only header files & LICENSE file.
 )
 
 # Support for CLion install target.
