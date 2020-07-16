@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.12.4)
 
 enable_testing()
 
+#find_package(GTest REQUIRED
+#    PATHS "../libs/googletest/googletest/generated"
+#)
+
 project(ionlang_tests)
 
 file(
@@ -10,18 +14,18 @@ file(
     "*.cpp"
 )
 
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+include_directories("${gtest_SOURCE_DIR}/include" "${gtest_SOURCE_DIR}")
 
 add_executable("${PROJECT_NAME}" ${SOURCES})
 
 target_link_libraries(
     ${PROJECT_NAME} PUBLIC
     gtest
-    ionir
+    ionlang
 )
 
 # Specify additional include directories to look for imports.
-target_include_directories(${PROJECT_NAME} PRIVATE "../src")
+target_include_directories("${PROJECT_NAME}" PRIVATE "../src")
 
 # Prepare a macro for adding tests.
 # macro(package_add_test TESTNAME)
