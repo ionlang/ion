@@ -13,6 +13,7 @@ set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 # Scan dependencies.
+find_package(ionshared REQUIRED)
 find_package(ionir REQUIRED)
 find_package(CLI11 CONFIG)
 
@@ -51,11 +52,8 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 llvm_map_components_to_libnames(llvm_libs all)
 
-# Link against LLVM libraries.
-target_link_libraries("${PROJECT_NAME}" PRIVATE LLVM)
-
-# Link against libionir.
-target_link_libraries("${PROJECT_NAME}" PRIVATE ionir::ionir)
+# Link against various libraries such as LLVM, libionir, and libionshared.
+target_link_libraries("${PROJECT_NAME}" PRIVATE LLVM ionir::ionir ionshared::ionshared)
 
 # Provide include directories to be used in the build command. Position in file matters.
 target_include_directories(${PROJECT_NAME} PUBLIC "src" "include" "libs")
