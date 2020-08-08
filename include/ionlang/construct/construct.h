@@ -29,7 +29,9 @@ namespace ionlang {
 
         Ref,
 
-        Value
+        Value,
+
+        Statement
     };
 
     class Construct;
@@ -41,5 +43,7 @@ namespace ionlang {
         explicit Construct(ConstructKind kind);
 
         virtual void accept(Pass &visitor) = 0;
+
+        virtual Ast getChildNodes();
     };
 }

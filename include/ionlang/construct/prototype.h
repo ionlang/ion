@@ -1,12 +1,13 @@
 #pragma once
 
 #include <ionshared/misc/named.h>
-#include <ionlang/passes/pass.h>
 #include <ionlang/construct/pseudo/args.h>
 #include "type.h"
 #include "module.h"
 
 namespace ionlang {
+    class Pass;
+
     class Prototype : public Construct, public ionshared::Named {
     private:
         ionshared::Ptr<Args> args;

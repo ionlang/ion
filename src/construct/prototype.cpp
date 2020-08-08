@@ -1,8 +1,9 @@
+#include <ionlang/passes/pass.h>
 #include <ionlang/construct/prototype.h>
 
 namespace ionlang {
     Prototype::Prototype(std::string id, ionshared::Ptr<Args> args, ionshared::Ptr<Type> returnType, ionshared::Ptr<Module> parent)
-        : ChildConstruct<Module>(parent, ConstructKind::Prototype), Named(id), args(args), returnType(returnType) {
+        : ChildConstruct<Module>(parent, ConstructKind::Prototype), Named(std::move(id)), args(std::move(args)), returnType(std::move(returnType)) {
         //
     }
 
