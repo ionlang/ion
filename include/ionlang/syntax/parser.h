@@ -3,9 +3,10 @@
 #include <optional>
 #include <string>
 #include <ionshared/reporting/notice_factory.h>
-#include <ionlang/lexical/token.h>
 #include <ionir/misc/helpers.h>
 #include <ionir/const/const_name.h>
+#include <ionlang/lexical/token.h>
+#include <ionlang/construct/construct.h>
 #include "scope.h"
 #include "parser_helpers.h"
 
@@ -23,7 +24,7 @@ namespace ionlang {
     protected:
         bool is(TokenKind tokenKind) noexcept;
 
-        bool isPeek(TokenKind tokenKind);
+        bool isNext(TokenKind tokenKind);
 
         bool expect(TokenKind tokenKind);
 
@@ -34,10 +35,13 @@ namespace ionlang {
         std::nullopt_t makeNotice(std::string message, ionshared::NoticeType type = ionshared::NoticeType::Error);
 
     public:
-        explicit Parser(TokenStream stream, ionshared::StackTrace stackTrace = {}, std::string filePath = ConstName::anonymous);
+        // TODO: Default value is hard-coded.
+        explicit Parser(TokenStream stream, ionshared::StackTrace stackTrace = {}, std::string filePath = "anonymous"/*ConstName::anonymous*/);
 
         ionshared::StackTrace getStackTrace() const;
 
         std::string getFilePath() const;
+
+        ionshared::OptPtr<Construct> parseTopLevel(ionshared::Ptr<Module> parent);
     };
 }
