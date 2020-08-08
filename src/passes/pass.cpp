@@ -90,4 +90,12 @@ namespace ionlang {
     void Pass::visitType(ionshared::Ptr<Type> node) {
         //
     }
+
+    void Pass::visitRef(PtrRef<> node) {
+        //
+    }
+
+    void Pass::visitFunction(ionshared::Ptr<Function> node) {
+        //
+    }
 }
