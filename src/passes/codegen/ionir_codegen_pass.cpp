@@ -1,6 +1,26 @@
+#include <ionir/construct/value/integer.h>
+#include <ionir/construct/value/char.h>
+#include <ionir/construct/value/string.h>
+#include <ionir/construct/value/boolean.h>
 #include <ionlang/passes/codegen/ionir_codegen_pass.h>
 
 namespace ionlang {
+    IonIrCodegenPass::IonIrCodegenPass() {
+        //
+    }
+
+    IonIrCodegenPass::~IonIrCodegenPass() {
+        // TODO
+    }
+
+    ionshared::Stack<ionir::Value<>> IonIrCodegenPass::getValueStack() const noexcept {
+        return this->valueStack;
+    }
+
+    ionshared::Stack<ionir::Type> IonIrCodegenPass::getTypeStack() const noexcept {
+        return this->typeStack;
+    }
+
     void IonIrCodegenPass::visit(ionshared::Ptr<Construct> node) {
         /**
          * Only instruct the node to visit this instance and
@@ -16,7 +36,7 @@ namespace ionlang {
         }
 
         ionshared::OptPtr<ionir::Function> existingDefinition =
-            moduleBuffer->get()->lookupFunction(node->getPrototype()->getId();
+            moduleBuffer->get()->lookupFunction(node->getPrototype()->getId());
 
         if (ionshared::Util::hasValue(existingDefinition)) {
             throw std::runtime_error("Re-definition of extern not allowed");
@@ -92,5 +112,47 @@ namespace ionlang {
         }
 
         this->valueStack.push(ionIrFunction);
+    }
+
+    void IonIrCodegenPass::visitType(ionshared::Ptr<Type> node) {
+        // TODO
+    }
+
+    void IonIrCodegenPass::visitIntegerValue(ionshared::Ptr<IntegerValue> node) {
+        ionshared::Ptr<Type> nodeType = node->getType();
+
+        if (nodeType->getTypeKind() != TypeKind::Integer) {
+            throw std::runtime_error("Integer value's type must be integer type");
+        }
+
+        this->visitIntegerType(nodeType->dynamicCast<IntegerType>());
+
+        ionshared::Ptr<ionir::IntegerType> ionIrIntegerType = this->typeStack.pop()->dynamicCast<ionir::IntegerType>();
+
+        ionshared::Ptr<ionir::IntegerValue> ionIrIntegerValue =
+            std::make_shared<ionir::IntegerValue>(ionIrIntegerType, node->getValue());
+
+        this->valueStack.push(ionIrIntegerValue->dynamicCast<ionir::Value<>>());
+    }
+
+    void IonIrCodegenPass::visitCharValue(ionshared::Ptr<CharValue> node) {
+        ionshared::Ptr<ionir::CharValue> ionIrCharValue =
+            std::make_shared<ionir::CharValue>(node->getValue());
+
+        this->valueStack.push(ionIrCharValue->dynamicCast<ionir::Value<>>());
+    }
+
+    void IonIrCodegenPass::visitStringValue(ionshared::Ptr<StringValue> node) {
+        ionshared::Ptr<ionir::StringValue> ionIrStringValue =
+            std::make_shared<ionir::StringValue>(node->getValue());
+
+        this->valueStack.push(ionIrStringValue->dynamicCast<ionir::Value<>>());
+    }
+
+    void IonIrCodegenPass::visitBooleanValue(ionshared::Ptr<BooleanValue> node) {
+        ionshared::Ptr<ionir::BooleanValue> ionIrBooleanValue =
+            std::make_shared<ionir::BooleanValue>(node->getValue());
+
+        this->valueStack.push(ionIrBooleanValue->dynamicCast<ionir::Value<>>());
     }
 }
