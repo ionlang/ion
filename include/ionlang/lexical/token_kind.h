@@ -56,6 +56,8 @@ namespace ionlang {
 
         KeywordModule,
 
+        KeywordGlobal,
+
         TypeVoid,
 
         TypeBool,

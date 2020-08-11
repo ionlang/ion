@@ -19,10 +19,12 @@ namespace ionlang {
     }
 
     bool Classifier::isUnsignedIntegerType(TokenKind tokenKind) {
-        return tokenKind == TokenKind::TypeUnsignedInt8
-            || tokenKind == TokenKind::TypeUnsignedInt16
-            || tokenKind == TokenKind::TypeUnsignedInt32
-            || tokenKind == TokenKind::TypeUnsignedInt64;
+//        return tokenKind == TokenKind::TypeUnsignedInt8
+//            || tokenKind == TokenKind::TypeUnsignedInt16
+//            || tokenKind == TokenKind::TypeUnsignedInt32
+//            || tokenKind == TokenKind::TypeUnsignedInt64;
+        // TODO
+        return false;
     }
 
     bool Classifier::isIntegerType(TokenKind tokenKind) {
