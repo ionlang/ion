@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <ionshared/misc/util.h>
+#include <ionshared/misc/named.h>
 #include <ionlang/construct/construct.h>
 
 namespace ionlang {

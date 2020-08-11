@@ -3,12 +3,14 @@
 #include <optional>
 #include <string>
 #include <ionshared/reporting/notice_factory.h>
+#include <ionshared/syntax/parser_helpers.h>
 #include <ionir/misc/helpers.h>
 #include <ionir/const/const_name.h>
 #include <ionlang/lexical/token.h>
 #include <ionlang/construct/construct.h>
+#include <ionlang/construct/module.h>
+#include <ionlang/construct/type/void_type.h>
 #include "scope.h"
-#include "parser_helpers.h"
 
 namespace ionlang {
     class Parser {
@@ -19,7 +21,8 @@ namespace ionlang {
 
         std::string filePath;
 
-        Classifier classifier;
+        // TODO
+//        Classifier classifier;
 
     protected:
         bool is(TokenKind tokenKind) noexcept;
@@ -42,6 +45,60 @@ namespace ionlang {
 
         std::string getFilePath() const;
 
-        ionshared::OptPtr<Construct> parseTopLevel(ionshared::Ptr<Module> parent);
+        ionshared::OptPtr<Construct> parseTopLevel(const ionshared::Ptr<Module> &parent);
+
+        /**
+         * Parses a integer literal in the form of long (or integer 64).
+         */
+        ionshared::OptPtr<IntegerValue> parseInt();
+
+        ionshared::OptPtr<CharValue> parseChar();
+
+        ionshared::OptPtr<StringValue> parseString();
+
+        std::optional<std::string> parseId();
+
+        ionshared::OptPtr<Type> parseType();
+
+        ionshared::OptPtr<VoidType> parseVoidType();
+
+        ionshared::OptPtr<IntegerType> parseIntegerType();
+
+        std::optional<Arg> parseArg();
+
+        ionshared::OptPtr<Args> parseArgs();
+
+        ionshared::OptPtr<Prototype> parsePrototype(ionshared::Ptr<Module> parent);
+
+        ionshared::OptPtr<Extern> parseExtern(ionshared::Ptr<Module> parent);
+
+        ionshared::OptPtr<Function> parseFunction(ionshared::Ptr<Module> parent);
+
+        ionshared::OptPtr<Global> parseGlobal();
+
+        ionshared::OptPtr<Value<>> parseValue();
+
+        ionshared::OptPtr<Construct> parsePrimaryExpr(ionshared::Ptr<Construct> parent);
+
+        ionshared::OptPtr<BasicBlock> parseBasicBlock(ionshared::Ptr<FunctionBody> parent);
+
+        ionshared::OptPtr<FunctionBody> parseFunctionBody(ionshared::Ptr<Function> parent);
+
+        ionshared::OptPtr<Module> parseModule();
+
+        ionshared::OptPtr<VariableDeclaration> parseVariableDecl(ionshared::Ptr<BasicBlock> parent);
+
+        std::optional<std::string> parseLine();
+
+        // TODO: Add comment-parsing support.
+
+        template<typename T = Construct>
+        ionshared::OptPtr<Ref<T>> parseRef(ionshared::Ptr<Construct> owner) {
+            std::optional<std::string> id = this->parseId();
+
+            IONIR_PARSER_ASSURE(id)
+
+            return std::make_shared<Ref<T>>(*id, owner);
+        }
     };
 }

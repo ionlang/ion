@@ -2,13 +2,15 @@
 
 #include <ionshared/misc/named.h>
 #include <ionlang/construct/pseudo/args.h>
+#include <ionlang/construct/pseudo/child_construct.h>
 #include "type.h"
-#include "module.h"
 
 namespace ionlang {
     class Pass;
 
-    class Prototype : public Construct, public ionshared::Named {
+    class Module;
+
+    class Prototype : public ChildConstruct<Module>, public ionshared::Named {
     private:
         ionshared::Ptr<Args> args;
 

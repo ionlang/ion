@@ -1,27 +1,26 @@
 #pragma once
 
+#include <string>
 #include <ionshared/misc/named.h>
 #include <ionshared/misc/helpers.h>
-#include <string>
+#include <ionshared/tracking/symbol_table.h>
+#include <ionshared/tracking/scope_anchor.h>
+#include <ionlang/construct/pseudo/child_construct.h>
+#include "variable_declaration.h"
+#include "statement.h"
 
 namespace ionlang {
     class Pass;
 
     class FunctionBody;
 
-    class InstBuilder;
+    class StatementBuilder;
 
     enum class BasicBlockKind {
         /**
          * The entry basic block of a function body.
          */
         Entry,
-
-        /**
-         * A basic block defined by the user. Can be jumped to
-         * using a goto instruction.
-         */
-        Label,
 
         /**
          * A basic block which forms part of a construct. Cannot be
@@ -35,24 +34,24 @@ namespace ionlang {
 
         std::string id;
 
-        std::vector<ionshared::Ptr<RegisterAssign>> registers = {};
+        std::vector<ionshared::Ptr<VariableDeclaration>> variableDecls = {};
 
-        std::vector<ionshared::Ptr<Inst>> insts = {};
+        std::vector<ionshared::Ptr<Statement>> statements = {};
 
-        PtrSymbolTable<Inst> symbolTable = TypeFactory::makePtrSymbolTable<Inst>();
+        ionshared::PtrSymbolTable<Statement> symbolTable = ionshared::Util::makePtrSymbolTable<Statement>();
     };
 
     // TODO: Must be verified to contain a single terminal instruction at the end.
-    class BasicBlock : public ChildConstruct<FunctionBody>, public ScopeAnchor<Inst>, public ionshared::Named {
+    class BasicBlock : public ChildConstruct<FunctionBody>, public ionshared::ScopeAnchor<Statement>, public ionshared::Named {
     private:
         BasicBlockKind kind;
 
-        std::vector<ionshared::Ptr<RegisterAssign>> variableDecls;
+        std::vector<ionshared::Ptr<VariableDeclaration>> variableDecls;
 
-        std::vector<ionshared::Ptr<Inst>> statements;
+        std::vector<ionshared::Ptr<Statement>> statements;
 
     public:
-        explicit BasicBlock(BasicBlockOpts opts);
+        explicit BasicBlock(const BasicBlockOpts &opts);
 
         void accept(Pass &visitor) override;
 
@@ -60,15 +59,15 @@ namespace ionlang {
 
         BasicBlockKind getKind() const noexcept;
 
-        std::vector<ionshared::Ptr<RegisterAssign>> &getRegisters() noexcept;
+        std::vector<ionshared::Ptr<VariableDeclaration>> &getRegisters() noexcept;
 
-        void setVariableDecls(std::vector<ionshared::Ptr<RegisterAssign>> variableDecls);
+        void setVariableDecls(std::vector<ionshared::Ptr<VariableDeclaration>> variableDecls);
 
-        std::vector<ionshared::Ptr<Inst>> &getStatements() noexcept;
+        std::vector<ionshared::Ptr<Statement>> &getStatements() noexcept;
 
-        void setStatements(std::vector<ionshared::Ptr<Inst>> statements);
+        void setStatements(std::vector<ionshared::Ptr<Statement>> statements);
 
-        void insertStatement(ionshared::Ptr<Inst> statement);
+        void insertStatement(const ionshared::Ptr<Statement> &statement);
 
         uint32_t relocateStatements(BasicBlock &target, uint32_t from = 0);
 
@@ -76,10 +75,10 @@ namespace ionlang {
          * Attempt to find the index location of an instruction.
          * Returns null if not found.
          */
-        std::optional<uint32_t> locate(ionshared::Ptr<Inst> statement) const;
+        std::optional<uint32_t> locate(ionshared::Ptr<Statement> statement) const;
 
-        ionshared::Ptr<InstBuilder> createBuilder();
+        ionshared::Ptr<StatementBuilder> createBuilder();
 
-        ionshared::OptPtr<Inst> findTerminalStatement() const;
+        ionshared::OptPtr<Statement> findTerminalStatement() const;
     };
 }

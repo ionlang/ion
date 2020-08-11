@@ -2,7 +2,7 @@
 
 namespace ionlang {
     Function::Function(ionshared::Ptr<Prototype> prototype, ionshared::Ptr<FunctionBody> body)
-        : Construct(ConstructKind::Function), prototype(prototype), body(body) {
+        : Construct(ConstructKind::Function), prototype(std::move(prototype)), body(std::move(body)) {
         //
     }
 
@@ -22,7 +22,7 @@ namespace ionlang {
     }
 
     void Function::setPrototype(ionshared::Ptr<Prototype> prototype) {
-        this->prototype = prototype;
+        this->prototype = std::move(prototype);
     }
 
     ionshared::Ptr<FunctionBody> Function::getBody() const noexcept {
@@ -30,14 +30,14 @@ namespace ionlang {
     }
 
     void Function::setBody(ionshared::Ptr<FunctionBody> body) noexcept {
-        this->body = body;
+        this->body = std::move(body);
     }
 
-    ionshared::PtrSymbolTable<ionshared::LocalVariableDescriptor> Function::getLocalVariables() const {
+    ionshared::PtrSymbolTable<LocalVariableDescriptor> Function::getLocalVariables() const {
         return this->localVariables;
     }
 
-    void Function::setLocalVariables(ionshared::PtrSymbolTable<ionshared::LocalVariableDescriptor> localVariables) {
-        this->localVariables = localVariables;
+    void Function::setLocalVariables(ionshared::PtrSymbolTable<LocalVariableDescriptor> localVariables) {
+        this->localVariables = std::move(localVariables);
     }
 }

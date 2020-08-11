@@ -1,4 +1,5 @@
 #include <ionlang/passes/pass.h>
+#include <ionlang/construct/module.h>
 #include <ionlang/construct/prototype.h>
 
 namespace ionlang {
@@ -24,6 +25,6 @@ namespace ionlang {
     }
 
     void Prototype::setReturnType(ionshared::Ptr<Type> returnType) noexcept {
-        this->returnType = returnType;
+        this->returnType = std::move(returnType);
     }
 }

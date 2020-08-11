@@ -87,7 +87,27 @@ namespace ionlang {
         }
     }
 
+    void Pass::visitBooleanValue(ionshared::Ptr<BooleanValue> node) {
+        //
+    }
+
+    void Pass::visitCharValue(ionshared::Ptr<CharValue> node) {
+        //
+    }
+
+    void Pass::visitIntegerValue(ionshared::Ptr<IntegerValue> node) {
+        //
+    }
+
+    void Pass::visitStringValue(ionshared::Ptr<StringValue> node) {
+        //
+    }
+
     void Pass::visitType(ionshared::Ptr<Type> node) {
+        //
+    }
+
+    void Pass::visitVoidType(ionshared::Ptr<VoidType> node) {
         //
     }
 
@@ -96,6 +116,26 @@ namespace ionlang {
     }
 
     void Pass::visitFunction(ionshared::Ptr<Function> node) {
+        //
+    }
+
+    void Pass::visitVariableDecl(ionshared::Ptr<VariableDeclaration> node) {
+        //
+    }
+
+    void Pass::visitScopeAnchor(ionshared::Ptr<ionshared::ScopeAnchor<Construct>> node) {
+        //
+    }
+
+    void Pass::visitFunctionBody(ionshared::Ptr<FunctionBody> node) {
+        //
+    }
+
+    void Pass::visitIntegerType(ionshared::Ptr<IntegerType> node) {
+        //
+    }
+
+    void Pass::visitGlobal(ionshared::Ptr <Global> node) {
         //
     }
 }
