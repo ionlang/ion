@@ -1,7 +1,7 @@
-#include <ionir/construct/value/integer.h>
-#include <ionir/construct/value/char.h>
-#include <ionir/construct/value/string.h>
-#include <ionir/construct/value/boolean.h>
+#include <ionir/construct/value/integer_value.h>
+#include <ionir/construct/value/char_value.h>
+#include <ionir/construct/value/string_value.h>
+#include <ionir/construct/value/boolean_value.h>
 #include <ionlang/passes/codegen/ionir_codegen_pass.h>
 
 namespace ionlang {
@@ -13,12 +13,20 @@ namespace ionlang {
         // TODO
     }
 
-    ionshared::Stack<ionir::Value<>> IonIrCodegenPass::getValueStack() const noexcept {
-        return this->valueStack;
+    ionshared::Stack<ionshared::Ptr<ionir::Value<>>> IonIrCodegenPass::getValueStack() const noexcept {
+        return this->constructStack;
     }
 
-    ionshared::Stack<ionir::Type> IonIrCodegenPass::getTypeStack() const noexcept {
+    ionshared::Stack<ionshared::Ptr<ionir::Type>> IonIrCodegenPass::getTypeStack() const noexcept {
         return this->typeStack;
+    }
+
+    ionshared::Ptr<ionshared::SymbolTable<ionshared::Ptr<ionir::Module>>> IonIrCodegenPass::getModules() const {
+        return this->modules;
+    }
+
+    ionshared::OptPtr<ionir::Module> IonIrCodegenPass::getModuleBuffer() const {
+        return this->moduleBuffer;
     }
 
     void IonIrCodegenPass::visit(ionshared::Ptr<Construct> node) {
@@ -80,16 +88,22 @@ namespace ionlang {
             // Visit and pop the return type.
             this->visitType(node->getReturnType());
 
-            llvm::Type *llvmReturnType = this->typeStack.pop();
+            ionshared::Ptr<ionir::Type> ionIrReturnType = this->typeStack.pop();
 
-            // TODO: Support for infinite arguments and hard-coded return type.
-            // Create the function type.
-            llvm::FunctionType *type =
-                llvm::FunctionType::get(llvmReturnType, arguments, node->getArgs()->getIsVariable());
+            // TODO: Support for variable arguments and hard-coded return type.
+            // TODO: Args and parent (ionir::Module) in form of IonIR entities.
+            auto ionIrPrototype = std::make_shared<ionir::Prototype>(node->getId(), nullptr, ionIrReturnType, nullptr);
 
-            // Cast the value to a function, since we know getCallee() will return a function.
-            ionIrFunction =
-                llvm::dyn_cast<llvm::Function>((*this->moduleBuffer)->getOrInsertFunction(node->getId(), type).getCallee());
+            // TODO: Hard coded until figured.
+            auto ionIrFunctionBody = 0;
+
+            ionIrFunction = std::make_shared<ionir::Function>(ionIrPrototype, ionIrFunctionBody);
+
+            /**
+             * Insert the previously created function and register it
+             * within the current module buffer.
+             */
+            this->moduleBuffer->get()->insertFunction(*ionIrFunction);
         }
 
         // Begin processing arguments. Argument count must be the same.
@@ -111,11 +125,43 @@ namespace ionlang {
             i++;
         }
 
-        this->valueStack.push(ionIrFunction);
+        this->constructStack.push(*ionIrFunction);
     }
 
     void IonIrCodegenPass::visitType(ionshared::Ptr<Type> node) {
-        // TODO
+        // Convert type to a pointer if applicable.
+        if (node->getIsPointer()) {
+            /**
+             * TODO: Convert type to pointer before passing on
+             * to explicit handlers, thus saving time and code.
+             */
+        }
+
+        switch (node->getTypeKind()) {
+            case TypeKind::Void: {
+                return this->visitVoidType(node->staticCast<VoidType>());
+            }
+
+            case TypeKind::Integer: {
+                return this->visitIntegerType(node->staticCast<IntegerType>());
+            }
+
+            case TypeKind::String: {
+                // TODO
+
+                throw std::runtime_error("Not implemented");
+            }
+
+            case TypeKind::UserDefined: {
+                // TODO
+
+                throw std::runtime_error("Not implemented");
+            }
+
+            default: {
+                throw std::runtime_error("Could not identify type kind");
+            }
+        }
     }
 
     void IonIrCodegenPass::visitIntegerValue(ionshared::Ptr<IntegerValue> node) {
@@ -132,27 +178,27 @@ namespace ionlang {
         ionshared::Ptr<ionir::IntegerValue> ionIrIntegerValue =
             std::make_shared<ionir::IntegerValue>(ionIrIntegerType, node->getValue());
 
-        this->valueStack.push(ionIrIntegerValue->dynamicCast<ionir::Value<>>());
+        this->constructStack.push(ionIrIntegerValue->dynamicCast<ionir::Value<>>());
     }
 
     void IonIrCodegenPass::visitCharValue(ionshared::Ptr<CharValue> node) {
         ionshared::Ptr<ionir::CharValue> ionIrCharValue =
             std::make_shared<ionir::CharValue>(node->getValue());
 
-        this->valueStack.push(ionIrCharValue->dynamicCast<ionir::Value<>>());
+        this->constructStack.push(ionIrCharValue->dynamicCast<ionir::Value<>>());
     }
 
     void IonIrCodegenPass::visitStringValue(ionshared::Ptr<StringValue> node) {
         ionshared::Ptr<ionir::StringValue> ionIrStringValue =
             std::make_shared<ionir::StringValue>(node->getValue());
 
-        this->valueStack.push(ionIrStringValue->dynamicCast<ionir::Value<>>());
+        this->constructStack.push(ionIrStringValue->dynamicCast<ionir::Value<>>());
     }
 
     void IonIrCodegenPass::visitBooleanValue(ionshared::Ptr<BooleanValue> node) {
         ionshared::Ptr<ionir::BooleanValue> ionIrBooleanValue =
             std::make_shared<ionir::BooleanValue>(node->getValue());
 
-        this->valueStack.push(ionIrBooleanValue->dynamicCast<ionir::Value<>>());
+        this->constructStack.push(ionIrBooleanValue->dynamicCast<ionir::Value<>>());
     }
 }

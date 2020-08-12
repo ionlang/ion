@@ -10,7 +10,7 @@
 #include <ionlang/construct/basic_block.h>
 #include <ionlang/construct/statement.h>
 #include <ionlang/construct/value.h>
-#include <ionlang/construct/value/boolean.h>
+#include <ionlang/construct/value/boolean_value.h>
 #include <ionlang/construct/value/char_value.h>
 #include <ionlang/construct/value/integer_value.h>
 #include <ionlang/construct/value/string_value.h>
