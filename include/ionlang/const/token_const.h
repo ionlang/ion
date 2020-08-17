@@ -28,8 +28,6 @@ namespace ionlang {
 
         static TokenKindVector types;
 
-        static TokenKindVector insts;
-
         static std::map<TokenKind, std::string> names;
 
         static bool pushSimple(std::string value, TokenKind tokenKind);
@@ -54,8 +52,6 @@ namespace ionlang {
         static const ionshared::BiMap<std::string, TokenKind> &getOperators();
 
         static const TokenKindVector &getTypes();
-
-        static const TokenKindVector &getInsts();
 
         static std::map<TokenKind, std::string> getNames();
 

@@ -35,7 +35,7 @@ namespace ionlang {
         return this->statements;
     }
 
-    // TODO: SymbolTable must be re-populated after changing insts vector.
+    // TODO: SymbolTable must be re-populated after changing statements vector.
     void BasicBlock::setStatements(std::vector<ionshared::Ptr<Statement>> statements) {
         this->statements = std::move(statements);
     }

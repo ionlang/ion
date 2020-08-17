@@ -1,5 +1,4 @@
 #include <ionlang/passes/pass.h>
-#include <ionlang/construct/construct.h>
 
 namespace ionlang {
     Construct::Construct(ConstructKind kind) : ionshared::BaseConstruct<Construct, ConstructKind>(kind) {

@@ -39,10 +39,6 @@ namespace ionlang {
         return TokenConst::getKeywords().contains(tokenKind);
     }
 
-    bool Classifier::isInst(TokenKind tokenKind) {
-        return TokenConst::contains(TokenConst::getInsts(), tokenKind);
-    }
-
     bool Classifier::isLiteral(TokenKind tokenKind) {
         return tokenKind == TokenKind::LiteralInteger
             || tokenKind == TokenKind::LiteralDecimal

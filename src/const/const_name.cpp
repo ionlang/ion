@@ -33,13 +33,5 @@ namespace ionlang {
 
     const std::string ConstName::typeString = "str";
 
-    const std::string ConstName::instAlloca = "alloca";
-
-    const std::string ConstName::instBranch = "branch";
-
-    const std::string ConstName::instCall = "call";
-
     const std::string ConstName::instReturn = "ret";
-
-    const std::string ConstName::instStore = "store";
 }

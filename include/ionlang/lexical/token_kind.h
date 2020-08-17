@@ -76,6 +76,10 @@ namespace ionlang {
 
         TypeFloat64,
 
+        TypeChar,
+
+        TypeString,
+
         OperatorAdd,
 
         OperatorSubtract,

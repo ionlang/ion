@@ -1,8 +1,11 @@
+#include <ionshared/misc/util.h>
+#include <ionir/construct/function.h>
 #include <ionir/construct/value/integer_value.h>
 #include <ionir/construct/value/char_value.h>
 #include <ionir/construct/value/string_value.h>
 #include <ionir/construct/value/boolean_value.h>
 #include <ionlang/passes/codegen/ionir_codegen_pass.h>
+#include <ionlang/const/notice.h>
 
 namespace ionlang {
     IonIrCodegenPass::IonIrCodegenPass() {
@@ -61,7 +64,7 @@ namespace ionlang {
         uint32_t argumentCount = node->getArgs()->getItems().getSize();
 
         // Create the argument buffer vector.
-        std::vector<llvm::Type *> arguments = {};
+        ionshared::Ptr<ionir::Args> arguments = std::make_shared<ionir::Args>();
 
         // Attempt to retrieve an existing function.
         ionshared::OptPtr<ionir::Function> ionIrFunction =
@@ -69,13 +72,22 @@ namespace ionlang {
 
         // A function with a matching identifier already exists.
         if (ionshared::Util::hasValue(ionIrFunction)) {
+            ionshared::Ptr<ionir::Prototype> ionIrPrototype = ionIrFunction->get()->getPrototype();
+
             // Function already has a body, disallow re-definition.
-            if (ionIrFunction->getBasicBlockList().empty()) {
-                throw std::runtime_error("Cannot re-define function");
+            if (!ionIrFunction->get()->getBody()->getSymbolTable()->isEmpty()) {
+                // TODO
+                throw ionshared::Util::quickError<std::string>(
+                    IONLANG_NOTICE_FUNCTION_ALREADY_DEFINED,
+                    ionIrPrototype->getId()
+                );
             }
-                // If the function takes a different number of arguments, reject.
+            // If the function takes a different number of arguments, reject.
             else if (ionIrFunction->arg_size() != argumentCount) {
-                throw std::runtime_error("Re-definition of function with a different amount arguments");
+                throw ionshared::Util::quickError(
+                    IONLANG_NOTICE_FUNCTION_REDEFINITION_DIFFERENT_SIG,
+                    ionIrPrototype->getId()
+                );
             }
         }
         // Otherwise, function will be created.
@@ -92,7 +104,8 @@ namespace ionlang {
 
             // TODO: Support for variable arguments and hard-coded return type.
             // TODO: Args and parent (ionir::Module) in form of IonIR entities.
-            auto ionIrPrototype = std::make_shared<ionir::Prototype>(node->getId(), nullptr, ionIrReturnType, nullptr);
+            ionshared::Ptr<ionir::Prototype> ionIrPrototype =
+                std::make_shared<ionir::Prototype>(node->getId(), nullptr, ionIrReturnType, nullptr);
 
             // TODO: Hard coded until figured.
             auto ionIrFunctionBody = 0;
@@ -113,7 +126,7 @@ namespace ionlang {
 
         int i = 0;
 
-        for (auto &arg : ionIrFunction->args()) {
+        for (const auto &arg : ionIrFunction->args()) {
             // TODO: getItems() no longer a vector; cannot index by index, only key.
             // Retrieve the name element from the argument tuple.
             //            std::string name = node->getArgs()->getItems()[i].second;

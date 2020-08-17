@@ -12,7 +12,11 @@ namespace ionlang {
 
     class FunctionBody : public ChildConstruct<Function>, public ionshared::ScopeAnchor<BasicBlock> {
     public:
-        explicit FunctionBody(ionshared::Ptr<Function> parent, ionshared::PtrSymbolTable<BasicBlock> symbolTable = ionshared::Util::makePtrSymbolTable<BasicBlock>());
+        explicit FunctionBody(
+            ionshared::Ptr<Function> parent,
+            ionshared::PtrSymbolTable<BasicBlock> symbolTable =
+                ionshared::Util::makePtrSymbolTable<BasicBlock>()
+        );
 
         void accept(Pass &visitor) override;
 
@@ -22,6 +26,6 @@ namespace ionlang {
 
         bool hasEntryBasicBlock();
 
-        void insertBasicBlock(ionshared::Ptr<BasicBlock> basicBlock);
+        void insertBasicBlock(const ionshared::Ptr<BasicBlock> &basicBlock);
     };
 }
