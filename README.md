@@ -4,4 +4,6 @@
 
 #### ionlang
 
-The Ion language.
+Ion is a general purpose programming language, currently undergoing active development.
+
+[Join our Discord server](https://discord.gg/H3eMUXp)
