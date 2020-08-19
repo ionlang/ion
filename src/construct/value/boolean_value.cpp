@@ -2,7 +2,7 @@
 
 namespace ionlang {
     BooleanValue::BooleanValue(bool value)
-        : Value(ValueKind::Boolean, TypeFactory::typeBoolean()), value(value) {
+        : Value(ValueKind::Boolean, std::make_shared<BooleanType>()), value(value) {
         //
     }
 

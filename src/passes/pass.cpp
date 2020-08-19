@@ -111,6 +111,10 @@ namespace ionlang {
         //
     }
 
+    void Pass::visitBooleanType(ionshared::Ptr<BooleanType> node) {
+        //
+    }
+
     void Pass::visitRef(PtrRef<> node) {
         //
     }

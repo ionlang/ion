@@ -16,6 +16,7 @@
 #include <ionlang/construct/value/string_value.h>
 #include <ionlang/construct/type.h>
 #include <ionlang/construct/type/void_type.h>
+#include <ionlang/construct/type/boolean_type.h>
 #include <ionlang/construct/function.h>
 #include <ionlang/construct/variable_declaration.h>
 #include <ionlang/construct/global.h>
@@ -50,6 +51,8 @@ namespace ionlang {
         virtual void visitType(ionshared::Ptr<Type> node);
 
         virtual void visitVoidType(ionshared::Ptr<VoidType> node);
+
+        virtual void visitBooleanType(ionshared::Ptr<BooleanType> node);
 
         virtual void visitRef(PtrRef<> node);
 

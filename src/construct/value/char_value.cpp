@@ -2,7 +2,7 @@
 
 namespace ionlang {
     CharValue::CharValue(char value)
-        : Value(ValueKind::Character, TypeFactory::typeChar()), value(value) {
+        : Value(ValueKind::Character, std::make_shared<IntegerType>(IntegerKind::Int8, false)), value(value) {
         //
     }
 
