@@ -31,7 +31,9 @@ namespace ionlang {
 
         Value,
 
-        Statement
+        Statement,
+
+        ErrorMarker
     };
 
     class Construct;
@@ -81,6 +83,8 @@ namespace ionlang {
         }
 
         explicit Construct(ConstructKind kind);
+
+        void accept(ionshared::BasePass<Construct> visitor) override;
 
         virtual void accept(Pass &visitor) = 0;
 

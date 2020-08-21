@@ -14,7 +14,7 @@ namespace ionlang::test::bootstrap {
 
     TokenStream tokenStream(int amountOfItems = 1);
 
-    Parser parser(std::vector<Token> tokens);
+    Parser parser(const std::vector<Token> &tokens);
 
     ionshared::Ptr<ionir::Module> ionIrModule(std::string identifier = "test");
 

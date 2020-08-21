@@ -7,7 +7,7 @@ namespace ionlang {
 
     class BooleanType : public Type {
     public:
-        explicit BooleanType(bool isPointer = false);
+        explicit BooleanType();
 
         void accept(Pass &pass) override;
     };

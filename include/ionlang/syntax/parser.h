@@ -2,7 +2,8 @@
 
 #include <optional>
 #include <string>
-#include <ionshared/reporting/notice_factory.h>
+#include <ionshared/error_handling/notice_factory.h>
+#include <ionlang/error_handling/notice_sentinel.h>
 #include <ionshared/syntax/parser_helpers.h>
 #include <ionir/misc/helpers.h>
 #include <ionir/const/const_name.h>
@@ -17,7 +18,9 @@ namespace ionlang {
     private:
         TokenStream stream;
 
-        ionshared::StackTrace stackTrace;
+        ionshared::Ptr<ionshared::NoticeStack> noticeStack;
+
+        ionshared::Ptr<NoticeSentinel> noticeSentinel;
 
         std::string filePath;
 
@@ -39,9 +42,16 @@ namespace ionlang {
 
     public:
         // TODO: Default value is hard-coded.
-        explicit Parser(TokenStream stream, ionshared::StackTrace stackTrace = {}, std::string filePath = "anonymous"/*ConstName::anonymous*/);
+        explicit Parser(
+            TokenStream stream,
 
-        ionshared::StackTrace getStackTrace() const;
+            const ionshared::Ptr<ionshared::NoticeStack> &noticeStack =
+                std::make_shared<ionshared::Stack<ionshared::Notice>>(),
+
+            std::string filePath = "anonymous"/*ConstName::anonymous*/
+        );
+
+        ionshared::Ptr<NoticeSentinel> getNoticeSentinel() const;
 
         std::string getFilePath() const;
 

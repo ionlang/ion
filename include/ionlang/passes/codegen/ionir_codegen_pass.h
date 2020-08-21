@@ -6,7 +6,7 @@
 namespace ionlang {
     class IonIrCodegenPass : public Pass {
     private:
-        ionshared::Stack<ionshared::Ptr<ionir::Value<>>> constructStack;
+        ionshared::Stack<ionshared::Ptr<ionir::Construct>> constructStack;
 
         ionshared::Stack<ionshared::Ptr<ionir::Type>> typeStack;
 
@@ -22,7 +22,7 @@ namespace ionlang {
 
         ~IonIrCodegenPass();
 
-        ionshared::Stack<ionshared::Ptr<ionir::Value<>>> getValueStack() const noexcept;
+        ionshared::Stack<ionshared::Ptr<ionir::Construct>> getConstructStack() const noexcept;
 
         ionshared::Stack<ionshared::Ptr<ionir::Type>> getTypeStack() const noexcept;
 

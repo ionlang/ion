@@ -1,9 +1,9 @@
 #include <ionlang/passes/pass.h>
-#include <ionlang/construct/type/integer_type.h>
+#include <ionlang/misc/util.h>
 
 namespace ionlang {
-    IntegerType::IntegerType(IntegerKind kind, bool isSigned, bool isPointer)
-        : Type(Util::resolveIntegerKindName(kind), TypeKind::Integer, isPointer), kind(kind), isSigned(isSigned) {
+    IntegerType::IntegerType(IntegerKind kind, bool isSigned)
+        : Type(Util::resolveIntegerKindName(kind), TypeKind::Integer), kind(kind), isSigned(isSigned) {
         //
     }
 

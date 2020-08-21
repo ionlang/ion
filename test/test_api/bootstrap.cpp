@@ -1,4 +1,5 @@
 #include <ionlang/const/const.h>
+#include <ionlang/misc/type_factory.h>
 #include "const.h"
 #include "bootstrap.h"
 
@@ -19,7 +20,7 @@ namespace ionlang::test::bootstrap {
         return TokenStream(tokens);
     }
 
-    Parser parser(std::vector<Token> tokens) {
+    Parser parser(const std::vector<Token> &tokens) {
         return ionlang::Parser(ionlang::TokenStream(std::move(tokens)));
     }
 

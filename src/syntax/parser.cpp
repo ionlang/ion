@@ -42,18 +42,18 @@ namespace ionlang {
     }
 
     std::nullopt_t Parser::makeNotice(std::string message, ionshared::NoticeType type) {
-        this->stackTrace.push_back(this->createNoticeFactory().make(type, std::move(message)));
+        this->noticeStack->push(this->createNoticeFactory().make(type, std::move(message)));
 
         return std::nullopt;
     }
 
-    Parser::Parser(TokenStream stream, ionshared::StackTrace stackTrace, std::string filePath)
-        : stream(std::move(stream)), stackTrace(std::move(stackTrace)), filePath(std::move(filePath)) {
+    Parser::Parser(TokenStream stream, const ionshared::Ptr<ionshared::NoticeStack> &noticeStack, std::string filePath)
+        : stream(std::move(stream)), noticeStack(noticeStack), noticeSentinel(std::make_shared<NoticeSentinel>(noticeStack)), filePath(std::move(filePath)) {
         //
     }
 
-    ionshared::StackTrace Parser::getStackTrace() const {
-        return this->stackTrace;
+    ionshared::Ptr<NoticeSentinel> Parser::getNoticeSentinel() const {
+        return this->noticeSentinel;
     }
 
     std::string Parser::getFilePath() const {

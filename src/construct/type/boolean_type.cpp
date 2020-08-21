@@ -3,8 +3,8 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    BooleanType::BooleanType(bool isPointer)
-        : Type(ConstName::typeBool, TypeKind::Boolean, isPointer) {
+    BooleanType::BooleanType()
+        : Type(ConstName::typeBool, TypeKind::Boolean) {
         //
     }
 

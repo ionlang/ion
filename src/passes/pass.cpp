@@ -142,4 +142,8 @@ namespace ionlang {
     void Pass::visitGlobal(ionshared::Ptr <Global> node) {
         //
     }
+
+    void Pass::visitErrorMarker(ionshared::Ptr<ErrorMarker> node) {
+        //
+    }
 }

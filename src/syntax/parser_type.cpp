@@ -1,5 +1,7 @@
 #include <ionlang/syntax/parser.h>
 #include <ionlang/const/const.h>
+#include <ionlang/lexical/classifier.h>
+#include <ionlang/misc/util.h>
 
 namespace ionlang {
     // TODO: Consider using Ref<> to register pending type reference if user-defined type is parsed?
@@ -34,12 +36,13 @@ namespace ionlang {
          * user-defined type assumption.
          */
         if (!ionshared::Util::hasValue(type)) {
-            type = std::make_shared<Type>(tokenValue, ionshared::Util::resolveTypeKind(tokenValue));
+            type = std::make_shared<Type>(tokenValue, Util::resolveTypeKind(tokenValue));
             this->stream.skip();
         }
 
         // If applicable, mark the type as a pointer.
         if (this->is(TokenKind::SymbolStar)) {
+            // TODO: Use pointer type. (8/20/2020 new PointerType additions on IONIR, not here, but copy).
             // TODO: CRITICAL: Pointer must be an expression, since what about **?
             /**
              * Only mark the type as a pointer if marked so
@@ -48,7 +51,7 @@ namespace ionlang {
              * in this case would prevent it from being a pointer
              * unless a star symbol is present.
              */
-            type->get()->setIsPointer(true);
+//            type->get()->setIsPointer(true);
 
             // Skip from the star token.
             this->stream.skip();

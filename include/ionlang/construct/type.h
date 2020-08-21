@@ -20,17 +20,11 @@ namespace ionlang {
     private:
         TypeKind kind;
 
-        bool isPointer;
-
     public:
-        explicit Type(std::string id, TypeKind kind = TypeKind::UserDefined, bool isPointer = false);
+        explicit Type(std::string id, TypeKind kind = TypeKind::UserDefined);
 
         void accept(Pass &visitor) override;
 
         TypeKind getTypeKind() const noexcept;
-
-        bool getIsPointer() const noexcept;
-
-        void setIsPointer(bool isPointer) noexcept;
     };
 }

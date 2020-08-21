@@ -1,8 +1,8 @@
-#include <ionir/passes/pass.h>
+#include <ionlang/passes/pass.h>
 
 namespace ionlang {
     Global::Global(ionshared::Ptr<Type> type, std::string id, ionshared::OptPtr<Value<>> value)
-        : Construct(ConstructKind::Global), type(type), Named(id), value(value) {
+        : Construct(ConstructKind::Global), type(std::move(type)), Named(std::move(id)), value(std::move(value)) {
         //
     }
 
@@ -29,7 +29,7 @@ namespace ionlang {
     }
 
     void Global::setType(ionshared::Ptr<Type> type) noexcept {
-        this->type = type;
+        this->type = std::move(type);
     }
 
     ionshared::OptPtr<Value<>> Global::getValue() const noexcept {
@@ -37,6 +37,6 @@ namespace ionlang {
     }
 
     void Global::setValue(ionshared::OptPtr<Value<>> value) noexcept {
-        this->value = value;
+        this->value = std::move(value);
     }
 }

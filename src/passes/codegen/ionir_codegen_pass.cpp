@@ -8,15 +8,13 @@
 #include <ionlang/const/notice.h>
 
 namespace ionlang {
-    IonIrCodegenPass::IonIrCodegenPass() {
-        //
-    }
+    IonIrCodegenPass::IonIrCodegenPass() = default;
 
     IonIrCodegenPass::~IonIrCodegenPass() {
         // TODO
     }
 
-    ionshared::Stack<ionshared::Ptr<ionir::Value<>>> IonIrCodegenPass::getValueStack() const noexcept {
+    ionshared::Stack<ionshared::Ptr<ionir::Construct>> IonIrCodegenPass::getConstructStack() const noexcept {
         return this->constructStack;
     }
 
@@ -73,6 +71,7 @@ namespace ionlang {
         // A function with a matching identifier already exists.
         if (ionshared::Util::hasValue(ionIrFunction)) {
             ionshared::Ptr<ionir::Prototype> ionIrPrototype = ionIrFunction->get()->getPrototype();
+            size_t  existingFunctionArgumentCount = ionIrPrototype->getArgs()->getItems().getSize();
 
             // Function already has a body, disallow re-definition.
             if (!ionIrFunction->get()->getBody()->getSymbolTable()->isEmpty()) {
@@ -83,7 +82,7 @@ namespace ionlang {
                 );
             }
             // If the function takes a different number of arguments, reject.
-            else if (ionIrFunction->arg_size() != argumentCount) {
+            else if (existingFunctionArgumentCount != argumentCount) {
                 throw ionshared::Util::quickError(
                     IONLANG_NOTICE_FUNCTION_REDEFINITION_DIFFERENT_SIG,
                     ionIrPrototype->getId()
@@ -93,8 +92,8 @@ namespace ionlang {
         // Otherwise, function will be created.
         else {
             for (uint32_t i = 0; i < argumentCount; ++i) {
-                // TODO: Wrong type.
-                arguments.push_back(llvm::Type::getDoubleTy(**this->contextBuffer));
+                // TODO: Process arguments.
+//                arguments.push_back(llvm::Type::getDoubleTy(**this->contextBuffer));
             }
 
             // Visit and pop the return type.
@@ -119,14 +118,10 @@ namespace ionlang {
             this->moduleBuffer->get()->insertFunction(*ionIrFunction);
         }
 
-        // Begin processing arguments. Argument count must be the same.
-        if (argumentCount != ionIrFunction->arg_size()) {
-            throw std::runtime_error("Expected argument count to be the same as the function's argument count");
-        }
+        uint32_t i = 0;
+        auto args = ionIrFunction->get()->getPrototype()->getArgs()->getItems().unwrap();
 
-        int i = 0;
-
-        for (const auto &arg : ionIrFunction->args()) {
+        for (const auto &arg : args) {
             // TODO: getItems() no longer a vector; cannot index by index, only key.
             // Retrieve the name element from the argument tuple.
             //            std::string name = node->getArgs()->getItems()[i].second;
@@ -143,12 +138,13 @@ namespace ionlang {
 
     void IonIrCodegenPass::visitType(ionshared::Ptr<Type> node) {
         // Convert type to a pointer if applicable.
-        if (node->getIsPointer()) {
-            /**
-             * TODO: Convert type to pointer before passing on
-             * to explicit handlers, thus saving time and code.
-             */
-        }
+        // TODO: Now it's PointerType (soon to be implemented or already).
+//        if (node->getIsPointer()) {
+//            /**
+//             * TODO: Convert type to pointer before passing on
+//             * to explicit handlers, thus saving time and code.
+//             */
+//        }
 
         switch (node->getTypeKind()) {
             case TypeKind::Void: {

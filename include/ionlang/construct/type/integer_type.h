@@ -24,7 +24,7 @@ namespace ionlang {
         bool isSigned;
 
     public:
-        explicit IntegerType(IntegerKind kind, bool isSigned = true, bool isPointer = false);
+        explicit IntegerType(IntegerKind kind, bool isSigned = true);
 
         void accept(Pass &pass) override;
 

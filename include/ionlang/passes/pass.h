@@ -3,6 +3,7 @@
 #include <ionshared/misc/helpers.h>
 #include <ionshared/passes/base_pass.h>
 #include <ionlang/construct/pseudo/ref.h>
+#include <ionlang/construct/pseudo/error_marker.h>
 #include <ionlang/construct/construct.h>
 #include <ionlang/construct/module.h>
 #include <ionlang/construct/prototype.h>
@@ -67,5 +68,7 @@ namespace ionlang {
         virtual void visitIntegerType(ionshared::Ptr<IntegerType> node);
 
         virtual void visitGlobal(ionshared::Ptr<Global> node);
+
+        virtual void visitErrorMarker(ionshared::Ptr<ErrorMarker> node);
     };
 }
