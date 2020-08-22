@@ -1,7 +1,8 @@
 #include <ionlang/construct/module.h>
 
 namespace ionlang {
-    Module::Module(std::string id) : Construct(ConstructKind::Module), ionshared::Named(id) {
+    Module::Module(std::string id, ionshared::PtrSymbolTable<Construct> symbolTable)
+        : Construct(ConstructKind::Module), ionshared::ScopeAnchor<Construct>(std::move(symbolTable)), ionshared::Named(std::move(id)) {
         //
     }
 

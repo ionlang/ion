@@ -16,7 +16,7 @@ namespace ionlang::test::bootstrap {
 
     Parser parser(const std::vector<Token> &tokens);
 
-    ionshared::Ptr<ionir::Module> ionIrModule(std::string identifier = "test");
+    ionshared::Ptr<ionir::Module> ionIrModule(const std::string &identifier = "test");
 
     ionshared::Ptr<IonIrCodegenPass> ionIrCodegenPass();
 

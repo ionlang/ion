@@ -1,14 +1,30 @@
 #include <ionshared/misc/util.h>
-#include <ionir/construct/function.h>
 #include <ionir/construct/value/integer_value.h>
 #include <ionir/construct/value/char_value.h>
 #include <ionir/construct/value/string_value.h>
 #include <ionir/construct/value/boolean_value.h>
+#include <ionir/construct/function.h>
+#include <ionir/construct/global.h>
 #include <ionlang/passes/codegen/ionir_codegen_pass.h>
 #include <ionlang/const/notice.h>
 
 namespace ionlang {
-    IonIrCodegenPass::IonIrCodegenPass() = default;
+    void IonIrCodegenPass::requireModule() {
+        if (!ionshared::Util::hasValue(this->moduleBuffer)) {
+            throw std::runtime_error("Expected the module buffer to be set, but was null");
+        }
+    }
+
+    void IonIrCodegenPass::requireFunction() {
+        if (!ionshared::Util::hasValue(this->functionBuffer)) {
+            throw std::runtime_error("Expected the function buffer to be set, but was null");
+        }
+    }
+
+    IonIrCodegenPass::IonIrCodegenPass(ionshared::PtrSymbolTable<ionir::Module> modules)
+        : modules(std::move(modules)), constructStack(), typeStack(), moduleBuffer(std::nullopt), functionBuffer(std::nullopt) {
+        //
+    }
 
     IonIrCodegenPass::~IonIrCodegenPass() {
         // TODO
@@ -30,6 +46,16 @@ namespace ionlang {
         return this->moduleBuffer;
     }
 
+    bool IonIrCodegenPass::setModuleBuffer(const std::string &id) {
+        if (this->modules->contains(id)) {
+            this->moduleBuffer = this->modules->lookup(id);
+
+            return true;
+        }
+
+        return false;
+    }
+
     void IonIrCodegenPass::visit(ionshared::Ptr<Construct> node) {
         /**
          * Only instruct the node to visit this instance and
@@ -37,6 +63,63 @@ namespace ionlang {
          * the other member methods.
          */
         node->accept(*this);
+    }
+
+    void IonIrCodegenPass::visitModule(ionshared::Ptr<Module> node) {
+        this->moduleBuffer = std::make_shared<ionir::Module>(node->getId());
+
+        // Set the module on the modules symbol table.
+        this->modules->insert(node->getId(), *this->moduleBuffer);
+
+        // Proceed to visit all the module's children (top-level constructs).
+        std::map<std::string, ionshared::Ptr<Construct>> moduleSymbolTable =
+            node->getSymbolTable()->unwrap();
+
+        for (const auto &[id, topLevelConstruct] : moduleSymbolTable) {
+            this->visit(topLevelConstruct);
+        }
+    }
+
+    void IonIrCodegenPass::visitFunction(ionshared::Ptr<Function> node) {
+        this->requireModule();
+
+        // TODO: Awaiting verification implementation.
+//        if (!node->verify()) {
+//            throw ionshared::Util::quickError(
+//                IONLANG_NOTICE_MISC_VERIFICATION_FAILED,
+//                "Function" // TODO: Hard-coded, should be using Util::getConstructName().
+//            );
+//        }
+
+        std::string ionIrFunctionId = node->getPrototype()->getId();
+
+        if ((*this->moduleBuffer)->getSymbolTable()->contains(ionIrFunctionId)) {
+            throw ionshared::Util::quickError(
+                IONLANG_NOTICE_FUNCTION_ALREADY_DEFINED,
+                ionIrFunctionId
+            );
+        }
+
+        // Visit the prototype.
+        this->visitPrototype(node->getPrototype());
+
+        // Retrieve the resulting function off the stack.
+        ionshared::Ptr<ionir::Function> ionIrFunction =
+            this->constructStack.pop()->dynamicCast<ionir::Function>();
+
+        // Set the function buffer.
+        this->functionBuffer = ionIrFunction;
+
+        // Register the newly created function on the buffer module's symbol table.
+        (*this->moduleBuffer)->insertFunction(ionIrFunction);
+
+        // Visit the function's body.
+        this->visitFunctionBody(node->getBody());
+
+        // TODO: Verify the resulting LLVM function (through LLVM).
+
+        // Push the function back onto the stack.
+        this->constructStack.push(ionIrFunction);
     }
 
     void IonIrCodegenPass::visitExtern(ionshared::Ptr<Extern> node) {
@@ -58,6 +141,8 @@ namespace ionlang {
     }
 
     void IonIrCodegenPass::visitPrototype(ionshared::Ptr<Prototype> node) {
+        this->requireModule();
+
         // Retrieve argument count from the argument vector.
         uint32_t argumentCount = node->getArgs()->getItems().getSize();
 
@@ -106,10 +191,8 @@ namespace ionlang {
             ionshared::Ptr<ionir::Prototype> ionIrPrototype =
                 std::make_shared<ionir::Prototype>(node->getId(), nullptr, ionIrReturnType, nullptr);
 
-            // TODO: Hard coded until figured.
-            auto ionIrFunctionBody = 0;
-
-            ionIrFunction = std::make_shared<ionir::Function>(ionIrPrototype, ionIrFunctionBody);
+            // Function body will be nullptr until set once it's visited.
+            ionIrFunction = std::make_shared<ionir::Function>(ionIrPrototype, nullptr);
 
             /**
              * Insert the previously created function and register it
@@ -134,43 +217,6 @@ namespace ionlang {
         }
 
         this->constructStack.push(*ionIrFunction);
-    }
-
-    void IonIrCodegenPass::visitType(ionshared::Ptr<Type> node) {
-        // Convert type to a pointer if applicable.
-        // TODO: Now it's PointerType (soon to be implemented or already).
-//        if (node->getIsPointer()) {
-//            /**
-//             * TODO: Convert type to pointer before passing on
-//             * to explicit handlers, thus saving time and code.
-//             */
-//        }
-
-        switch (node->getTypeKind()) {
-            case TypeKind::Void: {
-                return this->visitVoidType(node->staticCast<VoidType>());
-            }
-
-            case TypeKind::Integer: {
-                return this->visitIntegerType(node->staticCast<IntegerType>());
-            }
-
-            case TypeKind::String: {
-                // TODO
-
-                throw std::runtime_error("Not implemented");
-            }
-
-            case TypeKind::UserDefined: {
-                // TODO
-
-                throw std::runtime_error("Not implemented");
-            }
-
-            default: {
-                throw std::runtime_error("Could not identify type kind");
-            }
-        }
     }
 
     void IonIrCodegenPass::visitIntegerValue(ionshared::Ptr<IntegerValue> node) {
@@ -209,5 +255,129 @@ namespace ionlang {
             std::make_shared<ionir::BooleanValue>(node->getValue());
 
         this->constructStack.push(ionIrBooleanValue->dynamicCast<ionir::Value<>>());
+    }
+
+    void IonIrCodegenPass::visitGlobal(ionshared::Ptr<Global> node) {
+        // Module buffer will be used, therefore it must be set.
+        this->requireModule();
+
+        this->visitType(node->getType());
+
+        ionshared::Ptr<ionir::Type> type = this->typeStack.pop();
+        ionshared::OptPtr<Value<>> nodeValue = node->getValue();
+        ionshared::OptPtr<ionir::Value<>> value = std::nullopt;
+
+        // Assign value if applicable.
+        if (ionshared::Util::hasValue(nodeValue)) {
+            // Visit global variable value.
+            this->visitValue(*nodeValue);
+
+            value = this->constructStack.pop()->dynamicCast<ionir::Value<>>();
+        }
+
+        ionshared::Ptr<ionir::Global> globalVar =
+            std::make_shared<ionir::Global>(type, node->getId(), value);
+
+        this->constructStack.push(globalVar);
+    }
+
+    void IonIrCodegenPass::visitType(ionshared::Ptr<Type> node) {
+        // Convert type to a pointer if applicable.
+        // TODO: Now it's PointerType (soon to be implemented or already).
+        //        if (node->getIsPointer()) {
+        //            /**
+        //             * TODO: Convert type to pointer before passing on
+        //             * to explicit handlers, thus saving time and code.
+        //             */
+        //        }
+
+        switch (node->getTypeKind()) {
+            case TypeKind::Void: {
+                return this->visitVoidType(node->staticCast<VoidType>());
+            }
+
+            case TypeKind::Integer: {
+                return this->visitIntegerType(node->staticCast<IntegerType>());
+            }
+
+            case TypeKind::String: {
+                // TODO
+
+                throw std::runtime_error("Not implemented");
+            }
+
+            case TypeKind::UserDefined: {
+                // TODO
+
+                throw std::runtime_error("Not implemented");
+            }
+
+            default: {
+                throw std::runtime_error("Could not identify type kind");
+            }
+        }
+    }
+
+    void IonIrCodegenPass::visitIntegerType(ionshared::Ptr<IntegerType> node) {
+        ionir::IntegerKind ionIrIntegerKind;
+
+        /**
+         * Create the corresponding IonIR integer type based off the
+         * node's integer kind.
+         */
+        switch (node->getIntegerKind()) {
+            case IntegerKind::Int8: {
+                ionIrIntegerKind = ionir::IntegerKind::Int8;
+
+                break;
+            }
+
+            case IntegerKind::Int16: {
+                ionIrIntegerKind = ionir::IntegerKind::Int16;
+
+                break;
+            }
+
+            case IntegerKind::Int32: {
+                ionIrIntegerKind = ionir::IntegerKind::Int32;
+
+                break;
+            }
+
+            case IntegerKind::Int64: {
+                ionIrIntegerKind = ionir::IntegerKind::Int64;
+
+                break;
+            }
+
+            case IntegerKind::Int128: {
+                ionIrIntegerKind = ionir::IntegerKind::Int128;
+
+                break;
+            }
+
+            default: {
+                throw std::runtime_error("An unrecognized integer kind was provided");
+            }
+        }
+
+        ionshared::Ptr<ionir::IntegerType> ionIrType =
+            std::make_shared<ionir::IntegerType>(ionIrIntegerKind);
+
+        this->typeStack.push(ionIrType);
+    }
+
+    void IonIrCodegenPass::visitBooleanType(ionshared::Ptr<BooleanType> node) {
+        ionshared::Ptr<ionir::BooleanType> ionIrBooleanType =
+            std::make_shared<ionir::BooleanType>();
+
+        this->typeStack.push(ionIrBooleanType);
+    }
+
+    void IonIrCodegenPass::visitVoidType(ionshared::Ptr<VoidType> node) {
+        ionshared::Ptr<ionir::VoidType> ionIrVoidType =
+            std::make_shared<ionir::VoidType>();
+
+        this->typeStack.push(ionIrVoidType);
     }
 }
