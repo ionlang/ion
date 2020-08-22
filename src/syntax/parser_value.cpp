@@ -1,6 +1,7 @@
 #include <ionshared/misc/util.h>
 #include <ionlang/const/const.h>
 #include <ionlang/const/const_name.h>
+#include <ionlang/const/notice.h>
 #include <ionlang/syntax/parser.h>
 #include <ionlang/misc/util.h>
 
@@ -10,17 +11,30 @@ namespace ionlang {
 
         switch (token.getKind()) {
             case TokenKind::LiteralInteger: {
-                return Util::convertAstPtrResult<IntegerValue, Value<>>(this->parseInt());
+                ionshared::OptPtr<IntegerValue> integerValue = this->parseInt();
+
+                if (ionshared::Util::hasValue(integerValue)) {
+                    return (*integerValue)->dynamicCast<Value<>>();
+                }
+
+                return std::nullopt;
             }
 
             case TokenKind::LiteralCharacter: {
-                return Util::convertAstPtrResult<CharValue, Value<>>(this->parseChar());
+                ionshared::OptPtr<CharValue> charValue = this->parseChar();
+
+                if (ionshared::Util::hasValue(charValue)) {
+                    return (*charValue)->dynamicCast<Value<>>();
+                }
+
+                return std::nullopt;
             }
 
                 // TODO: Missing values.
 
             default: {
-                return this->noticeSentinel->makeError<Value<>>(IONIR_NOTICE_MISC_UNEXPECTED_TOKEN);
+                // TODO: Return std::nullopt instead.
+                throw ionshared::Util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_TOKEN);
             }
         }
     }

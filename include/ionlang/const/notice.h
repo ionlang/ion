@@ -20,3 +20,4 @@
 #define IONLANG_NOTICE_FUNCTION_INVALID_RETURN_TYPE "Expected function '%' to return value of type '%' but got '%s'"
 #define IONLANG_NOTICE_FUNCTION_INVALID_CALL_ARGUMENTS "Invalid argument(s) were provided when calling '%s'"
 #define IONLANG_NOTICE_FUNCTION_MISSING_RETURN "Missing return value for function '%s' returning type '%s'"
+#define IONLANG_NOTICE_FUNCTION_CALL_LEADING_COMMA "Leading comma in argument list is disallowed"

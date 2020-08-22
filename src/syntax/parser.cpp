@@ -79,4 +79,112 @@ namespace ionlang {
             }
         }
     }
+
+    ionshared::OptPtr<Global> Parser::parseGlobal() {
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordGlobal))
+
+        ionshared::OptPtr<Type> type = this->parseType();
+
+        IONIR_PARSER_ASSURE(type)
+
+        std::optional<std::string> id = this->parseId();
+
+        IONIR_PARSER_ASSURE(id)
+
+        // TODO: Handle in-line initialization & pass std::optional<Value> into Global constructor.
+
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
+
+        return std::make_shared<Global>(*type, *id);
+    }
+
+    ionshared::OptPtr<BasicBlock> Parser::parseBasicBlock(ionshared::Ptr<FunctionBody> parent) {
+        // TODO: NO AT (@)!!!! CRITICAL!
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolAt))
+
+        std::optional<std::string> id = this->parseId();
+
+        IONIR_PARSER_ASSURE(id)
+
+        // TODO: NO COLONS!!! CRITICAL!
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolColon))
+
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
+
+        ionshared::Ptr<BasicBlock> basicBlock = std::make_shared<BasicBlock>(BasicBlockOpts{
+            std::move(parent),
+            *id
+        });
+
+        std::vector<ionshared::Ptr<RegisterAssign>> registers = {};
+        std::vector<ionshared::Ptr<Inst>> statements = {};
+        ionshared::PtrSymbolTable<Inst> symbolTable = basicBlock->getSymbolTable();
+
+        while (!this->is(TokenKind::SymbolBraceR) && !this->is(TokenKind::SymbolAt)) {
+            AstPtrResult<Inst> inst;
+
+            // TODO: This means that allocas without register assigns are possible (lonely, redundant allocas).
+            // Register assignment. This includes an instruction.
+            if (this->is(TokenKind::OperatorModulo)) {
+                AstPtrResult<RegisterAssign> registerAssignResult = this->parseRegisterAssign(basicBlock);
+
+                IONIR_PARSER_ASSERT_RESULT(registerAssignResult, BasicBlock)
+
+                ionshared::Ptr<RegisterAssign> registerAssign = Util::getResultValue(registerAssignResult);
+
+                inst = registerAssign->getValue()->dynamicCast<Inst>();
+
+                /**
+                 * Register the instruction on the resulting block's symbol
+                 * table.
+                 */
+                symbolTable->insert(registerAssign->getId(), Util::getResultValue(inst));
+
+                /**
+                 * Add the register to the block's registers to be processed
+                 * later for code-gen.
+                 */
+                registers.push_back(registerAssign);
+            }
+                // Otherwise, it must be just an instruction.
+            else {
+                inst = this->parseInst(basicBlock);
+            }
+
+            IONIR_PARSER_ASSURE(inst)
+            statements.push_back(Util::getResultValue(inst));
+        }
+
+        this->stream.skip();
+        basicBlock->setRegisters(registers);
+        basicBlock->setInsts(statements);
+
+        return basicBlock;
+    }
+
+    ionshared::OptPtr<FunctionBody> Parser::parseFunctionBody(ionshared::Ptr<Function> parent) {
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
+
+        ionshared::Ptr<FunctionBody> functionBody = std::make_shared<FunctionBody>(parent);
+
+        ionshared::PtrSymbolTable<BasicBlock> basicBlocks =
+            std::make_shared<ionshared::SymbolTable<ionshared::Ptr<BasicBlock>>>();
+
+        while (!this->is(TokenKind::SymbolBraceR)) {
+            ionshared::OptPtr<BasicBlock> basicBlockResult = this->parseBasicBlock(functionBody);
+
+            IONIR_PARSER_ASSURE(basicBlockResult)
+
+            ionshared::Ptr<BasicBlock> basicBlock = *basicBlockResult;
+
+            basicBlocks->insert(basicBlock->getId(), basicBlock);
+        }
+
+        functionBody->setSymbolTable(basicBlocks);
+
+        // Skip over right brace token.
+        this->stream.skip();
+
+        return functionBody;
+    }
 }
