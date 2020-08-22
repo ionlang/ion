@@ -5,6 +5,26 @@
 #include <ionlang/misc/util.h>
 
 namespace ionlang {
+    ionshared::OptPtr<Value<>> Parser::parseValue() {
+        Token token = this->stream.get();
+
+        switch (token.getKind()) {
+            case TokenKind::LiteralInteger: {
+                return Util::convertAstPtrResult<IntegerValue, Value<>>(this->parseInt());
+            }
+
+            case TokenKind::LiteralCharacter: {
+                return Util::convertAstPtrResult<CharValue, Value<>>(this->parseChar());
+            }
+
+                // TODO: Missing values.
+
+            default: {
+                return this->noticeSentinel->makeError<Value<>>(IONIR_NOTICE_MISC_UNEXPECTED_TOKEN);
+            }
+        }
+    }
+
     ionshared::OptPtr<IntegerValue> Parser::parseInt() {
         IONIR_PARSER_EXPECT(TokenKind::LiteralInteger)
 

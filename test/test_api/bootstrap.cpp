@@ -29,14 +29,14 @@ namespace ionlang::test::bootstrap {
         return std::make_shared<ionir::Module>(identifier);
     }
 
-    ionshared::Ptr<IonIrCodegenPass> llvmCodegenPass() {
+    ionshared::Ptr<IonIrCodegenPass> ionIrCodegenPass() {
         ionshared::Ptr<ionir::Module> module = ionIrModule();
 
-        ionshared::PtrSymbolTable<ionir::Module> modules = std::make_shared<ionshared::SymbolTable<ionir::Module>>(
-            ionshared::SymbolTable<ionir::Module>({
-                {module->getId(), module->unwrap()}
-            })
-        );
+        ionshared::PtrSymbolTable<ionir::Module> modules =
+            std::make_shared<ionshared::SymbolTable<ionshared::Ptr<ionir::Module>>>();
+
+        // TODO: Inserting module, but can be done inline above -- it's just a headache.
+        modules->insert(module->getId(), module);
 
         ionshared::Ptr<IonIrCodegenPass> ionIrCodegenPass =
             std::make_shared<IonIrCodegenPass>(modules);

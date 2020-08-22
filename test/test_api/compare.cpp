@@ -1,7 +1,5 @@
-#include <ionir/llvm/llvm_module.h>
 #include <ionshared/misc/helpers.h>
 #include "compare.h"
-#include "util.h"
 #include "filesystem.h"
 
 namespace ionlang::test::compare {
@@ -31,6 +29,8 @@ namespace ionlang::test::compare {
             throw std::runtime_error("Module buffer in IonIrCodegenPass is not set");
         }
 
-        return compare::ir(LlvmModule(*ionIrModuleBuffer).getAsString(), fileName);
+        // TODO: IonIR cannot yet convert constructs to strings (code representation).
+        throw std::runtime_error("Not implemented");
+//        return compare::ir(LlvmModule(*ionIrModuleBuffer).getAsString(), fileName);
     }
 }

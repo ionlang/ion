@@ -78,11 +78,11 @@ namespace ionlang {
 
         ionshared::OptPtr<Args> parseArgs();
 
-        ionshared::OptPtr<Prototype> parsePrototype(ionshared::Ptr<Module> parent);
+        ionshared::OptPtr<Prototype> parsePrototype(const ionshared::Ptr<Module> &parent);
 
-        ionshared::OptPtr<Extern> parseExtern(ionshared::Ptr<Module> parent);
+        ionshared::OptPtr<Extern> parseExtern(const ionshared::Ptr<Module> &parent);
 
-        ionshared::OptPtr<Function> parseFunction(ionshared::Ptr<Module> parent);
+        ionshared::OptPtr<Function> parseFunction(const ionshared::Ptr<Module> &parent);
 
         ionshared::OptPtr<Global> parseGlobal();
 
