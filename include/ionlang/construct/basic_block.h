@@ -6,7 +6,7 @@
 #include <ionshared/tracking/symbol_table.h>
 #include <ionshared/tracking/scope_anchor.h>
 #include <ionlang/construct/pseudo/child_construct.h>
-#include "variable_declaration.h"
+#include "ionlang/construct/statement/variable_declaration.h"
 #include "statement.h"
 
 namespace ionlang {
@@ -16,60 +16,34 @@ namespace ionlang {
 
     class StatementBuilder;
 
-    enum class BasicBlockKind {
-        /**
-         * The entry basic block of a function body.
-         */
-        Entry,
-
-        /**
-         * A basic block which forms part of a construct. Cannot be
-         * directly accessed by the user.
-         */
-        Internal
-    };
-
     struct BasicBlockOpts : ChildConstructOpts<FunctionBody> {
-        BasicBlockKind kind;
-
         std::string id;
-
-        std::vector<ionshared::Ptr<VariableDeclaration>> variableDecls = {};
 
         std::vector<ionshared::Ptr<Statement>> statements = {};
 
         ionshared::PtrSymbolTable<Statement> symbolTable = ionshared::Util::makePtrSymbolTable<Statement>();
     };
 
-    // TODO: Must be verified to contain a single terminal instruction at the end.
-    class BasicBlock : public ChildConstruct<FunctionBody>, public ionshared::ScopeAnchor<Statement>, public ionshared::Named {
+    // TODO: Must be verified to contain a single terminal instruction at the end?
+    class Block : public ChildConstruct<FunctionBody>, public ionshared::ScopeAnchor<Statement>, public ionshared::Named {
     private:
-        BasicBlockKind kind;
-
-        std::vector<ionshared::Ptr<VariableDeclaration>> variableDecls;
-
         std::vector<ionshared::Ptr<Statement>> statements;
 
     public:
-        explicit BasicBlock(const BasicBlockOpts &opts);
+        explicit Block(const BasicBlockOpts &opts);
 
         void accept(Pass &visitor) override;
 
         Ast getChildNodes() override;
 
-        BasicBlockKind getKind() const noexcept;
-
-        std::vector<ionshared::Ptr<VariableDeclaration>> &getRegisters() noexcept;
-
-        void setVariableDecls(std::vector<ionshared::Ptr<VariableDeclaration>> variableDecls);
-
         std::vector<ionshared::Ptr<Statement>> &getStatements() noexcept;
 
+        // TODO: When statements are set, the symbol table must be cleared and re-populated.
         void setStatements(std::vector<ionshared::Ptr<Statement>> statements);
 
         void insertStatement(const ionshared::Ptr<Statement> &statement);
 
-        uint32_t relocateStatements(BasicBlock &target, uint32_t from = 0);
+        uint32_t relocateStatements(Block &target, uint32_t from = 0);
 
         /**
          * Attempt to find the index location of an instruction.

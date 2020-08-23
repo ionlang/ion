@@ -1,7 +1,7 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    Statement::Statement(ionshared::Ptr<BasicBlock> parent, StatementKind kind, ionshared::OptPtr<Statement> yields)
+    Statement::Statement(ionshared::Ptr<Block> parent, StatementKind kind, ionshared::OptPtr<Statement> yields)
         : ChildConstruct(parent, ConstructKind::Statement), kind(kind), yields(yields) {
         //
     }

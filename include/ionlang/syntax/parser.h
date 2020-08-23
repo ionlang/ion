@@ -90,13 +90,13 @@ namespace ionlang {
 
         ionshared::OptPtr<Construct> parsePrimaryExpr(ionshared::Ptr<Construct> parent);
 
-        ionshared::OptPtr<BasicBlock> parseBasicBlock(ionshared::Ptr<FunctionBody> parent);
+        ionshared::OptPtr<Block> parseBasicBlock(ionshared::Ptr<FunctionBody> parent);
 
         ionshared::OptPtr<FunctionBody> parseFunctionBody(ionshared::Ptr<Function> parent);
 
         ionshared::OptPtr<Module> parseModule();
 
-        ionshared::OptPtr<VariableDeclaration> parseVariableDecl(ionshared::Ptr<BasicBlock> parent);
+        ionshared::OptPtr<VariableDecl> parseVariableDecl(ionshared::Ptr<Block> parent);
 
         std::optional<std::string> parseLine();
 

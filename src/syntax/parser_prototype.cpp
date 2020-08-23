@@ -85,11 +85,10 @@ namespace ionlang {
 
         ionshared::Ptr<FunctionBody> body = *bodyResult;
 
-        ionshared::Ptr<Function> function =
-            std::make_shared<Function>(
-                *prototype,
-                body
-            );
+        ionshared::Ptr<Function> function = std::make_shared<Function>(
+            *prototype,
+            body
+        );
 
         body->setParent(function);
 

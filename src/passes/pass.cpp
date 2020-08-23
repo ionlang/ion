@@ -45,11 +45,47 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitBasicBlock(ionshared::Ptr<BasicBlock> node) {
+    void Pass::visitBlock(ionshared::Ptr<Block> node) {
         //
     }
 
     void Pass::visitStatement(ionshared::Ptr<Statement> node) {
+        switch (node->getStatementKind()) {
+            case StatementKind::If: {
+                this->visitIfStatement(node->dynamicCast<IfStatement>());
+
+                break;
+            }
+
+            case StatementKind::Return: {
+                this->visitReturnStatement(node->dynamicCast<ReturnStatement>());
+
+                break;
+            }
+
+            case StatementKind::VariableDeclaration: {
+                this->visitVariableDecl(node->dynamicCast<VariableDecl>());
+
+                break;
+            }
+
+            // TODO: Add for all statements. Critical!
+
+            default: {
+                throw std::runtime_error("Unknown statement kind");
+            }
+        }
+    }
+
+    void Pass::visitIfStatement(ionshared::Ptr<IfStatement> node) {
+        //
+    }
+
+    void Pass::visitReturnStatement(ionshared::Ptr<ReturnStatement> node) {
+        //
+    }
+
+    void Pass::visitCallStatement(ionshared::Ptr<CallStatement> node) {
         //
     }
 
@@ -123,7 +159,7 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitVariableDecl(ionshared::Ptr<VariableDeclaration> node) {
+    void Pass::visitVariableDecl(ionshared::Ptr<VariableDecl> node) {
         //
     }
 

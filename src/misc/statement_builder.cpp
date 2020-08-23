@@ -1,11 +1,11 @@
 #include <ionlang/misc/statement_builder.h>
 
 namespace ionlang {
-    StatementBuilder::StatementBuilder(ionshared::Ptr<BasicBlock> basicBlock) : basicBlock(basicBlock) {
+    StatementBuilder::StatementBuilder(ionshared::Ptr<Block> basicBlock) : basicBlock(basicBlock) {
         //
     }
 
-    ionshared::Ptr<BasicBlock> StatementBuilder::getSection() const {
+    ionshared::Ptr<Block> StatementBuilder::getSection() const {
         return this->basicBlock;
     }
 

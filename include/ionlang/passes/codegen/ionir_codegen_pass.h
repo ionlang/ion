@@ -19,9 +19,21 @@ namespace ionlang {
 
         ionshared::OptPtr<ionir::Function> functionBuffer;
 
+        ionshared::OptPtr<ionir::BasicBlock> basicBlockBuffer;
+
+        ionshared::OptPtr<ionir::InstBuilder> builderBuffer;
+
         void requireModule();
 
         void requireFunction();
+
+        void requireBuilder();
+
+        /**
+         * Set the currently active builder if any. Modifying the builder
+         * will also set/update the active IonIR basic block buffer.
+         */
+        void setBuilder(ionshared::Ptr<ionir::BasicBlock> basicBlock);
 
     public:
         explicit IonIrCodegenPass(
@@ -70,5 +82,13 @@ namespace ionlang {
         void visitBooleanType(ionshared::Ptr<BooleanType> node) override;
 
         void visitVoidType(ionshared::Ptr<VoidType> node) override;
+
+        void visitIfStatement(ionshared::Ptr<IfStatement> node) override;
+
+        void visitReturnStatement(ionshared::Ptr<ReturnStatement> node) override;
+
+        void visitVariableDecl(ionshared::Ptr<VariableDecl> node) override;
+
+        void visitCallStatement(ionshared::Ptr<CallStatement> node) override;
     };
 }

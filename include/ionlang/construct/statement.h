@@ -6,22 +6,32 @@
 namespace ionlang {
     class Pass;
 
-    class BasicBlock;
+    class Block;
 
-    typedef ChildConstructOpts<BasicBlock> InstOpts;
+    typedef ChildConstructOpts<Block> StatementOpts;
 
     enum class StatementKind {
-        Return
+        If,
+
+        Return,
+
+        VariableDeclaration,
+
+        Call
     };
 
-    class Statement : public ChildConstruct<BasicBlock> {
+    class Statement : public ChildConstruct<Block> {
     private:
         StatementKind kind;
 
         ionshared::OptPtr<Statement> yields;
 
     public:
-        Statement(ionshared::Ptr<BasicBlock> parent, StatementKind kind, ionshared::OptPtr<Statement> yields = std::nullopt);
+        Statement(
+            ionshared::Ptr<Block> parent,
+            StatementKind kind,
+            ionshared::OptPtr<Statement> yields = std::nullopt
+        );
 
         virtual void accept(Pass &visitor) = 0;
 

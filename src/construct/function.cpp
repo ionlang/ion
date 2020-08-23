@@ -1,7 +1,7 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    Function::Function(ionshared::Ptr<Prototype> prototype, ionshared::Ptr<FunctionBody> body)
+    Function::Function(ionshared::Ptr<Prototype> prototype, ionshared::Ptr<Block> body)
         : Construct(ConstructKind::Function), prototype(std::move(prototype)), body(std::move(body)) {
         //
     }
@@ -25,11 +25,11 @@ namespace ionlang {
         this->prototype = std::move(prototype);
     }
 
-    ionshared::Ptr<FunctionBody> Function::getBody() const noexcept {
+    ionshared::Ptr<Block> Function::getBody() const noexcept {
         return this->body;
     }
 
-    void Function::setBody(ionshared::Ptr<FunctionBody> body) noexcept {
+    void Function::setBody(ionshared::Ptr<Block> body) noexcept {
         this->body = std::move(body);
     }
 

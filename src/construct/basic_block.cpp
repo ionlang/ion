@@ -1,58 +1,50 @@
+#include <utility>
 #include <ionlang/passes/pass.h>
 #include <ionlang/misc/statement_builder.h>
 
 namespace ionlang {
-    BasicBlock::BasicBlock(const BasicBlockOpts &opts)
-        : ChildConstruct(opts.parent, ConstructKind::BasicBlock), ionshared::ScopeAnchor<Statement>(), kind(opts.kind), Named(opts.id), variableDecls(opts.variableDecls), statements(opts.statements) {
+    Block::Block(const BasicBlockOpts &opts)
+        : ChildConstruct(opts.parent, ConstructKind::BasicBlock), ionshared::ScopeAnchor<Statement>(), Named(opts.id), statements(opts.statements) {
         //
     }
 
-    void BasicBlock::accept(Pass &visitor) {
+    void Block::accept(Pass &visitor) {
         visitor.visitScopeAnchor(this->dynamicCast<ionshared::ScopeAnchor<Construct>>());
-        visitor.visitBasicBlock(this->dynamicCast<BasicBlock>());
+        visitor.visitBlock(this->dynamicCast<Block>());
     }
 
-    Ast BasicBlock::getChildNodes() {
-        return Construct::mergeChildren(
-            Construct::convertChildren(this->variableDecls),
-            Construct::convertChildren(this->statements)
-        );
+    Ast Block::getChildNodes() {
+        return Construct::convertChildren(this->statements);
     }
 
-    BasicBlockKind BasicBlock::getKind() const noexcept {
-        return this->kind;
-    }
-
-    std::vector<ionshared::Ptr<VariableDeclaration>> &BasicBlock::getRegisters() noexcept {
-        return this->variableDecls;
-    }
-
-    void BasicBlock::setVariableDecls(std::vector<ionshared::Ptr<VariableDeclaration>> variableDecls) {
-        this->variableDecls = variableDecls;
-    }
-
-    std::vector<ionshared::Ptr<Statement>> &BasicBlock::getStatements() noexcept {
+    std::vector<ionshared::Ptr<Statement>> &Block::getStatements() noexcept {
         return this->statements;
     }
 
-    // TODO: SymbolTable must be re-populated after changing statements vector.
-    void BasicBlock::setStatements(std::vector<ionshared::Ptr<Statement>> statements) {
+    void Block::setStatements(std::vector<ionshared::Ptr<Statement>> statements) {
         this->statements = std::move(statements);
     }
 
-    void BasicBlock::insertStatement(const ionshared::Ptr<Statement> &statement) {
+    void Block::insertStatement(const ionshared::Ptr<Statement> &statement) {
         this->statements.push_back(statement);
 
-        // TODO
-        std::optional<std::string> id = /*Util::getInstId(statement);*/std::nullopt;
+        bool isNamed = false;
 
-        // Instruction is named. Register it in the symbol table.
-        if (id.has_value()) {
-            this->getSymbolTable()->insert(*id, statement);
+        // Certain types of statements are named.
+        if (statement->getStatementKind() == StatementKind::VariableDeclaration) {
+            isNamed = true;
+        }
+
+        // Register the named statement in the symbol table, if applicable.
+        if (isNamed) {
+            ionshared::Ptr<ionshared::Named> namedStatement =
+                statement->dynamicCast<ionshared::Named>();
+
+            this->getSymbolTable()->insert(namedStatement->getId(), statement);
         }
     }
 
-    uint32_t BasicBlock::relocateStatements(BasicBlock &target, const uint32_t from) {
+    uint32_t Block::relocateStatements(Block &target, uint32_t from) {
         uint32_t count = 0;
 
         for (uint32_t i = from; i < this->statements.size(); i++) {
@@ -64,15 +56,18 @@ namespace ionlang {
         return count;
     }
 
-    std::optional<uint32_t> BasicBlock::locate(ionshared::Ptr<Statement> statement) const {
-        return ionshared::Util::locateInVector<ionshared::Ptr<Statement>>(this->statements, std::move(statement));
+    std::optional<uint32_t> Block::locate(ionshared::Ptr<Statement> construct) const {
+        return ionshared::Util::locateInVector<ionshared::Ptr<Statement>>(
+            this->statements,
+            std::move(construct)
+        );
     }
 
-    ionshared::Ptr<StatementBuilder> BasicBlock::createBuilder() {
-        return std::make_shared<StatementBuilder>(this->dynamicCast<BasicBlock>());
+    ionshared::Ptr<StatementBuilder> Block::createBuilder() {
+        return std::make_shared<StatementBuilder>(this->dynamicCast<Block>());
     }
 
-    ionshared::OptPtr<Statement> BasicBlock::findTerminalStatement() const {
+    ionshared::OptPtr<Statement> Block::findTerminalStatement() const {
         for (const auto &statement : this->statements) {
             if (statement->isTerminal()) {
                 return statement;

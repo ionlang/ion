@@ -5,6 +5,7 @@
 #include <ionir/construct/value/boolean_value.h>
 #include <ionir/construct/function.h>
 #include <ionir/construct/global.h>
+#include <ionir/misc/inst_builder.h>
 #include <ionlang/passes/codegen/ionir_codegen_pass.h>
 #include <ionlang/const/notice.h>
 
@@ -21,8 +22,21 @@ namespace ionlang {
         }
     }
 
+    void IonIrCodegenPass::requireBuilder() {
+        // Builder must be instantiated.
+        if (!this->builderBuffer.has_value()) {
+            // Otherwise, throw a runtime error.
+            throw std::runtime_error("Expected builder to be instantiated");
+        }
+    }
+
+    void IonIrCodegenPass::setBuilder(ionshared::Ptr<ionir::BasicBlock> basicBlock) {
+        this->builderBuffer = basicBlock->createBuilder();
+        this->basicBlockBuffer = basicBlock;
+    }
+
     IonIrCodegenPass::IonIrCodegenPass(ionshared::PtrSymbolTable<ionir::Module> modules)
-        : modules(std::move(modules)), constructStack(), typeStack(), moduleBuffer(std::nullopt), functionBuffer(std::nullopt) {
+        : modules(std::move(modules)), constructStack(), typeStack(), moduleBuffer(std::nullopt), functionBuffer(std::nullopt), basicBlockBuffer(std::nullopt), builderBuffer(std::nullopt) {
         //
     }
 
@@ -379,5 +393,74 @@ namespace ionlang {
             std::make_shared<ionir::VoidType>();
 
         this->typeStack.push(ionIrVoidType);
+    }
+
+    void IonIrCodegenPass::visitIfStatement(ionshared::Ptr<IfStatement> node) {
+        // TODO: Implement.
+        throw std::runtime_error("Not implemented");
+    }
+
+    void IonIrCodegenPass::visitReturnStatement(ionshared::Ptr<ReturnStatement> node) {
+        this->requireBuilder();
+
+        ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = *this->builderBuffer;
+        ionshared::OptPtr<ionir::Value<>> ionIrValue = std::nullopt;
+
+        if (node->hasValue()) {
+            this->visitValue(*node->getValue());
+            ionIrValue = this->constructStack.pop()->dynamicCast<ionir::Value<>>();
+        }
+
+        ionshared::Ptr<ionir::ReturnInst> ionIrReturnInst =
+            ionIrInstBuilder->createReturn(ionIrValue);
+
+        this->constructStack.push(ionIrReturnInst);
+    }
+
+    void IonIrCodegenPass::visitVariableDecl(ionshared::Ptr<VariableDecl> node) {
+        this->requireBuilder();
+
+        ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = *this->builderBuffer;
+
+        // First, visit the type and create a IonIR alloca inst,  and push it onto the stack.
+        this->visitType(node->getType());
+
+        ionshared::Ptr<ionir::Type> ionIrType = this->typeStack.pop();
+
+        ionshared::Ptr<ionir::AllocaInst> ionIrAllocaInst =
+            ionIrInstBuilder->createAlloca(node->getId(), ionIrType);
+
+        this->constructStack.push(ionIrAllocaInst);
+
+        // Lastly, then create a IonIR store inst, and push it onto the stack.
+        this->visitValue(node->getValue());
+
+        ionshared::Ptr<ionir::Value<>> ionIrValue =
+            this->constructStack.pop()->dynamicCast<ionir::Value<>>();
+
+        ionir::PtrRef<ionir::AllocaInst> ionIrRef = std::make_shared<ionir::Ref<ionir::AllocaInst>>(
+            node->getId(),
+
+            // TODO: CRITICAL: Provide owner for ref!
+            nullptr,
+
+            ionIrAllocaInst
+        );
+
+        ionshared::Ptr<ionir::StoreInst> ionIrStoreInst = ionIrInstBuilder->createStore(
+            ionIrValue,
+            ionIrRef
+        );
+    }
+
+    void IonIrCodegenPass::visitCallStatement(ionshared::Ptr<CallStatement> node) {
+        this->requireBuilder();
+
+        ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = *this->builderBuffer;
+
+        // TODO: Continue/finish implementation.
+//        ionIrInstBuilder->createCall()
+
+        throw std::runtime_error("Not implemented");
     }
 }

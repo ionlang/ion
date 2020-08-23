@@ -54,7 +54,7 @@ namespace ionlang::test::bootstrap {
         // TODO: Consider support for module here.
         ionshared::Ptr<Prototype> prototype = std::make_shared<Prototype>(test::constant::foobar, std::make_shared<Args>(), returnType, nullptr);
 
-        ionshared::Ptr<BasicBlock> entrySection = std::make_shared<BasicBlock>(BasicBlockOpts{
+        ionshared::Ptr<Block> entrySection = std::make_shared<Block>(BasicBlockOpts{
             nullptr,
             BasicBlockKind::Entry,
             Const::basicBlockEntryId,
@@ -64,10 +64,10 @@ namespace ionlang::test::bootstrap {
 
         // TODO: Fix mumbo-jumbo debugging code. -------------
 
-        typedef ionshared::PtrSymbolTable<BasicBlock> BasicBlockPtrSymbolTable;
-        typedef ionshared::SymbolTable<ionshared::Ptr<BasicBlock>> tt;
+        typedef ionshared::PtrSymbolTable<Block> BasicBlockPtrSymbolTable;
+        typedef ionshared::SymbolTable<ionshared::Ptr<Block>> tt;
 
-        auto t1 = std::map<std::string, ionshared::Ptr<BasicBlock>>{
+        auto t1 = std::map<std::string, ionshared::Ptr<Block>>{
             {entrySection->getId(), entrySection}
         };
 

@@ -8,12 +8,12 @@
 namespace ionlang {
     class StatementBuilder {
     private:
-        ionshared::Ptr<BasicBlock> basicBlock;
+        ionshared::Ptr<Block> basicBlock;
 
     public:
-        explicit StatementBuilder(ionshared::Ptr<BasicBlock> basicBlock);
+        explicit StatementBuilder(ionshared::Ptr<Block> basicBlock);
 
-        ionshared::Ptr<BasicBlock> getSection() const;
+        ionshared::Ptr<Block> getSection() const;
 
         void insert(const ionshared::Ptr<Statement> &inst);
 

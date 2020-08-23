@@ -98,7 +98,7 @@ namespace ionlang {
         return std::make_shared<Global>(*type, *id);
     }
 
-    ionshared::OptPtr<BasicBlock> Parser::parseBasicBlock(ionshared::Ptr<FunctionBody> parent) {
+    ionshared::OptPtr<Block> Parser::parseBasicBlock(ionshared::Ptr<FunctionBody> parent) {
         // TODO: NO AT (@)!!!! CRITICAL!
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolAt))
 
@@ -111,7 +111,7 @@ namespace ionlang {
 
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
-        ionshared::Ptr<BasicBlock> basicBlock = std::make_shared<BasicBlock>(BasicBlockOpts{
+        ionshared::Ptr<Block> basicBlock = std::make_shared<Block>(BasicBlockOpts{
             std::move(parent),
             *id
         });
@@ -167,15 +167,15 @@ namespace ionlang {
 
         ionshared::Ptr<FunctionBody> functionBody = std::make_shared<FunctionBody>(parent);
 
-        ionshared::PtrSymbolTable<BasicBlock> basicBlocks =
-            std::make_shared<ionshared::SymbolTable<ionshared::Ptr<BasicBlock>>>();
+        ionshared::PtrSymbolTable<Block> basicBlocks =
+            std::make_shared<ionshared::SymbolTable<ionshared::Ptr<Block>>>();
 
         while (!this->is(TokenKind::SymbolBraceR)) {
-            ionshared::OptPtr<BasicBlock> basicBlockResult = this->parseBasicBlock(functionBody);
+            ionshared::OptPtr<Block> basicBlockResult = this->parseBasicBlock(functionBody);
 
             IONIR_PARSER_ASSURE(basicBlockResult)
 
-            ionshared::Ptr<BasicBlock> basicBlock = *basicBlockResult;
+            ionshared::Ptr<Block> basicBlock = *basicBlockResult;
 
             basicBlocks->insert(basicBlock->getId(), basicBlock);
         }

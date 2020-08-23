@@ -4,7 +4,6 @@
 #include <ionlang/tracking/local_var_descriptor.h>
 #include "construct.h"
 #include "prototype.h"
-#include "function_body.h"
 
 namespace ionlang {
     class Pass;
@@ -13,12 +12,12 @@ namespace ionlang {
     private:
         ionshared::Ptr<Prototype> prototype;
 
-        ionshared::Ptr<FunctionBody> body;
+        ionshared::Ptr<Block> body;
 
         ionshared::PtrSymbolTable<LocalVariableDescriptor> localVariables;
 
     public:
-        Function(ionshared::Ptr<Prototype> prototype, ionshared::Ptr<FunctionBody> body);
+        Function(ionshared::Ptr<Prototype> prototype, ionshared::Ptr<Block> body);
 
         void accept(Pass &visitor) override;
 
@@ -28,10 +27,10 @@ namespace ionlang {
 
         void setPrototype(ionshared::Ptr<Prototype> prototype);
 
-        ionshared::Ptr<FunctionBody> getBody() const noexcept;
+        ionshared::Ptr<Block> getBody() const noexcept;
 
         // TODO: Should this automatically set the body's parent as well?
-        void setBody(ionshared::Ptr<FunctionBody> body) noexcept;
+        void setBody(ionshared::Ptr<Block> body) noexcept;
 
         ionshared::PtrSymbolTable<LocalVariableDescriptor> getLocalVariables() const;
 

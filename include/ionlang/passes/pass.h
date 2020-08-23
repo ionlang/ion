@@ -10,6 +10,9 @@
 #include <ionlang/construct/extern.h>
 #include <ionlang/construct/basic_block.h>
 #include <ionlang/construct/statement.h>
+#include <ionlang/construct/statement/if_statement.h>
+#include <ionlang/construct/statement/return_statement.h>
+#include <ionlang/construct/statement/call_statement.h>
 #include <ionlang/construct/value.h>
 #include <ionlang/construct/value/boolean_value.h>
 #include <ionlang/construct/value/char_value.h>
@@ -19,7 +22,7 @@
 #include <ionlang/construct/type/void_type.h>
 #include <ionlang/construct/type/boolean_type.h>
 #include <ionlang/construct/function.h>
-#include <ionlang/construct/variable_declaration.h>
+#include <ionlang/construct/statement/variable_declaration.h>
 #include <ionlang/construct/global.h>
 
 namespace ionlang {
@@ -35,9 +38,15 @@ namespace ionlang {
 
         virtual void visitExtern(ionshared::Ptr<Extern> node);
 
-        virtual void visitBasicBlock(ionshared::Ptr<BasicBlock> node);
+        virtual void visitBlock(ionshared::Ptr<Block> node);
 
         virtual void visitStatement(ionshared::Ptr<Statement> node);
+
+        virtual void visitIfStatement(ionshared::Ptr<IfStatement> node);
+
+        virtual void visitReturnStatement(ionshared::Ptr<ReturnStatement> node);
+
+        virtual void visitCallStatement(ionshared::Ptr<CallStatement> node);
 
         virtual void visitValue(ionshared::Ptr<Value<>> node);
 
@@ -59,7 +68,7 @@ namespace ionlang {
 
         virtual void visitFunction(ionshared::Ptr<Function> node);
 
-        virtual void visitVariableDecl(ionshared::Ptr<VariableDeclaration> node);
+        virtual void visitVariableDecl(ionshared::Ptr<VariableDecl> node);
 
         virtual void visitScopeAnchor(ionshared::Ptr<ionshared::ScopeAnchor<Construct>> node);
 
