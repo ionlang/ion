@@ -51,5 +51,7 @@ namespace ionlang {
         ionshared::Ptr<StatementBuilder> createBuilder();
 
         ionshared::OptPtr<Statement> findTerminalStatement() const;
+
+        bool isFunctionBody() const;
     };
 }

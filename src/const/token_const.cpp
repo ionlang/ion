@@ -42,7 +42,7 @@ namespace ionlang {
 
     void TokenConst::ensureInit() {
         if (!TokenConst::getIsInitialized()) {
-            throw std::runtime_error("Not initialized");
+            throw std::runtime_error("Constants not initialized");
         }
     }
 

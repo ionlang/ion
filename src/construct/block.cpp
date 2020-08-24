@@ -76,4 +76,18 @@ namespace ionlang {
 
         return std::nullopt;
     }
+
+    bool Block::isFunctionBody() const {
+        ionshared::Ptr<Construct> parent = this->getParent();
+
+        if (parent == nullptr) {
+            throw std::runtime_error("Unexpected parent construct to be nullptr");
+        }
+
+        /**
+         * A block is considered a function body if it's parent is
+         * a function construct.
+         */
+        return parent->getConstructKind() == ConstructKind::Function;
+    }
 }

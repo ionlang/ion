@@ -104,10 +104,6 @@ namespace ionlang {
     }
 
     ionshared::OptPtr<Block> Parser::parseBlock(const ionshared::Ptr<Construct> &parent) {
-        std::optional<std::string> id = this->parseId();
-
-        IONIR_PARSER_ASSURE(id)
-
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
         ionshared::Ptr<Block> block = std::make_shared<Block>(parent);

@@ -7,8 +7,10 @@
 #include <ionir/construct/global.h>
 #include <ionir/construct/extern.h>
 #include <ionir/misc/inst_builder.h>
+#include <ionir/const/const.h>
 #include <ionlang/passes/codegen/ionir_codegen_pass.h>
 #include <ionlang/const/notice.h>
+#include <ionlang/const/const.h>
 
 namespace ionlang {
     ionshared::Ptr<ionir::Module> IonIrCodegenPass::requireModule() {
@@ -25,12 +27,14 @@ namespace ionlang {
         }
     }
 
-    void IonIrCodegenPass::requireBuilder() {
+    ionshared::Ptr<ionir::InstBuilder> IonIrCodegenPass::requireBuilder() {
         // Builder must be instantiated.
         if (!this->builderBuffer.has_value()) {
             // Otherwise, throw a runtime error.
             throw std::runtime_error("Expected builder to be instantiated");
         }
+
+        return *builderBuffer;
     }
 
     void IonIrCodegenPass::setBuilder(ionshared::Ptr<ionir::BasicBlock> basicBlock) {
@@ -117,22 +121,28 @@ namespace ionlang {
             );
         }
 
-        // Visit the prototype.
         this->visitPrototype(node->getPrototype());
+
+        ionshared::Ptr<ionir::Prototype> ionIrPrototype =
+            this->constructStack.pop()->dynamicCast<ionir::Prototype>();
+
+        this->visitBlock(node->getBody());
+
+        ionshared::Ptr<ionir::FunctionBody> ionIrFunctionBody =
+            this->constructStack.pop()->dynamicCast<ionir::FunctionBody>();
 
         // Retrieve the resulting function off the stack.
         ionshared::Ptr<ionir::Function> ionIrFunction =
-            this->constructStack.pop()->dynamicCast<ionir::Function>();
+            std::make_shared<ionir::Function>(ionIrPrototype, ionIrFunctionBody);
+
+        // The function's body basic block's parent is nullptr. At this stage, fill it in.
+        ionIrFunctionBody->setParent(ionIrFunction);
 
         // Set the function buffer.
         this->functionBuffer = ionIrFunction;
 
         // Register the newly created function on the buffer module's symbol table.
         moduleBuffer->insertFunction(ionIrFunction);
-
-        // Visit the function's body and discard it from the stack.
-        this->visitBlock(node->getBody());
-        this->constructStack.pop();
 
         // Push the function back onto the stack.
         this->constructStack.push(ionIrFunction);
@@ -216,6 +226,72 @@ namespace ionlang {
 //        }
 
         this->constructStack.push(ionIrPrototype);
+    }
+
+    void IonIrCodegenPass::visitBlock(ionshared::Ptr<Block> node) {
+        this->requireFunction();
+
+        ionshared::OptPtr<ionir::FunctionBody> ionIrFunctionBody = std::nullopt;
+        ionir::BasicBlockKind ionIrBasicBlockKind = ionir::BasicBlockKind::Internal;
+
+        // TODO: Use a counter or something, along with naming depending on the block's parent (ex. if statement parent => if_0, etc.).
+        std::string ionIrBasicBlockId = "FIXME_NAME";
+
+        if (node->isFunctionBody()) {
+            // TODO: Make function body and push it onto the stack.
+            ionIrFunctionBody = std::make_shared<ionir::FunctionBody>();
+            ionIrBasicBlockKind = ionir::BasicBlockKind::Entry;
+            ionIrBasicBlockId = ionir::Const::basicBlockEntryId;
+        }
+
+        // TODO: Create the block somehow. It requires 'BasicBlockKind', 'registers' and 'insts'.
+        ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlock =
+            std::make_shared<ionir::BasicBlock>(ionir::BasicBlockOpts{
+                // The basic block's parent will be filled in by the calling visit function.
+                nullptr,
+
+                ionIrBasicBlockKind,
+                ionIrBasicBlockId
+            });
+
+        /**
+         * Create and assign the block to the builder. This will also
+         * set/update the block buffer. This builder may be used by subsequently
+         * called visit functions, such as when visiting certain statements which
+         * need the builder.
+         */
+        this->setBuilder(ionIrBasicBlock);
+
+        std::vector<ionshared::Ptr<Statement>> statements = node->getStatements();
+
+        for (const auto &statement : statements) {
+            // Visit the statement.
+            this->visitStatement(statement);
+
+            // TODO: IMPORTANT: DO note that (some?) visitStatements, (ex. visitReturnStatement) already register insts via builder. (They use buffered builder, which is set on code above and bound to the buffered block, set above).
+            // TODO: Insts and registers must be popped off and added onto the block.
+
+            // Discard the result off the stack, as it will not be used.
+            this->constructStack.pop();
+        }
+
+        // Push the basic block onto the stack.
+        if (!ionshared::Util::hasValue(ionIrFunctionBody)) {
+            this->constructStack.push(ionIrBasicBlock);
+        }
+        /**
+         * Provided block classifies as a function body. Push the resulting
+         * function body onto the stack instead.
+         */
+        else {
+            // Register the IonIR basic block on the function body's symbol table.
+            ionIrFunctionBody->get()->getSymbolTable()->insert(
+                ionir::Const::basicBlockEntryId,
+                ionIrBasicBlock
+            );
+
+            this->constructStack.push(*ionIrFunctionBody);
+        }
     }
 
     void IonIrCodegenPass::visitIntegerValue(ionshared::Ptr<IntegerValue> node) {
@@ -386,9 +462,7 @@ namespace ionlang {
     }
 
     void IonIrCodegenPass::visitReturnStatement(ionshared::Ptr<ReturnStatement> node) {
-        this->requireBuilder();
-
-        ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = *this->builderBuffer;
+        ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = this->requireBuilder();
         ionshared::OptPtr<ionir::Value<>> ionIrValue = std::nullopt;
 
         if (node->hasValue()) {

@@ -28,7 +28,7 @@ namespace ionlang {
 
         void requireFunction();
 
-        void requireBuilder();
+        ionshared::Ptr<ionir::InstBuilder> requireBuilder();
 
         /**
          * Set the currently active builder if any. Modifying the builder
@@ -63,6 +63,8 @@ namespace ionlang {
         void visitExtern(ionshared::Ptr<Extern> node) override;
 
         void visitPrototype(ionshared::Ptr<Prototype> node) override;
+
+        void visitBlock(ionshared::Ptr<Block> node) override;
 
         void visitIntegerValue(ionshared::Ptr<IntegerValue> node) override;
 
