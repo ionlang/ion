@@ -5,15 +5,18 @@
 #include <ionir/construct/value/boolean_value.h>
 #include <ionir/construct/function.h>
 #include <ionir/construct/global.h>
+#include <ionir/construct/extern.h>
 #include <ionir/misc/inst_builder.h>
 #include <ionlang/passes/codegen/ionir_codegen_pass.h>
 #include <ionlang/const/notice.h>
 
 namespace ionlang {
-    void IonIrCodegenPass::requireModule() {
+    ionshared::Ptr<ionir::Module> IonIrCodegenPass::requireModule() {
         if (!ionshared::Util::hasValue(this->moduleBuffer)) {
             throw std::runtime_error("Expected the module buffer to be set, but was null");
         }
+
+        return *this->moduleBuffer;
     }
 
     void IonIrCodegenPass::requireFunction() {
@@ -95,7 +98,7 @@ namespace ionlang {
     }
 
     void IonIrCodegenPass::visitFunction(ionshared::Ptr<Function> node) {
-        this->requireModule();
+        ionshared::Ptr<ionir::Module> moduleBuffer = this->requireModule();
 
         // TODO: Awaiting verification implementation.
 //        if (!node->verify()) {
@@ -107,7 +110,7 @@ namespace ionlang {
 
         std::string ionIrFunctionId = node->getPrototype()->getId();
 
-        if ((*this->moduleBuffer)->getSymbolTable()->contains(ionIrFunctionId)) {
+        if (moduleBuffer->getSymbolTable()->contains(ionIrFunctionId)) {
             throw ionshared::Util::quickError(
                 IONLANG_NOTICE_FUNCTION_ALREADY_DEFINED,
                 ionIrFunctionId
@@ -125,33 +128,48 @@ namespace ionlang {
         this->functionBuffer = ionIrFunction;
 
         // Register the newly created function on the buffer module's symbol table.
-        (*this->moduleBuffer)->insertFunction(ionIrFunction);
+        moduleBuffer->insertFunction(ionIrFunction);
 
-        // Visit the function's body.
-        this->visitFunctionBody(node->getBody());
-
-        // TODO: Verify the resulting LLVM function (through LLVM).
+        // Visit the function's body and discard it from the stack.
+        this->visitBlock(node->getBody());
+        this->constructStack.pop();
 
         // Push the function back onto the stack.
         this->constructStack.push(ionIrFunction);
     }
 
     void IonIrCodegenPass::visitExtern(ionshared::Ptr<Extern> node) {
-        if (node->getPrototype() == nullptr) {
+        ionshared::Ptr<ionir::Module> moduleBuffer = this->requireModule();
+
+        ionshared::PtrSymbolTable<ionir::Construct> moduleBufferSymbolTable =
+            moduleBuffer->getSymbolTable();
+
+        ionshared::Ptr<Prototype> prototype = node->getPrototype();
+
+        // TODO: Use verify instead.
+        if (prototype == nullptr) {
             throw std::runtime_error("Unexpected external definition's prototype to be null");
         }
 
-        ionshared::OptPtr<ionir::Function> existingDefinition =
-            moduleBuffer->get()->lookupFunction(node->getPrototype()->getId());
-
-        if (ionshared::Util::hasValue(existingDefinition)) {
-            throw std::runtime_error("Re-definition of extern not allowed");
+        if (moduleBufferSymbolTable->contains(prototype->getId())) {
+            throw std::runtime_error("Entity with same id already exists on module");
         }
 
-        // Visit the prototype.
-        this->visitPrototype(node->getPrototype());
+        this->visitPrototype(prototype);
 
-        // No need to push the resulting function onto the stack.
+        ionshared::Ptr<ionir::Prototype> ionIrPrototype =
+            this->constructStack.pop()->dynamicCast<ionir::Prototype>();
+
+        ionshared::Ptr<ionir::Extern> ionIrExtern =
+            std::make_shared<ionir::Extern>(ionIrPrototype);
+
+        /**
+         * Register the IonIR extern on the module buffer's symbol table.
+         * This will allow the IonIR codegen pass to visit the extern.
+         */
+        moduleBufferSymbolTable->insert(prototype->getId(), ionIrExtern);
+
+        this->constructStack.push(ionIrExtern);
     }
 
     void IonIrCodegenPass::visitPrototype(ionshared::Ptr<Prototype> node) {
@@ -163,74 +181,41 @@ namespace ionlang {
         // Create the argument buffer vector.
         ionshared::Ptr<ionir::Args> arguments = std::make_shared<ionir::Args>();
 
-        // Attempt to retrieve an existing function.
-        ionshared::OptPtr<ionir::Function> ionIrFunction =
-            this->moduleBuffer->get()->lookupFunction(node->getId());
+        // TODO: Process arguments.
+        //            for (uint32_t i = 0; i < argumentCount; ++i) {
+        //                arguments.push_back(llvm::Type::getDoubleTy(**this->contextBuffer));
+        //            }
 
-        // A function with a matching identifier already exists.
-        if (ionshared::Util::hasValue(ionIrFunction)) {
-            ionshared::Ptr<ionir::Prototype> ionIrPrototype = ionIrFunction->get()->getPrototype();
-            size_t  existingFunctionArgumentCount = ionIrPrototype->getArgs()->getItems().getSize();
+        // Visit and pop the return type.
+        this->visitType(node->getReturnType());
 
-            // Function already has a body, disallow re-definition.
-            if (!ionIrFunction->get()->getBody()->getSymbolTable()->isEmpty()) {
-                // TODO
-                throw ionshared::Util::quickError<std::string>(
-                    IONLANG_NOTICE_FUNCTION_ALREADY_DEFINED,
-                    ionIrPrototype->getId()
-                );
-            }
-            // If the function takes a different number of arguments, reject.
-            else if (existingFunctionArgumentCount != argumentCount) {
-                throw ionshared::Util::quickError(
-                    IONLANG_NOTICE_FUNCTION_REDEFINITION_DIFFERENT_SIG,
-                    ionIrPrototype->getId()
-                );
-            }
-        }
-        // Otherwise, function will be created.
-        else {
-            for (uint32_t i = 0; i < argumentCount; ++i) {
-                // TODO: Process arguments.
-//                arguments.push_back(llvm::Type::getDoubleTy(**this->contextBuffer));
-            }
+        ionshared::Ptr<ionir::Type> ionIrReturnType = this->typeStack.pop();
 
-            // Visit and pop the return type.
-            this->visitType(node->getReturnType());
+        // TODO: Arguments are just hard-coded empty, they should be precessed before then popped somehow then passed on the make_shared() below.
+        auto tempEmptyArgs = std::make_shared<ionir::Args>();
 
-            ionshared::Ptr<ionir::Type> ionIrReturnType = this->typeStack.pop();
+        // TODO: Support for variable arguments.
+        // TODO: Args in form of IonIR entities (need to create & implement this->visitArgs() or is it this->visitArg() with a loop here? Investigate.).
+        ionshared::Ptr<ionir::Prototype> ionIrPrototype =
+            std::make_shared<ionir::Prototype>(node->getId(), tempEmptyArgs, ionIrReturnType, *this->moduleBuffer);
 
-            // TODO: Support for variable arguments and hard-coded return type.
-            // TODO: Args and parent (ionir::Module) in form of IonIR entities.
-            ionshared::Ptr<ionir::Prototype> ionIrPrototype =
-                std::make_shared<ionir::Prototype>(node->getId(), nullptr, ionIrReturnType, nullptr);
+        // TODO: Actually process args.
+//        uint32_t i = 0;
+//        auto args = ionIrFunction->get()->getPrototype()->getArgs()->getItems().unwrap();
+//
+//        for (const auto &arg : args) {
+//            // TODO: getItems() no longer a vector; cannot index by index, only key.
+//            // Retrieve the name element from the argument tuple.
+//            //            std::string name = node->getArgs()->getItems()[i].second;
+//
+//            // Name the argument.
+//            //            arg.setName(name);
+//
+//            // Increment the counter to prepare for next iteration.
+//            i++;
+//        }
 
-            // Function body will be nullptr until set once it's visited.
-            ionIrFunction = std::make_shared<ionir::Function>(ionIrPrototype, nullptr);
-
-            /**
-             * Insert the previously created function and register it
-             * within the current module buffer.
-             */
-            this->moduleBuffer->get()->insertFunction(*ionIrFunction);
-        }
-
-        uint32_t i = 0;
-        auto args = ionIrFunction->get()->getPrototype()->getArgs()->getItems().unwrap();
-
-        for (const auto &arg : args) {
-            // TODO: getItems() no longer a vector; cannot index by index, only key.
-            // Retrieve the name element from the argument tuple.
-            //            std::string name = node->getArgs()->getItems()[i].second;
-
-            // Name the argument.
-            //            arg.setName(name);
-
-            // Increment the counter to prepare for next iteration.
-            i++;
-        }
-
-        this->constructStack.push(*ionIrFunction);
+        this->constructStack.push(ionIrPrototype);
     }
 
     void IonIrCodegenPass::visitIntegerValue(ionshared::Ptr<IntegerValue> node) {

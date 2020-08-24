@@ -51,7 +51,7 @@ namespace ionlang {
 
         static const ionshared::BiMap<std::string, TokenKind> &getOperators();
 
-        static const TokenKindVector &getTypes();
+        static const TokenKindVector &getBuiltInTypes();
 
         static std::map<TokenKind, std::string> getNames();
 

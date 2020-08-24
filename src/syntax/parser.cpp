@@ -1,4 +1,7 @@
+#include <ionlang/lexical/classifier.h>
 #include <ionlang/syntax/parser.h>
+#include <ionlang/misc/util.h>
+#include <ionlang/const/notice.h>
 
 namespace ionlang {
     bool Parser::is(TokenKind tokenKind) noexcept {
@@ -35,10 +38,11 @@ namespace ionlang {
         Token token = this->stream.get();
 
         return ionshared::NoticeFactory(ionshared::NoticeContext{
-            this->filePath,
-            token.getLineNumber(),
-            token.getStartPosition()
-        });
+                this->filePath,
+                token.getLineNumber(),
+                token.getStartPosition()
+            }
+        );
     }
 
     std::nullopt_t Parser::makeNotice(std::string message, ionshared::NoticeType type) {
@@ -48,7 +52,8 @@ namespace ionlang {
     }
 
     Parser::Parser(TokenStream stream, const ionshared::Ptr<ionshared::NoticeStack> &noticeStack, std::string filePath)
-        : stream(std::move(stream)), noticeStack(noticeStack), noticeSentinel(std::make_shared<NoticeSentinel>(noticeStack)), filePath(std::move(filePath)) {
+        : stream(std::move(stream)), noticeStack(noticeStack),
+        noticeSentinel(std::make_shared<NoticeSentinel>(noticeStack)), filePath(std::move(filePath)) {
         //
     }
 
@@ -98,93 +103,94 @@ namespace ionlang {
         return std::make_shared<Global>(*type, *id);
     }
 
-    ionshared::OptPtr<Block> Parser::parseBasicBlock(ionshared::Ptr<FunctionBody> parent) {
-        // TODO: NO AT (@)!!!! CRITICAL!
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolAt))
-
+    ionshared::OptPtr<Block> Parser::parseBlock(const ionshared::Ptr<Construct> &parent) {
         std::optional<std::string> id = this->parseId();
 
         IONIR_PARSER_ASSURE(id)
 
-        // TODO: NO COLONS!!! CRITICAL!
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolColon))
-
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
-        ionshared::Ptr<Block> basicBlock = std::make_shared<Block>(BasicBlockOpts{
-            std::move(parent),
-            *id
-        });
-
-        std::vector<ionshared::Ptr<RegisterAssign>> registers = {};
-        std::vector<ionshared::Ptr<Inst>> statements = {};
-        ionshared::PtrSymbolTable<Inst> symbolTable = basicBlock->getSymbolTable();
-
-        while (!this->is(TokenKind::SymbolBraceR) && !this->is(TokenKind::SymbolAt)) {
-            AstPtrResult<Inst> inst;
-
-            // TODO: This means that allocas without register assigns are possible (lonely, redundant allocas).
-            // Register assignment. This includes an instruction.
-            if (this->is(TokenKind::OperatorModulo)) {
-                AstPtrResult<RegisterAssign> registerAssignResult = this->parseRegisterAssign(basicBlock);
-
-                IONIR_PARSER_ASSERT_RESULT(registerAssignResult, BasicBlock)
-
-                ionshared::Ptr<RegisterAssign> registerAssign = Util::getResultValue(registerAssignResult);
-
-                inst = registerAssign->getValue()->dynamicCast<Inst>();
-
-                /**
-                 * Register the instruction on the resulting block's symbol
-                 * table.
-                 */
-                symbolTable->insert(registerAssign->getId(), Util::getResultValue(inst));
-
-                /**
-                 * Add the register to the block's registers to be processed
-                 * later for code-gen.
-                 */
-                registers.push_back(registerAssign);
-            }
-                // Otherwise, it must be just an instruction.
-            else {
-                inst = this->parseInst(basicBlock);
-            }
-
-            IONIR_PARSER_ASSURE(inst)
-            statements.push_back(Util::getResultValue(inst));
-        }
-
-        this->stream.skip();
-        basicBlock->setRegisters(registers);
-        basicBlock->setInsts(statements);
-
-        return basicBlock;
-    }
-
-    ionshared::OptPtr<FunctionBody> Parser::parseFunctionBody(ionshared::Ptr<Function> parent) {
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
-
-        ionshared::Ptr<FunctionBody> functionBody = std::make_shared<FunctionBody>(parent);
-
-        ionshared::PtrSymbolTable<Block> basicBlocks =
-            std::make_shared<ionshared::SymbolTable<ionshared::Ptr<Block>>>();
+        ionshared::Ptr<Block> block = std::make_shared<Block>(parent);
+        std::vector<ionshared::Ptr<Statement>> statements = {};
 
         while (!this->is(TokenKind::SymbolBraceR)) {
-            ionshared::OptPtr<Block> basicBlockResult = this->parseBasicBlock(functionBody);
+            ionshared::OptPtr<Statement> statement = this->parseStatement(block);
 
-            IONIR_PARSER_ASSURE(basicBlockResult)
+            IONIR_PARSER_ASSURE(statement)
 
-            ionshared::Ptr<Block> basicBlock = *basicBlockResult;
-
-            basicBlocks->insert(basicBlock->getId(), basicBlock);
+            statements.push_back(*statement);
         }
 
-        functionBody->setSymbolTable(basicBlocks);
-
-        // Skip over right brace token.
         this->stream.skip();
+        block->setStatements(statements);
 
-        return functionBody;
+        return block;
+    }
+
+    ionshared::OptPtr<Module> Parser::parseModule() {
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordModule))
+
+        std::optional<std::string> id = this->parseId();
+
+        IONIR_PARSER_ASSURE(id)
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
+
+        ionshared::PtrSymbolTable<Construct> symbolTable =
+            std::make_shared<ionshared::SymbolTable<ionshared::Ptr<Construct>>>();
+
+        ionshared::Ptr<Module> module = std::make_shared<Module>(*id, symbolTable);
+
+        while (!this->is(TokenKind::SymbolBraceR)) {
+            ionshared::OptPtr<Construct> topLevelConstructResult = this->parseTopLevel(module);
+
+            // TODO: Make notice if it has no value? Or is it enough with the notice under 'parseTopLevel()'?
+            if (ionshared::Util::hasValue(topLevelConstructResult)) {
+                ionshared::Ptr<Construct> topLevelConstruct = *topLevelConstructResult;
+                std::optional<std::string> name = Util::findConstructId(topLevelConstruct);
+
+                if (!name.has_value()) {
+                    throw std::runtime_error("Unexpected construct name to be null");
+                }
+
+                // TODO: Ensure we're not re-defining something, issue a notice otherwise.
+                symbolTable->insert(*name, topLevelConstruct);
+            }
+
+            // No more tokens to process.
+            if (!this->stream.hasNext() && !this->is(TokenKind::SymbolBraceR)) {
+                // TODO: Use Ast(Ptr)Result<>.
+                throw ionshared::Util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_EOF);
+                //                return this->noticeSentinel->makeError<Module>(IONIR_NOTICE_MISC_UNEXPECTED_EOF);
+            }
+        }
+
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceR))
+
+        return module;
+    }
+
+    ionshared::OptPtr<VariableDecl> Parser::parseVariableDecl(const ionshared::Ptr<Block> &parent) {
+        ionshared::OptPtr<Type> type = this->parseType();
+
+        IONIR_PARSER_ASSURE(type)
+
+        std::optional<std::string> id = this->parseId();
+
+        IONIR_PARSER_ASSURE(id)
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual))
+
+        ionshared::OptPtr<Value<>> value = this->parseValue();
+
+        IONIR_PARSER_ASSURE(value)
+
+        ionshared::Ptr<VariableDecl> variableDecl =
+            std::make_shared<VariableDecl>(parent, *type, *id, *value);
+
+        // Register the statement on the resulting block's symbol table.
+        parent->getSymbolTable()->insert(variableDecl->getId(), variableDecl);
+
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
+
+        return variableDecl;
     }
 }

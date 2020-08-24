@@ -92,7 +92,7 @@ namespace ionlang {
         return TokenConst::operators;
     }
 
-    const TokenKindVector &TokenConst::getTypes() {
+    const TokenKindVector &TokenConst::getBuiltInTypes() {
         TokenConst::ensureInit();
 
         return TokenConst::types;
@@ -143,6 +143,10 @@ namespace ionlang {
             {"global", TokenKind::KeywordGlobal},
             {"else", TokenKind::KeywordElse},
             {"mut", TokenKind::KeywordMutable},
+
+            // Statement keywords.
+            {ConstName::statementReturn, TokenKind::KeywordReturn},
+            {ConstName::statementIf, TokenKind::KeywordIf},
 
             // Types keywords.
             {ConstName::typeVoid, TokenKind::TypeVoid},

@@ -2,7 +2,7 @@
 
 #include <ionshared/misc/helpers.h>
 #include <ionlang/construct/statement.h>
-#include <ionlang/construct/basic_block.h>
+#include <ionlang/construct/block.h>
 #include <ionlang/construct/type.h>
 
 namespace ionlang {

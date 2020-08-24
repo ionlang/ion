@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ionshared/container/stack.h>
+#include <ionir/construct/basic_block.h>
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
@@ -23,7 +24,7 @@ namespace ionlang {
 
         ionshared::OptPtr<ionir::InstBuilder> builderBuffer;
 
-        void requireModule();
+        ionshared::Ptr<ionir::Module> requireModule();
 
         void requireFunction();
 
@@ -60,8 +61,6 @@ namespace ionlang {
         void visitFunction(ionshared::Ptr<Function> node) override;
 
         void visitExtern(ionshared::Ptr<Extern> node) override;
-
-        void visitFunctionBody(ionshared::Ptr<FunctionBody> node) override;
 
         void visitPrototype(ionshared::Ptr<Prototype> node) override;
 

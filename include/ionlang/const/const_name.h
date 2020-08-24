@@ -37,6 +37,8 @@ namespace ionlang {
 
         static const std::string typeString;
 
-        static const std::string instReturn;
+        static const std::string statementReturn;
+
+        static const std::string statementIf;
     };
 }

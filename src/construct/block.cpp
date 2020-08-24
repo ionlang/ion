@@ -3,8 +3,8 @@
 #include <ionlang/misc/statement_builder.h>
 
 namespace ionlang {
-    Block::Block(const BasicBlockOpts &opts)
-        : ChildConstruct(opts.parent, ConstructKind::BasicBlock), ionshared::ScopeAnchor<Statement>(), Named(opts.id), statements(opts.statements) {
+    Block::Block(ionshared::Ptr<Construct> parent, std::vector<ionshared::Ptr<Statement>> statements, ionshared::PtrSymbolTable<Statement> symbolTable)
+        : ChildConstruct<Construct>(std::move(parent), ConstructKind::Block), ionshared::ScopeAnchor<Statement>(std::move(symbolTable)), statements(std::move(statements)) {
         //
     }
 

@@ -1,4 +1,4 @@
-#include <ionlang/construct/module.h>
+#include <ionlang/passes/pass.h>
 
 namespace ionlang {
     Module::Module(std::string id, ionshared::PtrSymbolTable<Construct> symbolTable)

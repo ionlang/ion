@@ -58,6 +58,8 @@ namespace ionlang {
 
         KeywordGlobal,
 
+        KeywordReturn,
+
         TypeVoid,
 
         TypeBool,

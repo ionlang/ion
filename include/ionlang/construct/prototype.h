@@ -8,16 +8,22 @@
 namespace ionlang {
     class Pass;
 
-    class Module;
-
-    class Prototype : public ChildConstruct<Module>, public ionshared::Named {
+    /**
+     * Prototype's parent is either a function or extern construct.
+     */
+    class Prototype : public ChildConstruct<>, public ionshared::Named {
     private:
         ionshared::Ptr<Args> args;
 
         ionshared::Ptr<Type> returnType;
 
     public:
-        explicit Prototype(std::string id, ionshared::Ptr<Args> args, ionshared::Ptr<Type> returnType, ionshared::Ptr<Module> parent);
+        explicit Prototype(
+            std::string id,
+            ionshared::Ptr<Args> args,
+            ionshared::Ptr<Type> returnType,
+            ionshared::Ptr<Construct> parent
+        );
 
         void accept(Pass &visitor) override;
 

@@ -2,6 +2,7 @@
 
 // Misc.
 #define IONLANG_NOTICE_MISC_UNEXPECTED_TOKEN "Unexpected token '%s'"
+#define IONLANG_NOTICE_MISC_UNEXPECTED_EOF "Unexpected end of input"
 #define IONLANG_NOTICE_MISC_UNDEFINED_REFERENCE "Reference to an undefined entity '%s'"
 #define IONLANG_NOTICE_MISC_NO_ENTRY_POINT "Could not find a suitable entry point"
 #define IONLANG_NOTICE_MISC_VERIFICATION_FAILED "Verification failed for construct '%s'"

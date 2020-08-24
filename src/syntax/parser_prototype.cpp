@@ -78,19 +78,25 @@ namespace ionlang {
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordFunction))
 
         ionshared::OptPtr<Prototype> prototype = this->parsePrototype(parent);
-        ionshared::OptPtr<FunctionBody> bodyResult = this->parseFunctionBody(nullptr);
+
+        /**
+         * Create the resulting function construct here, to be provided
+         * as the parent when parsing the body block.
+         */
+        ionshared::Ptr<Function> function = std::make_shared<Function>(
+            *prototype,
+
+            // To be filled below.
+            nullptr
+        );
+
+        ionshared::OptPtr<Block> bodyResult = this->parseBlock(function);
 
         IONIR_PARSER_ASSURE(prototype)
         IONIR_PARSER_ASSURE(bodyResult)
 
-        ionshared::Ptr<FunctionBody> body = *bodyResult;
-
-        ionshared::Ptr<Function> function = std::make_shared<Function>(
-            *prototype,
-            body
-        );
-
-        body->setParent(function);
+        // Fill in the nullptr body.
+        function->setBody(*bodyResult);
 
         return function;
     }

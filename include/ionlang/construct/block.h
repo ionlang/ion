@@ -12,25 +12,22 @@
 namespace ionlang {
     class Pass;
 
-    class FunctionBody;
-
     class StatementBuilder;
 
-    struct BasicBlockOpts : ChildConstructOpts<FunctionBody> {
-        std::string id;
-
-        std::vector<ionshared::Ptr<Statement>> statements = {};
-
-        ionshared::PtrSymbolTable<Statement> symbolTable = ionshared::Util::makePtrSymbolTable<Statement>();
-    };
-
     // TODO: Must be verified to contain a single terminal instruction at the end?
-    class Block : public ChildConstruct<FunctionBody>, public ionshared::ScopeAnchor<Statement>, public ionshared::Named {
+    class Block : public ChildConstruct<>, public ionshared::ScopeAnchor<Statement> {
     private:
         std::vector<ionshared::Ptr<Statement>> statements;
 
     public:
-        explicit Block(const BasicBlockOpts &opts);
+        explicit Block(
+            ionshared::Ptr<Construct> parent,
+
+            std::vector<ionshared::Ptr<Statement>> statements = {},
+
+            ionshared::PtrSymbolTable<Statement> symbolTable =
+                ionshared::Util::makePtrSymbolTable<Statement>()
+        );
 
         void accept(Pass &visitor) override;
 

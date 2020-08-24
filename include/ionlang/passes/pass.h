@@ -8,7 +8,7 @@
 #include <ionlang/construct/module.h>
 #include <ionlang/construct/prototype.h>
 #include <ionlang/construct/extern.h>
-#include <ionlang/construct/basic_block.h>
+#include <ionlang/construct/block.h>
 #include <ionlang/construct/statement.h>
 #include <ionlang/construct/statement/if_statement.h>
 #include <ionlang/construct/statement/return_statement.h>
@@ -71,8 +71,6 @@ namespace ionlang {
         virtual void visitVariableDecl(ionshared::Ptr<VariableDecl> node);
 
         virtual void visitScopeAnchor(ionshared::Ptr<ionshared::ScopeAnchor<Construct>> node);
-
-        virtual void visitFunctionBody(ionshared::Ptr<FunctionBody> node);
 
         virtual void visitIntegerType(ionshared::Ptr<IntegerType> node);
 

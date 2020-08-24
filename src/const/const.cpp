@@ -25,7 +25,7 @@ namespace ionlang {
         {ConstructKind::Function, "Function"},
         {ConstructKind::Extern, "Extern"},
         {ConstructKind::Global, "Global"},
-        {ConstructKind::BasicBlock, "BasicBlock"},
+        {ConstructKind::Block, "BasicBlock"},
         {ConstructKind::VariableRef, "VariableReference"},
         {ConstructKind::VariableDecl, "VariableDeclaration"},
         {ConstructKind::StructDecl, "StructDeclaration"},

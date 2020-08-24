@@ -167,10 +167,6 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitFunctionBody(ionshared::Ptr<FunctionBody> node) {
-        //
-    }
-
     void Pass::visitIntegerType(ionshared::Ptr<IntegerType> node) {
         //
     }

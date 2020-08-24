@@ -17,7 +17,7 @@ namespace ionlang {
 
         Global,
 
-        BasicBlock,
+        Block,
 
         VariableRef,
 

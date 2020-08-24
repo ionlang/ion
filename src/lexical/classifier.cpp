@@ -14,8 +14,8 @@ namespace ionlang {
         return TokenConst::getOperators().contains(tokenKind);
     }
 
-    bool Classifier::isType(TokenKind tokenKind) {
-        return TokenConst::contains(TokenConst::getTypes(), tokenKind);
+    bool Classifier::isBuiltInType(TokenKind tokenKind) {
+        return TokenConst::contains(TokenConst::getBuiltInTypes(), tokenKind);
     }
 
     bool Classifier::isUnsignedIntegerType(TokenKind tokenKind) {

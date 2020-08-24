@@ -3,14 +3,12 @@
 #include <optional>
 #include <string>
 #include <ionshared/error_handling/notice_factory.h>
-#include <ionlang/error_handling/notice_sentinel.h>
 #include <ionshared/syntax/parser_helpers.h>
 #include <ionir/misc/helpers.h>
 #include <ionir/const/const_name.h>
+#include <ionlang/error_handling/notice_sentinel.h>
 #include <ionlang/lexical/token.h>
-#include <ionlang/construct/construct.h>
-#include <ionlang/construct/module.h>
-#include <ionlang/construct/type/void_type.h>
+#include <ionlang/passes/pass.h>
 #include "scope.h"
 
 namespace ionlang {
@@ -90,13 +88,17 @@ namespace ionlang {
 
         ionshared::OptPtr<Construct> parsePrimaryExpr(ionshared::Ptr<Construct> parent);
 
-        ionshared::OptPtr<Block> parseBasicBlock(ionshared::Ptr<FunctionBody> parent);
-
-        ionshared::OptPtr<FunctionBody> parseFunctionBody(ionshared::Ptr<Function> parent);
+        ionshared::OptPtr<Block> parseBlock(const ionshared::Ptr<Construct> &parent);
 
         ionshared::OptPtr<Module> parseModule();
 
-        ionshared::OptPtr<VariableDecl> parseVariableDecl(ionshared::Ptr<Block> parent);
+        ionshared::OptPtr<Statement> parseStatement(const ionshared::Ptr<Block> &parent);
+
+        ionshared::OptPtr<VariableDecl> parseVariableDecl(const ionshared::Ptr<Block> &parent);
+
+        ionshared::OptPtr<IfStatement> parseIfStatement(const ionshared::Ptr<Block> &parent);
+
+        ionshared::OptPtr<ReturnStatement> parseReturnStatement(const ionshared::Ptr<Block> &parent);
 
         std::optional<std::string> parseLine();
 

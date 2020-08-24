@@ -8,6 +8,8 @@
 namespace ionlang {
     class Pass;
 
+    // TODO: Use StatementOpts struct for constructor options.
+
     class VariableDecl : public Statement, public ionshared::Named {
     private:
         ionshared::Ptr<Type> type;

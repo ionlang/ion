@@ -14,7 +14,7 @@ namespace ionlang {
         TokenKind tokenKind = token.getKind();
 
         IONIR_PARSER_ASSERT((
-            Classifier::isType(tokenKind)
+            Classifier::isBuiltInType(tokenKind)
                 || tokenKind == TokenKind::Identifier
         ))
 

@@ -16,7 +16,7 @@ namespace ionlang {
 
         static bool isIntegerType(TokenKind tokenKind);
 
-        static bool isType(TokenKind tokenKind);
+        static bool isBuiltInType(TokenKind tokenKind);
 
         static bool isKeyword(TokenKind tokenKind);
 

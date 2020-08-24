@@ -12,6 +12,9 @@ namespace ionlang::test::bootstrap {
     TokenStream tokenStream(int amountOfItems) {
         std::vector<Token> tokens = {};
 
+        // Reserve the amount of items in the vector.
+        tokens.reserve(amountOfItems);
+
         // Populate the tokens vector.
         for (int i = 0; i < amountOfItems; i++) {
             tokens.push_back(token());
@@ -52,34 +55,20 @@ namespace ionlang::test::bootstrap {
         ionshared::Ptr<VoidType> returnType = TypeFactory::typeVoid();
 
         // TODO: Consider support for module here.
-        ionshared::Ptr<Prototype> prototype = std::make_shared<Prototype>(test::constant::foobar, std::make_shared<Args>(), returnType, nullptr);
+        ionshared::Ptr<Prototype> prototype = std::make_shared<Prototype>(
+            test::constant::foobar,
+            std::make_shared<Args>(),
+            returnType,
+            nullptr
+        );
 
-        ionshared::Ptr<Block> entrySection = std::make_shared<Block>(BasicBlockOpts{
-            nullptr,
-            BasicBlockKind::Entry,
-            Const::basicBlockEntryId,
-            {},
-            std::move(statements)
-        });
+        ionshared::Ptr<Block> body =
+            std::make_shared<Block>(nullptr, std::move(statements));
 
-        // TODO: Fix mumbo-jumbo debugging code. -------------
+        ionshared::Ptr<Function> function =
+            std::make_shared<Function>(prototype, body);
 
-        typedef ionshared::PtrSymbolTable<Block> BasicBlockPtrSymbolTable;
-        typedef ionshared::SymbolTable<ionshared::Ptr<Block>> tt;
-
-        auto t1 = std::map<std::string, ionshared::Ptr<Block>>{
-            {entrySection->getId(), entrySection}
-        };
-
-        BasicBlockPtrSymbolTable sections = std::make_shared<tt>(t1);
-
-        // --------------------
-
-        ionshared::Ptr<Function> function = std::make_shared<Function>(prototype, nullptr);
-        ionshared::Ptr<FunctionBody> body = std::make_shared<FunctionBody>(function, sections);
-
-        entrySection->setParent(body);
-        function->setBody(body);
+        body->setParent(body);
 
         return function;
     }
