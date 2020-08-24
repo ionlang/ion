@@ -1,12 +1,12 @@
 #pragma once
 
 #include <vector>
-#include "ionlang/passes/codegen/ionir_codegen_pass.h"
-#include "../../include/ionlang/lexical/token.h"
-#include "ionir/lexical/token_kind.h"
-#include "../../include/ionlang/syntax/parser.h"
-#include "ionir/llvm/llvm_module.h"
-#include "../../include/ionir/misc/helpers.h"
+#include <ionshared/llvm/llvm_module.h>
+#include <ionir/misc/helpers.h>
+#include <ionlang/passes/codegen/ionir_codegen_pass.h>
+#include <ionlang/lexical/token.h>
+#include <ionir/lexical/token_kind.h>
+#include <ionlang/syntax/parser.h>
 #include "util.h"
 
 namespace ionlang::test::bootstrap {

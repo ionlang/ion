@@ -2,6 +2,7 @@
 
 #include <ionshared/misc/helpers.h>
 #include <ionshared/passes/base_pass.h>
+#include <ionshared/passes/base_pass_manager.h>
 #include <ionlang/construct/pseudo/ref.h>
 #include <ionlang/construct/pseudo/error_marker.h>
 #include <ionlang/construct/construct.h>
@@ -78,4 +79,8 @@ namespace ionlang {
 
         virtual void visitErrorMarker(ionshared::Ptr<ErrorMarker> node);
     };
+
+    typedef ionshared::BasePassManager<Pass, Construct> PassManager;
+
+    typedef ionshared::PassManagerItem<Pass> PassManagerItem;
 }
