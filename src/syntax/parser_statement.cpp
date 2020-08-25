@@ -11,11 +11,11 @@ namespace ionlang {
         if (Classifier::isBuiltInType(currentTokenKind)) {
             statement = this->parseVariableDecl(parent);
         }
-            // If statement.
+        // If statement.
         else if (currentTokenKind == TokenKind::KeywordIf) {
             statement = this->parseIfStatement(parent);
         }
-            // Return statement.
+        // Return statement.
         else if (currentTokenKind == TokenKind::KeywordReturn) {
             statement = this->parseReturnStatement(parent);
         }
@@ -77,10 +77,14 @@ namespace ionlang {
         ionshared::OptPtr<Value<>> value = std::nullopt;
 
         // Return statement contains a value. Parse it and save it.
-        if (!this->isNext(TokenKind::SymbolSemiColon)) {
+        if (!this->is(TokenKind::SymbolSemiColon)) {
             value = this->parseValue();
 
             IONIR_PARSER_ASSURE(value)
+        }
+        // Otherwise, simply skip the semi-colon token.
+        else {
+            IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
         }
 
         return std::make_shared<ReturnStatement>(ReturnStatementOpts{

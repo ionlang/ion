@@ -126,14 +126,24 @@ namespace ionlang {
         ionshared::Ptr<ionir::Prototype> ionIrPrototype =
             this->constructStack.pop()->dynamicCast<ionir::Prototype>();
 
+        /**
+         * The function's body will be filled below. The function must be
+         * set as the buffer in order for the body to visit (it requires
+         * a function buffer to be set).
+         */
+        ionshared::Ptr<ionir::Function> ionIrFunction =
+            std::make_shared<ionir::Function>(ionIrPrototype, nullptr);
+
+        // Set the function buffer. This is required when visiting the function body.
+        this->functionBuffer = ionIrFunction;
+
         this->visitBlock(node->getBody());
 
         ionshared::Ptr<ionir::FunctionBody> ionIrFunctionBody =
             this->constructStack.pop()->dynamicCast<ionir::FunctionBody>();
 
-        // Retrieve the resulting function off the stack.
-        ionshared::Ptr<ionir::Function> ionIrFunction =
-            std::make_shared<ionir::Function>(ionIrPrototype, ionIrFunctionBody);
+        // Fill in the function's body.
+        ionIrFunction->setBody(ionIrFunctionBody);
 
         // The function's body basic block's parent is nullptr. At this stage, fill it in.
         ionIrFunctionBody->setParent(ionIrFunction);
@@ -239,7 +249,12 @@ namespace ionlang {
 
         if (node->isFunctionBody()) {
             // TODO: Make function body and push it onto the stack.
-            ionIrFunctionBody = std::make_shared<ionir::FunctionBody>();
+            /**
+             * The function body's parent function will be filled in by
+             * the calling visit function.
+             */
+            ionIrFunctionBody = std::make_shared<ionir::FunctionBody>(nullptr);
+
             ionIrBasicBlockKind = ionir::BasicBlockKind::Entry;
             ionIrBasicBlockId = ionir::Const::basicBlockEntryId;
         }
