@@ -82,10 +82,8 @@ namespace ionlang {
 
             IONIR_PARSER_ASSURE(value)
         }
-        // Otherwise, simply skip the semi-colon token.
-        else {
-            IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
-        }
+
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
         return std::make_shared<ReturnStatement>(ReturnStatementOpts{
             parent,

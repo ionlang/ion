@@ -88,6 +88,8 @@ namespace ionlang {
 
         ionshared::OptPtr<Construct> parsePrimaryExpr(ionshared::Ptr<Construct> parent);
 
+        ionshared::OptPtr<CallExpr> parseCallExpr(const ionshared::Ptr<Block> &parent);
+
         ionshared::OptPtr<Block> parseBlock(const ionshared::Ptr<Construct> &parent);
 
         ionshared::OptPtr<Module> parseModule();

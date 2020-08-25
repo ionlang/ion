@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <utility>
 #include <ionshared/misc/util.h>
 #include <ionshared/misc/named.h>
 #include <ionlang/construct/construct.h>
@@ -17,8 +18,8 @@ namespace ionlang {
         ionshared::OptPtr<T> value;
 
     public:
-        Ref(std::string id, ionshared::Ptr<Construct> owner, ionshared::OptPtr<T> value = std::nullopt)
-            : Construct(ConstructKind::Ref), Named(id), owner(owner), value(value) {
+        Ref(const std::string &id, ionshared::Ptr<Construct> owner, ionshared::OptPtr<T> value = std::nullopt)
+            : Construct(ConstructKind::Ref), Named(id), owner(std::move(owner)), value(value) {
             //
         }
 
@@ -27,7 +28,7 @@ namespace ionlang {
             // visitor.visitRef(this->dynamicCast<Ref<T>>());
         }
 
-        ionshared::Ptr<Construct> getOwner() const noexcept {
+        [[nodiscard]] ionshared::Ptr<Construct> getOwner() const noexcept {
             return this->owner;
         }
 
@@ -35,12 +36,12 @@ namespace ionlang {
             this->owner = owner;
         }
 
-        ionshared::OptPtr<T> getValue() const noexcept {
+        [[nodiscard]] ionshared::OptPtr<T> getValue() const noexcept {
             return this->value;
         }
 
         template<typename TValue>
-        ionshared::OptPtr<TValue> getValueAs() const {
+        [[nodiscard]] ionshared::OptPtr<TValue> getValueAs() const {
             // TODO: Ensure T is or derives from Construct.
 
             ionshared::OptPtr<Construct> value = this->getValue();
@@ -52,7 +53,7 @@ namespace ionlang {
             return std::nullopt;
         }
 
-        bool isResolved() noexcept {
+        [[nodiscard]] bool isResolved() noexcept {
             return ionshared::Util::hasValue(this->value);
         }
 

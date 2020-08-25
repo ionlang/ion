@@ -96,11 +96,24 @@ namespace ionlang {
 
         IONIR_PARSER_ASSURE(id)
 
-        // TODO: Handle in-line initialization & pass std::optional<Value> into Global constructor.
+        ionshared::OptPtr<Value<>> value = std::nullopt;
+
+        // Global is being initialized inline with a value. Parse & process the value.
+        if (this->is(TokenKind::SymbolEqual)) {
+            // Skip the equal symbol before continuing parsing.
+            this->stream.skip();
+
+            value = this->parseValue();
+
+            // Value must have been parsed at this point.
+            if (!ionshared::Util::hasValue(value)) {
+                return std::nullopt;
+            }
+        }
 
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
-        return std::make_shared<Global>(*type, *id);
+        return std::make_shared<Global>(*type, *id, value);
     }
 
     ionshared::OptPtr<Block> Parser::parseBlock(const ionshared::Ptr<Construct> &parent) {

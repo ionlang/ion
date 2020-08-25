@@ -26,7 +26,7 @@ namespace ionlang {
 
         ionshared::Ptr<ionir::Module> requireModule();
 
-        void requireFunction();
+        ionshared::Ptr<ionir::Function> requireFunction();
 
         ionshared::Ptr<ionir::InstBuilder> requireBuilder();
 
@@ -90,6 +90,6 @@ namespace ionlang {
 
         void visitVariableDecl(ionshared::Ptr<VariableDecl> node) override;
 
-        void visitCallStatement(ionshared::Ptr<CallStatement> node) override;
+        void visitCallExpr(ionshared::Ptr<CallExpr> node) override;
     };
 }

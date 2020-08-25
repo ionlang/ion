@@ -21,10 +21,12 @@ namespace ionlang {
         return *this->moduleBuffer;
     }
 
-    void IonIrCodegenPass::requireFunction() {
+    ionshared::Ptr<ionir::Function> IonIrCodegenPass::requireFunction() {
         if (!ionshared::Util::hasValue(this->functionBuffer)) {
             throw std::runtime_error("Expected the function buffer to be set, but was null");
         }
+
+        return *this->functionBuffer;
     }
 
     ionshared::Ptr<ionir::InstBuilder> IonIrCodegenPass::requireBuilder() {
@@ -98,6 +100,12 @@ namespace ionlang {
 
         for (const auto &[id, topLevelConstruct] : moduleSymbolTable) {
             this->visit(topLevelConstruct);
+
+            /**
+             * Discard visited top-level constructs (such as functions and
+             * global variables) as they have no use elsewhere.
+             */
+            this->constructStack.pop();
         }
     }
 
@@ -318,12 +326,14 @@ namespace ionlang {
 
         this->visitIntegerType(nodeType->dynamicCast<IntegerType>());
 
-        ionshared::Ptr<ionir::IntegerType> ionIrIntegerType = this->typeStack.pop()->dynamicCast<ionir::IntegerType>();
+        ionshared::Ptr<ionir::IntegerType> ionIrIntegerType =
+            this->typeStack.pop()->dynamicCast<ionir::IntegerType>();
 
         ionshared::Ptr<ionir::IntegerValue> ionIrIntegerValue =
             std::make_shared<ionir::IntegerValue>(ionIrIntegerType, node->getValue());
 
-        this->constructStack.push(ionIrIntegerValue->dynamicCast<ionir::Value<>>());
+        // Use static pointer cast when downcasting to ionir::Value<>.
+        this->constructStack.push(ionIrIntegerValue->staticCast<ionir::Value<>>());
     }
 
     void IonIrCodegenPass::visitCharValue(ionshared::Ptr<CharValue> node) {
@@ -349,7 +359,7 @@ namespace ionlang {
 
     void IonIrCodegenPass::visitGlobal(ionshared::Ptr<Global> node) {
         // Module buffer will be used, therefore it must be set.
-        this->requireModule();
+        ionshared::Ptr<ionir::Module> ionIrModuleBuffer = this->requireModule();
 
         this->visitType(node->getType());
 
@@ -359,16 +369,31 @@ namespace ionlang {
 
         // Assign value if applicable.
         if (ionshared::Util::hasValue(nodeValue)) {
-            // Visit global variable value.
-            this->visitValue(*nodeValue);
+            Pass::visitValue(*nodeValue);
 
-            value = this->constructStack.pop()->dynamicCast<ionir::Value<>>();
+            // Use static pointer cast when downcasting to ionir::Value<>.
+            value = this->constructStack.pop()->staticCast<ionir::Value<>>();
+
+            // Ensure cast value is not nullptr as a precaution.
+            if (!ionshared::Util::hasValue(value)) {
+                throw std::runtime_error("Value cast failed");
+            }
         }
 
-        ionshared::Ptr<ionir::Global> globalVar =
+        ionshared::Ptr<ionir::Global> ionIrGlobalVariable =
             std::make_shared<ionir::Global>(type, node->getId(), value);
 
-        this->constructStack.push(globalVar);
+        /**
+         * Register the global variable on the buffered module's symbol table.
+         * This will allow it to be visited and emitted to LLVM IR during the
+         * IonIR codegen phase.
+         */
+        ionIrModuleBuffer->getSymbolTable()->insert(
+            ionIrGlobalVariable->getId(),
+            ionIrGlobalVariable
+        );
+
+        this->constructStack.push(ionIrGlobalVariable);
     }
 
     void IonIrCodegenPass::visitType(ionshared::Ptr<Type> node) {
@@ -472,8 +497,29 @@ namespace ionlang {
     }
 
     void IonIrCodegenPass::visitIfStatement(ionshared::Ptr<IfStatement> node) {
-        // TODO: Implement.
-        throw std::runtime_error("Not implemented");
+        ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = this->requireBuilder();
+
+        this->visitValue(node->getCondition());
+
+        // Use static pointer cast when casting to ionir::Value<>.
+        ionshared::Ptr<ionir::Value<>> ionIrCondition =
+            this->constructStack.pop()->staticCast<ionir::Value<>>();
+
+        // Ensure the cast was successful and not nullptr as a precaution.
+        if (ionIrCondition == nullptr) {
+            throw std::runtime_error("Could not cast condition; condition is nullptr");
+        }
+
+        this->visitBlock(node->getConsequentBlock());
+
+        ionshared::Ptr<ionir::BasicBlock> ionIrConsequentBasicBlock =
+            this->constructStack.pop()->dynamicCast<ionir::BasicBlock>();
+
+        // TODO: What to put for alternative block? Remember currently there's only 1 block bound to be function body... is that even in context/matters?
+//        ionIrInstBuilder->createBranch(ionIrCondition, ionIrConsequentBasicBlock, NULLPTR);
+
+        // TODO: Continue implementation. A block needs to be provided to continue function body's statements, figure out how to do that.
+        throw std::runtime_error("Implementation not complete");
     }
 
     void IonIrCodegenPass::visitReturnStatement(ionshared::Ptr<ReturnStatement> node) {
@@ -481,8 +527,15 @@ namespace ionlang {
         ionshared::OptPtr<ionir::Value<>> ionIrValue = std::nullopt;
 
         if (node->hasValue()) {
-            this->visitValue(*node->getValue());
-            ionIrValue = this->constructStack.pop()->dynamicCast<ionir::Value<>>();
+            Pass::visitValue(*node->getValue());
+
+            // Use a static pointer cast to cast to ionir::Value<>.
+            ionIrValue = this->constructStack.pop()->staticCast<ionir::Value<>>();
+
+            // Verify cast result isn't nullptr as a precaution.
+            if (!ionshared::Util::hasValue(ionIrValue)) {
+                throw std::runtime_error("Could not upcast return value");
+            }
         }
 
         ionshared::Ptr<ionir::ReturnInst> ionIrReturnInst =
@@ -507,7 +560,7 @@ namespace ionlang {
         this->constructStack.push(ionIrAllocaInst);
 
         // Lastly, then create a IonIR store inst, and push it onto the stack.
-        this->visitValue(node->getValue());
+        Pass::visitValue(node->getValue());
 
         ionshared::Ptr<ionir::Value<>> ionIrValue =
             this->constructStack.pop()->dynamicCast<ionir::Value<>>();
@@ -527,14 +580,27 @@ namespace ionlang {
         );
     }
 
-    void IonIrCodegenPass::visitCallStatement(ionshared::Ptr<CallStatement> node) {
-        this->requireBuilder();
+    void IonIrCodegenPass::visitCallExpr(ionshared::Ptr<CallExpr> node) {
+        ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = this->requireBuilder();
+        ionshared::Ptr<ionir::Function> ionIrCallee = this->requireFunction();
 
-        ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = *this->builderBuffer;
+        /**
+         * At this point, we know that the basic block buffer is
+         * set because the builder buffer is set.
+         */
+        ionshared::Ptr<ionir::CallInst> ionIrCallInst = ionIrInstBuilder->createCall(
+            *this->basicBlockBuffer,
 
-        // TODO: Continue/finish implementation.
-//        ionIrInstBuilder->createCall()
+            // TODO: Is basicBlockBuffer the correct owner for Ref in this case?
+            std::make_shared<ionir::Ref<ionir::Function>>(
+                ionIrCallee->getPrototype()->getId(),
+                *this->basicBlockBuffer,
+                ionIrCallee
+            )
+        );
 
-        throw std::runtime_error("Not implemented");
+        // TODO: Process arguments here.
+
+        this->constructStack.push(ionIrCallInst);
     }
 }

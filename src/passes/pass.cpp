@@ -85,14 +85,12 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitCallStatement(ionshared::Ptr<CallStatement> node) {
+    void Pass::visitCallExpr(ionshared::Ptr<CallExpr> node) {
         //
     }
 
     void Pass::visitValue(ionshared::Ptr<Value<>> node) {
         switch (node->getValueKind()) {
-            // TODO: Missing boolean value kind.
-
             case ValueKind::Character: {
                 this->visitCharValue(node->dynamicCast<CharValue>());
 

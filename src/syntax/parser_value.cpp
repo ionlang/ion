@@ -9,12 +9,16 @@ namespace ionlang {
     ionshared::OptPtr<Value<>> Parser::parseValue() {
         Token token = this->stream.get();
 
+        /**
+         * Always use static pointer cast when downcasting to Value<>,
+         * otherwise the cast result will be nullptr.
+         */
         switch (token.getKind()) {
             case TokenKind::LiteralInteger: {
                 ionshared::OptPtr<IntegerValue> integerValue = this->parseInt();
 
                 if (ionshared::Util::hasValue(integerValue)) {
-                    return (*integerValue)->dynamicCast<Value<>>();
+                    return (*integerValue)->staticCast<Value<>>();
                 }
 
                 return std::nullopt;
@@ -24,7 +28,7 @@ namespace ionlang {
                 ionshared::OptPtr<CharValue> charValue = this->parseChar();
 
                 if (ionshared::Util::hasValue(charValue)) {
-                    return (*charValue)->dynamicCast<Value<>>();
+                    return (*charValue)->staticCast<Value<>>();
                 }
 
                 return std::nullopt;
@@ -71,17 +75,21 @@ namespace ionlang {
 
         // Calculate the value's bit-length and it's corresponding integer kind.
         uint32_t valueBitLength = ionshared::Util::calculateBitLength(value);
-        std::optional<IntegerKind> valueIntegerKind = Util::calculateIntegerKindFromBitLength(valueBitLength);
+
+        std::optional<IntegerKind> valueIntegerKind =
+            Util::calculateIntegerKindFromBitLength(valueBitLength);
 
         if (!valueIntegerKind.has_value()) {
             return this->makeNotice("Integer value's type kind could not be determined");
         }
 
         // Create a long integer type for the value.
-        ionshared::Ptr<IntegerType> type = std::make_shared<IntegerType>(*valueIntegerKind);
+        ionshared::Ptr<IntegerType> type =
+            std::make_shared<IntegerType>(*valueIntegerKind);
 
         // Create the integer instance.
-        ionshared::Ptr<IntegerValue> integer = std::make_shared<IntegerValue>(type, value);
+        ionshared::Ptr<IntegerValue> integer =
+            std::make_shared<IntegerValue>(type, value);
 
         // Skip current token.
         this->stream.tryNext();
