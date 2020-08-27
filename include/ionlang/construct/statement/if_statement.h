@@ -39,5 +39,7 @@ namespace ionlang {
         [[nodiscard]] ionshared::OptPtr<Block> getAlternativeBlock() const noexcept;
 
         void setAlternativeBlock(ionshared::OptPtr<Block> block) noexcept;
+
+        [[nodiscard]] bool hasAlternativeBlock() const noexcept;
     };
 }

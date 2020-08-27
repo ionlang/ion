@@ -37,7 +37,8 @@ namespace ionlang {
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
 
         // The block's parent will be filled below.
-        ionshared::OptPtr<Block> consequentBlockResult = this->parseBlock(nullptr);
+        ionshared::OptPtr<Block> consequentBlockResult =
+            this->parseBlock(nullptr);
 
         IONIR_PARSER_ASSURE(consequentBlockResult)
 

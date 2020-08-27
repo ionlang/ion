@@ -15,7 +15,7 @@
 namespace ionlang {
     ionshared::Ptr<ionir::Module> IonIrCodegenPass::requireModule() {
         if (!ionshared::Util::hasValue(this->moduleBuffer)) {
-            throw std::runtime_error("Expected the module buffer to be set, but was null");
+            throw std::runtime_error("Expected the module buffer to be set, but was nullptr");
         }
 
         return *this->moduleBuffer;
@@ -23,10 +23,18 @@ namespace ionlang {
 
     ionshared::Ptr<ionir::Function> IonIrCodegenPass::requireFunction() {
         if (!ionshared::Util::hasValue(this->functionBuffer)) {
-            throw std::runtime_error("Expected the function buffer to be set, but was null");
+            throw std::runtime_error("Expected the function buffer to be set, but was nullptr");
         }
 
         return *this->functionBuffer;
+    }
+
+    ionshared::Ptr<ionir::BasicBlock> IonIrCodegenPass::requireBasicBlock() {
+        if (!ionshared::Util::hasValue(this->basicBlockBuffer)) {
+            throw std::runtime_error("Expected the basic block buffer to be set, but was nullptr");
+        }
+
+        return *this->basicBlockBuffer;
     }
 
     ionshared::Ptr<ionir::InstBuilder> IonIrCodegenPass::requireBuilder() {
@@ -294,8 +302,8 @@ namespace ionlang {
             // TODO: IMPORTANT: DO note that (some?) visitStatements, (ex. visitReturnStatement) already register insts via builder. (They use buffered builder, which is set on code above and bound to the buffered block, set above).
             // TODO: Insts and registers must be popped off and added onto the block.
 
-            // Discard the result off the stack, as it will not be used.
-            this->constructStack.pop();
+            // Discard the result off the stack (if any), as it will not be used.
+            this->constructStack.tryPop();
         }
 
         // Push the basic block onto the stack.
@@ -497,7 +505,7 @@ namespace ionlang {
     }
 
     void IonIrCodegenPass::visitIfStatement(ionshared::Ptr<IfStatement> node) {
-        ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = this->requireBuilder();
+        ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlockBuffer = this->requireBasicBlock();
 
         this->visitValue(node->getCondition());
 
@@ -510,16 +518,61 @@ namespace ionlang {
             throw std::runtime_error("Could not cast condition; condition is nullptr");
         }
 
+        /**
+         * Transfer all previously emitted instructions into a new continuation
+         * block for the buffered block, then link the buffered block with the
+         * new block.
+         */
+        uint32_t splitOrder = 0;
+
+        ionshared::OptPtr<ionir::Inst> ionIrLastInst =
+            ionIrBasicBlockBuffer->findLastInst();
+
+        if (ionshared::Util::hasValue(ionIrLastInst)) {
+            splitOrder = ionIrLastInst->get()->getOrder();
+        }
+
+        // TODO: What if, before splitting, the current basic block buffer already has a terminal inst? But that'd mean that there are more insts after a terminal inst which is an error. Who will catch that? Maybe not really needed to be catched here, instead in typecheck pass or something.
+
+        // TODO: Provide appropriate id for successor block.
+        ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlockBufferSuccessor =
+            ionIrBasicBlockBuffer->split(splitOrder, "tmp_debug_name_change_me");
+
         this->visitBlock(node->getConsequentBlock());
 
         ionshared::Ptr<ionir::BasicBlock> ionIrConsequentBasicBlock =
             this->constructStack.pop()->dynamicCast<ionir::BasicBlock>();
 
+        /**
+         * Link the current buffered basic block with the if statement's
+         * consequent basic block.
+         */
+        ionIrBasicBlockBuffer->link(ionIrConsequentBasicBlock);
+
+        /**
+         * Link the consequent basic block with the newly created
+         * buffered basic block's successor.
+         */
+        ionIrConsequentBasicBlock->link(ionIrBasicBlockBufferSuccessor);
+
+        if (node->hasAlternativeBlock()) {
+            this->visitBlock(*node->getAlternativeBlock());
+
+            ionshared::Ptr<ionir::BasicBlock> ionIrAlternativeBlock =
+                this->constructStack.pop()->dynamicCast<ionir::BasicBlock>();
+
+            /**
+             * Link the alternative basic block with the buffered basic
+             * block's successor.
+             */
+            ionIrAlternativeBlock->link(ionIrBasicBlockBufferSuccessor);
+        }
+
         // TODO: What to put for alternative block? Remember currently there's only 1 block bound to be function body... is that even in context/matters?
 //        ionIrInstBuilder->createBranch(ionIrCondition, ionIrConsequentBasicBlock, NULLPTR);
 
         // TODO: Continue implementation. A block needs to be provided to continue function body's statements, figure out how to do that.
-        throw std::runtime_error("Implementation not complete");
+//        throw std::runtime_error("Implementation not complete");
     }
 
     void IonIrCodegenPass::visitReturnStatement(ionshared::Ptr<ReturnStatement> node) {

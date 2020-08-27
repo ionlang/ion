@@ -39,4 +39,8 @@ namespace ionlang {
     void IfStatement::setAlternativeBlock(ionshared::OptPtr<Block> block) noexcept {
         this->alternativeBlock = std::move(block);
     }
+
+    bool IfStatement::hasAlternativeBlock() const noexcept {
+        return ionshared::Util::hasValue(this->getAlternativeBlock());
+    }
 }

@@ -28,6 +28,8 @@ namespace ionlang {
 
         ionshared::Ptr<ionir::Function> requireFunction();
 
+        ionshared::Ptr<ionir::BasicBlock> requireBasicBlock();
+
         ionshared::Ptr<ionir::InstBuilder> requireBuilder();
 
         /**
