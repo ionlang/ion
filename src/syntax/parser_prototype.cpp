@@ -70,6 +70,7 @@ namespace ionlang {
         ionshared::OptPtr<Prototype> prototype = this->parsePrototype(parent);
 
         IONIR_PARSER_ASSURE(prototype)
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
         return std::make_shared<Extern>(*prototype);
     }

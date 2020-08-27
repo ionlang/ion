@@ -130,7 +130,7 @@ namespace ionlang {
 
         std::string ionIrFunctionId = node->getPrototype()->getId();
 
-        if (moduleBuffer->getSymbolTable()->contains(ionIrFunctionId)) {
+        if (moduleBuffer->getContext()->getGlobalScope()->contains(ionIrFunctionId)) {
             throw ionshared::Util::quickError(
                 IONLANG_NOTICE_FUNCTION_ALREADY_DEFINED,
                 ionIrFunctionId
@@ -178,7 +178,7 @@ namespace ionlang {
         ionshared::Ptr<ionir::Module> moduleBuffer = this->requireModule();
 
         ionshared::PtrSymbolTable<ionir::Construct> moduleBufferSymbolTable =
-            moduleBuffer->getSymbolTable();
+            moduleBuffer->getContext()->getGlobalScope();
 
         ionshared::Ptr<Prototype> prototype = node->getPrototype();
 
@@ -396,7 +396,7 @@ namespace ionlang {
          * This will allow it to be visited and emitted to LLVM IR during the
          * IonIR codegen phase.
          */
-        ionIrModuleBuffer->getSymbolTable()->insert(
+        ionIrModuleBuffer->getContext()->getGlobalScope()->insert(
             ionIrGlobalVariable->getId(),
             ionIrGlobalVariable
         );
