@@ -143,9 +143,10 @@ namespace ionlang {
             this->constructStack.pop()->dynamicCast<ionir::Prototype>();
 
         /**
-         * The function's body will be filled below. The function must be
-         * set as the buffer in order for the body to visit (it requires
-         * a function buffer to be set).
+         * The function's body will be filled when visiting the body. The
+         * visit body function will detect that the block being visited is
+         * a function body, and will set the buffered function (this function)'s
+         * body with the newly created one.
          */
         ionshared::Ptr<ionir::Function> ionIrFunction =
             std::make_shared<ionir::Function>(ionIrPrototype, nullptr);
@@ -154,15 +155,6 @@ namespace ionlang {
         this->functionBuffer = ionIrFunction;
 
         this->visitBlock(node->getBody());
-
-        ionshared::Ptr<ionir::FunctionBody> ionIrFunctionBody =
-            this->constructStack.pop()->dynamicCast<ionir::FunctionBody>();
-
-        // Fill in the function's body.
-        ionIrFunction->setBody(ionIrFunctionBody);
-
-        // The function's body basic block's parent is nullptr. At this stage, fill it in.
-        ionIrFunctionBody->setParent(ionIrFunction);
 
         // Set the function buffer.
         this->functionBuffer = ionIrFunction;
@@ -255,32 +247,34 @@ namespace ionlang {
     }
 
     void IonIrCodegenPass::visitBlock(ionshared::Ptr<Block> node) {
-        this->requireFunction();
-
+        ionshared::Ptr<ionir::Function> ionIrFunctionBuffer = this->requireFunction();
         ionshared::OptPtr<ionir::FunctionBody> ionIrFunctionBody = std::nullopt;
         ionir::BasicBlockKind ionIrBasicBlockKind = ionir::BasicBlockKind::Internal;
 
         // TODO: Use a counter or something, along with naming depending on the block's parent (ex. if statement parent => if_0, etc.).
-        std::string ionIrBasicBlockId = "FIXME_NAME";
+        std::string ionIrBasicBlockId = "FIX_ME_NAME";
 
         if (node->isFunctionBody()) {
-            // TODO: Make function body and push it onto the stack.
-            /**
-             * The function body's parent function will be filled in by
-             * the calling visit function.
-             */
-            ionIrFunctionBody = std::make_shared<ionir::FunctionBody>(nullptr);
+            // TODO: Make function body and push it onto the stack?
+            ionIrFunctionBody = std::make_shared<ionir::FunctionBody>(ionIrFunctionBuffer);
 
-            ionIrBasicBlockKind = ionir::BasicBlockKind::Entry;
-            ionIrBasicBlockId = ionir::Const::basicBlockEntryId;
+            // Apply the newly created function body to the function.
+            ionIrFunctionBuffer->setBody(*ionIrFunctionBody);
+
+            /**
+             * Only make the basic block the entry block if no previous block
+             * was designated as entry basic block.
+             */
+            if (!ionIrFunctionBody->get()->hasEntryBasicBlock()) {
+                ionIrBasicBlockKind = ionir::BasicBlockKind::Entry;
+                ionIrBasicBlockId = ionir::Const::basicBlockEntryId;
+            }
         }
 
         // TODO: Create the block somehow. It requires 'BasicBlockKind', 'registers' and 'insts'.
         ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlock =
             std::make_shared<ionir::BasicBlock>(ionir::BasicBlockOpts{
-                // The basic block's parent will be filled in by the calling visit function.
-                nullptr,
-
+                ionIrFunctionBuffer->getBody(),
                 ionIrBasicBlockKind,
                 ionIrBasicBlockId
             });
@@ -317,11 +311,13 @@ namespace ionlang {
         else {
             // Register the IonIR basic block on the function body's symbol table.
             ionIrFunctionBody->get()->getSymbolTable()->insert(
-                ionir::Const::basicBlockEntryId,
+                ionIrBasicBlockId,
                 ionIrBasicBlock
             );
 
-            this->constructStack.push(*ionIrFunctionBody);
+            // TODO: REVIEW!.
+            // No value will be pushed onto the stack.
+//            this->constructStack.push(*ionIrFunctionBody);
         }
     }
 
@@ -525,6 +521,7 @@ namespace ionlang {
          */
         uint32_t splitOrder = 0;
 
+        // TODO: What about THIS instruction?
         ionshared::OptPtr<ionir::Inst> ionIrLastInst =
             ionIrBasicBlockBuffer->findLastInst();
 
@@ -537,6 +534,8 @@ namespace ionlang {
         // TODO: Provide appropriate id for successor block.
         ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlockBufferSuccessor =
             ionIrBasicBlockBuffer->split(splitOrder, "tmp_debug_name_change_me");
+
+        // TODO: ~!!!~ When is ionIrBasicBlockBufferSuccessor emitted? Split only creates a new ionir::BasicBlock instance, and registers it on the parent's symbol table. ~!!!~
 
         this->visitBlock(node->getConsequentBlock());
 
