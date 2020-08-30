@@ -18,8 +18,15 @@ namespace ionlang {
         ionshared::OptPtr<T> value;
 
     public:
-        Ref(const std::string &id, ionshared::Ptr<Construct> owner, ionshared::OptPtr<T> value = std::nullopt)
-            : Construct(ConstructKind::Ref), Named(id), owner(std::move(owner)), value(value) {
+        Ref(
+            const std::string &id,
+            ionshared::Ptr<Construct> owner,
+            ionshared::OptPtr<T> value = std::nullopt
+        ) :
+            Construct(ConstructKind::Ref),
+            Named(id),
+            owner(std::move(owner)),
+            value(value) {
             //
         }
 
@@ -33,7 +40,7 @@ namespace ionlang {
         }
 
         void setOwner(ionshared::Ptr<Construct> owner) noexcept {
-            this->owner = owner;
+            this->owner = std::move(owner);
         }
 
         [[nodiscard]] ionshared::OptPtr<T> getValue() const noexcept {
@@ -58,11 +65,7 @@ namespace ionlang {
         }
 
         void resolve(ionshared::OptPtr<T> value) {
-            /**
-             * Make sure the value is not a nullptr. To un-resolve the reference,
-             * std::nullopt should be used instead.
-             */
-            if (value.has_value() && *value == nullptr) {
+            if (!ionshared::util::hasValue(value)) {
                 throw std::runtime_error("Cannot resolve reference with a nullptr");
             }
 

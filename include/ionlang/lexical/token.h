@@ -1,10 +1,10 @@
 #pragma once
 
-#include <ionshared/lexical/bare_token.h>
+#include <ionshared/lexical/base_token.h>
 #include "token_kind.h"
 
 namespace ionlang {
-    class Token : public ionshared::BareToken<TokenKind> {
+    class Token : public ionshared::BaseToken<TokenKind> {
     public:
         Token(TokenKind kind, std::string value, uint32_t startPosition = 0, uint32_t lineNumber = 0);
     };

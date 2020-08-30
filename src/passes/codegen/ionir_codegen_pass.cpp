@@ -641,8 +641,6 @@ namespace ionlang {
          * set because the builder buffer is set.
          */
         ionshared::Ptr<ionir::CallInst> ionIrCallInst = ionIrInstBuilder->createCall(
-            *this->basicBlockBuffer,
-
             // TODO: Is basicBlockBuffer the correct owner for Ref in this case?
             std::make_shared<ionir::Ref<ionir::Function>>(
                 ionIrCallee->getPrototype()->getId(),
