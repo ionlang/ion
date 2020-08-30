@@ -2,10 +2,10 @@
 
 namespace ionlang {
     ionshared::BiMap<std::string, TokenKind> TokenConst::operators = ionshared::BiMap<std::string, TokenKind>(std::map<std::string, TokenKind>{
-        {"+", TokenKind::OperatorAdd},
-        {"-", TokenKind::OperatorSubtract},
-        {"*", TokenKind::OperatorMultiply},
-        {"/", TokenKind::OperatorDivide},
+        {"+", TokenKind::OperatorAddition},
+        {"-", TokenKind::OperatorSubtraction},
+        {"*", TokenKind::OperatorMultiplication},
+        {"/", TokenKind::OperatorDivision},
         {"%", TokenKind::OperatorModulo},
         {"^", TokenKind::OperatorExponent},
         {">", TokenKind::OperatorGreaterThan},

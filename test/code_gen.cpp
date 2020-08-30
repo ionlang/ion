@@ -22,7 +22,7 @@ TEST(CodeGenTest, VisitExtern) {
 
     ionshared::OptPtr<ionir::Module> ionIrModuleBuffer = ionIrCodegenPass->getModuleBuffer();
 
-    EXPECT_TRUE(ionshared::Util::hasValue(ionIrModuleBuffer));
+    EXPECT_TRUE(ionshared::util::hasValue(ionIrModuleBuffer));
 
     // Now, make the ionir::LlvmCodegenPass.
     ionshared::Ptr<ionir::LlvmCodegenPass> ionIrLlvmCodegenPass =
@@ -30,9 +30,6 @@ TEST(CodeGenTest, VisitExtern) {
 
     // Visit the resulting IonIR module buffer from our own codegen pass.
     ionIrLlvmCodegenPass->visitModule(*ionIrModuleBuffer);
-
-    // TODO: Debugging.
-    ionshared::LlvmModule((*ionIrLlvmCodegenPass->getModuleBuffer())).print();
 
     // Then proceed to compare, as LLVM entities will have been emitted inside the ionir::LlvmCodegenPass.
     EXPECT_TRUE(test::compare::ir(ionIrLlvmCodegenPass, "extern_simple"));

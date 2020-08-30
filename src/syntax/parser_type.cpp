@@ -7,7 +7,7 @@ namespace ionlang {
     // TODO: Consider using Ref<> to register pending type reference if user-defined type is parsed?
     ionshared::OptPtr<Type> Parser::parseType() {
         // Retrieve the current token.
-        Token token = this->stream.get();
+        Token token = this->tokenStream.get();
 
         // Abstract the token's properties
         std::string tokenValue = token.getValue();
@@ -35,9 +35,9 @@ namespace ionlang {
          * from the token's value, otherwise default to an
          * user-defined type assumption.
          */
-        if (!ionshared::Util::hasValue(type)) {
-            type = std::make_shared<Type>(tokenValue, Util::resolveTypeKind(tokenValue));
-            this->stream.skip();
+        if (!ionshared::util::hasValue(type)) {
+            type = std::make_shared<Type>(tokenValue, util::resolveTypeKind(tokenValue));
+            this->tokenStream.skip();
         }
 
         // If applicable, mark the type as a pointer.
@@ -54,7 +54,7 @@ namespace ionlang {
 //            type->get()->setIsPointer(true);
 
             // Skip from the star token.
-            this->stream.skip();
+            this->tokenStream.skip();
         }
 
         // Create and return the resulting type construct.
@@ -72,7 +72,7 @@ namespace ionlang {
     }
 
     ionshared::OptPtr<IntegerType> Parser::parseIntegerType() {
-        TokenKind currentTokenKind = this->stream.get().getKind();
+        TokenKind currentTokenKind = this->tokenStream.get().getKind();
 
         if (!Classifier::isIntegerType(currentTokenKind)) {
             return std::nullopt;
@@ -87,7 +87,7 @@ namespace ionlang {
         }
 
         // Skip over the type token.
-        this->stream.skip();
+        this->tokenStream.skip();
 
         return std::make_shared<IntegerType>(*integerKind);
     }

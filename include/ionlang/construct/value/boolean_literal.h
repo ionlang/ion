@@ -5,12 +5,12 @@
 namespace ionlang {
     class Pass;
 
-    class BooleanValue : public Value<> {
+    class BooleanLiteral : public Value<> {
     private:
         bool value;
 
     public:
-        explicit BooleanValue(bool value);
+        explicit BooleanLiteral(bool value);
 
         void accept(Pass &visitor) override;
 

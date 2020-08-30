@@ -57,7 +57,7 @@ namespace ionlang {
     }
 
     std::optional<uint32_t> Block::locate(ionshared::Ptr<Statement> construct) const {
-        return ionshared::Util::locateInVector<ionshared::Ptr<Statement>>(
+        return ionshared::util::locateInVector<ionshared::Ptr<Statement>>(
             this->statements,
             std::move(construct)
         );

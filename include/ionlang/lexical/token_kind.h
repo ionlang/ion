@@ -82,13 +82,13 @@ namespace ionlang {
 
         TypeString,
 
-        OperatorAdd,
+        OperatorAddition,
 
-        OperatorSubtract,
+        OperatorSubtraction,
 
-        OperatorMultiply,
+        OperatorMultiplication,
 
-        OperatorDivide,
+        OperatorDivision,
 
         OperatorModulo,
 

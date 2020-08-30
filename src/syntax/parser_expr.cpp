@@ -1,3 +1,4 @@
+#include <ionlang/misc/util.h>
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
@@ -12,7 +13,7 @@ namespace ionlang {
         // TODO: Support unary and binary operation parsing.
 
         // Otherwise, it must be a literal value.
-        return this->parseLiteralValue();
+        return this->parseLiteral();
     }
 
     ionshared::OptPtr<Construct> Parser::parseParenthesesExpr(const ionshared::Ptr<Block> &parent) {
@@ -32,6 +33,47 @@ namespace ionlang {
 
         // TODO: Is this the correct parent for the ref?
         return this->parseRef(parent);
+    }
+
+    ionshared::OptPtr<BinaryOperation> Parser::parseBinaryOperation(const ionshared::Ptr<Block> &parent) {
+        while (true) {
+            std::optional<Operator> operation =
+                util::findOperator(this->tokenStream.get().getKind());
+
+            IONIR_PARSER_ASSURE(operation)
+
+            this->tokenStream.skip();
+
+            ionshared::OptPtr<Construct> rightSide = this->parsePrimaryExpr(parent);
+
+            IONIR_PARSER_ASSURE(rightSide)
+
+            // TODO: UNFINISHED!!!! ---------------------------------------
+            // ------------------------------------------------------------
+            // ------------------------------------------------------------
+            // ------------------------------------------------------------
+            // ------------------------------------------------------------
+            // ------------------------------------------------------------
+            // Continue: https://github.com/ionlang/Ion.Net/blob/master/Ion/Parsing/BinaryOpRightSideParser.cs
+            // ------------------------------------------------------------
+
+            // TODO: Type should be rightSide's type (but rightSide is a construct. It must be a value... CallExpr should be a expression too).
+            return std::make_shared<BinaryOperation>(BinaryOperationOpts{
+                nullptr,
+                *operation,
+                nullptr,
+                *rightSide
+            });
+
+            // ------------------------------------------------------------
+            // ------------------------------------------------------------
+            // ------------------------------------------------------------
+            // ------------------------------------------------------------
+            // ------------------------------------------------------------
+            // ------------------------------------------------------------
+            // ------------------------------------------------------------
+            // ------------------------------------------------------------
+        }
     }
 
     ionshared::OptPtr<CallExpr> Parser::parseCallExpr(const ionshared::Ptr<Block> &parent) {

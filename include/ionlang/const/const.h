@@ -6,7 +6,7 @@
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/LLVMContext.h>
 #include <ionshared/container/map.h>
-#include <ionlang/construct/value/integer_value.h>
+#include <ionlang/construct/value/integer_literal.h>
 #include <ionlang/lexical/token_kind.h>
 
 namespace ionlang {

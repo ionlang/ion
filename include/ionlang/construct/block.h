@@ -26,7 +26,7 @@ namespace ionlang {
             std::vector<ionshared::Ptr<Statement>> statements = {},
 
             ionshared::PtrSymbolTable<Statement> symbolTable =
-                ionshared::Util::makePtrSymbolTable<Statement>()
+                ionshared::util::makePtrSymbolTable<Statement>()
         );
 
         void accept(Pass &visitor) override;

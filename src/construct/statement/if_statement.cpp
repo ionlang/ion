@@ -41,6 +41,6 @@ namespace ionlang {
     }
 
     bool IfStatement::hasAlternativeBlock() const noexcept {
-        return ionshared::Util::hasValue(this->getAlternativeBlock());
+        return ionshared::util::hasValue(this->getAlternativeBlock());
     }
 }

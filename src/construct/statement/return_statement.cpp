@@ -29,6 +29,6 @@ namespace ionlang {
     }
 
     bool ReturnStatement::hasValue() const noexcept {
-        return ionshared::Util::hasValue(this->value);
+        return ionshared::util::hasValue(this->value);
     }
 }

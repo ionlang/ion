@@ -5,17 +5,17 @@
 
 namespace ionlang {
     bool Parser::is(TokenKind tokenKind) noexcept {
-        return this->stream.get().getKind() == tokenKind;
+        return this->tokenStream.get().getKind() == tokenKind;
     }
 
     bool Parser::isNext(TokenKind tokenKind) {
-        return this->stream.peek()->getKind() == tokenKind;
+        return this->tokenStream.peek()->getKind() == tokenKind;
     }
 
     bool Parser::expect(TokenKind tokenKind) {
         if (!this->is(tokenKind)) {
             this->makeNotice("Expected token kind: " + std::to_string((int)tokenKind) + ", but got: " +
-                std::to_string((int)this->stream.get().getKind()));
+                std::to_string((int)this->tokenStream.get().getKind()));
 
             return false;
         }
@@ -28,14 +28,14 @@ namespace ionlang {
             return false;
         }
 
-        this->stream.skip();
+        this->tokenStream.skip();
 
         return true;
     }
 
     ionshared::NoticeFactory Parser::createNoticeFactory() noexcept {
         // Abstract current Token for easier access.
-        Token token = this->stream.get();
+        Token token = this->tokenStream.get();
 
         return ionshared::NoticeFactory(ionshared::NoticeContext{
                 this->filePath,
@@ -52,7 +52,7 @@ namespace ionlang {
     }
 
     Parser::Parser(TokenStream stream, const ionshared::Ptr<ionshared::NoticeStack> &noticeStack, std::string filePath)
-        : stream(std::move(stream)), noticeStack(noticeStack),
+        : tokenStream(std::move(stream)), noticeStack(noticeStack),
         noticeSentinel(std::make_shared<NoticeSentinel>(noticeStack)), filePath(std::move(filePath)) {
         //
     }
@@ -66,7 +66,7 @@ namespace ionlang {
     }
 
     ionshared::OptPtr<Construct> Parser::parseTopLevel(const ionshared::Ptr<Module> &parent) {
-        switch (this->stream.get().getKind()) {
+        switch (this->tokenStream.get().getKind()) {
             case TokenKind::KeywordFunction: {
                 return this->parseFunction(parent);
             }
@@ -101,12 +101,12 @@ namespace ionlang {
         // Global is being initialized inline with a value. Parse & process the value.
         if (this->is(TokenKind::SymbolEqual)) {
             // Skip the equal symbol before continuing parsing.
-            this->stream.skip();
+            this->tokenStream.skip();
 
-            value = this->parseLiteralValue();
+            value = this->parseLiteral();
 
             // Value must have been parsed at this point.
-            if (!ionshared::Util::hasValue(value)) {
+            if (!ionshared::util::hasValue(value)) {
                 return std::nullopt;
             }
         }
@@ -130,7 +130,7 @@ namespace ionlang {
             statements.push_back(*statement);
         }
 
-        this->stream.skip();
+        this->tokenStream.skip();
         block->setStatements(statements);
 
         return block;
@@ -153,9 +153,9 @@ namespace ionlang {
             ionshared::OptPtr<Construct> topLevelConstructResult = this->parseTopLevel(module);
 
             // TODO: Make notice if it has no value? Or is it enough with the notice under 'parseTopLevel()'?
-            if (ionshared::Util::hasValue(topLevelConstructResult)) {
+            if (ionshared::util::hasValue(topLevelConstructResult)) {
                 ionshared::Ptr<Construct> topLevelConstruct = *topLevelConstructResult;
-                std::optional<std::string> name = Util::findConstructId(topLevelConstruct);
+                std::optional<std::string> name = util::findConstructId(topLevelConstruct);
 
                 if (!name.has_value()) {
                     throw std::runtime_error("Unexpected construct name to be null");
@@ -166,9 +166,9 @@ namespace ionlang {
             }
 
             // No more tokens to process.
-            if (!this->stream.hasNext() && !this->is(TokenKind::SymbolBraceR)) {
+            if (!this->tokenStream.hasNext() && !this->is(TokenKind::SymbolBraceR)) {
                 // TODO: Use Ast(Ptr)Result<>.
-                throw ionshared::Util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_EOF);
+                throw ionshared::util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_EOF);
                 //                return this->noticeSentinel->makeError<Module>(IONIR_NOTICE_MISC_UNEXPECTED_EOF);
             }
         }
@@ -188,7 +188,7 @@ namespace ionlang {
         IONIR_PARSER_ASSURE(id)
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual))
 
-        ionshared::OptPtr<Value<>> value = this->parseLiteralValue();
+        ionshared::OptPtr<Value<>> value = this->parseLiteral();
 
         IONIR_PARSER_ASSURE(value)
 

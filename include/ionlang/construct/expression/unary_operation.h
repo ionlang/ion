@@ -12,7 +12,15 @@ namespace ionlang {
 
         Multiplication,
 
-        Division
+        Division,
+
+        Exponent,
+
+        Modulo,
+
+        LessThan,
+
+        GreaterThan
     };
 
     class UnaryOperation : public Expression {

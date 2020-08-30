@@ -5,7 +5,7 @@ namespace ionlang {
     ionshared::OptPtr<Statement> Parser::parseStatement(const ionshared::Ptr<Block> &parent) {
         ionshared::OptPtr<Statement> statement = std::nullopt;
         ionshared::PtrSymbolTable<Statement> symbolTable = parent->getSymbolTable();
-        TokenKind currentTokenKind = this->stream.get().getKind();
+        TokenKind currentTokenKind = this->tokenStream.get().getKind();
 
         // A built-in type at this position can only mean a variable declaration.
         if (Classifier::isBuiltInType(currentTokenKind)) {
@@ -21,7 +21,7 @@ namespace ionlang {
         }
         // TODO: Use Ast(Ptr)Result<>.
         //        else {
-        //            throw ionshared::Util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_TOKEN);
+        //            throw ionshared::util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_TOKEN);
         //        }
 
         return statement;
@@ -31,7 +31,7 @@ namespace ionlang {
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIf))
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
-        ionshared::OptPtr<Value<>> condition = this->parseLiteralValue();
+        ionshared::OptPtr<Value<>> condition = this->parseLiteral();
 
         IONIR_PARSER_ASSURE(condition)
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
@@ -65,7 +65,7 @@ namespace ionlang {
         // Finally, fill in the gaps.
         consequentBlock->setParent(ifStatement);
 
-        if (ionshared::Util::hasValue(alternativeBlock)) {
+        if (ionshared::util::hasValue(alternativeBlock)) {
             alternativeBlock->get()->setParent(ifStatement);
         }
 
@@ -79,7 +79,7 @@ namespace ionlang {
 
         // Return statement contains a value. Parse it and save it.
         if (!this->is(TokenKind::SymbolSemiColon)) {
-            value = this->parseLiteralValue();
+            value = this->parseLiteral();
 
             IONIR_PARSER_ASSURE(value)
         }

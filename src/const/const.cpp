@@ -10,10 +10,10 @@ namespace ionlang {
     const std::string Const::basicBlockEntryId = "entry";
 
     std::map<TokenKind, int> Const::operatorPrecedence = {
-        {TokenKind::OperatorAdd, 20},
-        {TokenKind::OperatorSubtract, 20},
-        {TokenKind::OperatorMultiply, 40},
-        {TokenKind::OperatorDivide, 40},
+        {TokenKind::OperatorAddition, 20},
+        {TokenKind::OperatorSubtraction, 20},
+        {TokenKind::OperatorMultiplication, 40},
+        {TokenKind::OperatorDivision, 40},
         {TokenKind::OperatorModulo, 40},
         {TokenKind::OperatorExponent, 80}
     };
@@ -61,7 +61,7 @@ namespace ionlang {
     }
 
     std::optional<std::string> Const::getConstructKindName(ConstructKind constructKind) {
-        if (ionshared::Util::mapContains<ConstructKind, std::string>(Const::constructNames, constructKind)) {
+        if (ionshared::util::mapContains<ConstructKind, std::string>(Const::constructNames, constructKind)) {
             return Const::constructNames[constructKind];
         }
 
@@ -69,7 +69,7 @@ namespace ionlang {
     }
 
     std::optional<IntegerKind> Const::getIntegerKind(TokenKind tokenKind) {
-        if (ionshared::Util::mapContains<TokenKind, IntegerKind>(Const::tokenKindToIntegerKind, tokenKind)) {
+        if (ionshared::util::mapContains<TokenKind, IntegerKind>(Const::tokenKindToIntegerKind, tokenKind)) {
             return Const::tokenKindToIntegerKind[tokenKind];
         }
 

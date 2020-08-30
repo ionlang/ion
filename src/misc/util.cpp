@@ -3,8 +3,8 @@
 #include <ionlang/construct/function.h>
 #include <ionlang/construct/extern.h>
 
-namespace ionlang {
-    std::string Util::resolveIntegerKindName(IntegerKind kind) {
+namespace ionlang::util {
+    std::string resolveIntegerKindName(IntegerKind kind) {
         switch (kind) {
             case IntegerKind ::Int8: {
                 return ConstName::typeInt8;
@@ -28,7 +28,7 @@ namespace ionlang {
         }
     }
 
-    TypeKind Util::resolveTypeKind(const std::string &id) {
+    TypeKind resolveTypeKind(const std::string &id) {
         // TODO: CRITICAL: Add support new/missing types.
 
         if (id == ConstName::typeInt8) {
@@ -53,7 +53,7 @@ namespace ionlang {
         return TypeKind::UserDefined;
     }
 
-    std::optional<IntegerKind> Util::calculateIntegerKindFromBitLength(uint32_t bitLength) noexcept {
+    std::optional<IntegerKind> calculateIntegerKindFromBitLength(uint32_t bitLength) noexcept {
         if (bitLength <= 8) {
             return IntegerKind::Int8;
         }
@@ -73,7 +73,7 @@ namespace ionlang {
         return std::nullopt;
     }
 
-    std::optional<std::string> Util::findConstructId(const ionshared::Ptr<Construct> &construct) {
+    std::optional<std::string> findConstructId(const ionshared::Ptr<Construct> &construct) {
         ConstructKind constructKind = construct->getConstructKind();
 
         /**
@@ -95,7 +95,7 @@ namespace ionlang {
             }
 
             case ConstructKind::Statement: {
-                return Util::findStatementId(construct->dynamicCast<Statement>());
+                return util::findStatementId(construct->dynamicCast<Statement>());
             }
 
             // TODO: Make sure there aren't any more that should be here.
@@ -106,10 +106,50 @@ namespace ionlang {
         }
     }
 
-    std::optional<std::string> Util::findStatementId(const ionshared::Ptr<Statement> &statement) noexcept {
-        // TODO: Implement. Check for derivations from ionshared::Named first, then specific cases (similar to Util::findConstructId()).
+    std::optional<std::string> findStatementId(const ionshared::Ptr<Statement> &statement) noexcept {
+        // TODO: Implement. Check for derivations from ionshared::Named first, then specific cases (similar to util::findConstructId()).
         // TODO: VariableDecl can easily be implemented as derived.
         switch (statement->getStatementKind()) {
+            default: {
+                return std::nullopt;
+            }
+        }
+    }
+
+    std::optional<Operator> findOperator(TokenKind tokenKind) {
+        switch (tokenKind) {
+            case TokenKind::OperatorAddition: {
+                return Operator::Addition;
+            }
+
+            case TokenKind::OperatorSubtraction: {
+                return Operator::Subtraction;
+            }
+
+            case TokenKind::OperatorMultiplication: {
+                return Operator::Multiplication;
+            }
+
+            case TokenKind::OperatorDivision: {
+                return Operator::Division;
+            }
+
+            case TokenKind::OperatorExponent: {
+                return Operator::Exponent;
+            }
+
+            case TokenKind::OperatorModulo: {
+                return Operator::Modulo;
+            }
+
+            case TokenKind::OperatorLessThan: {
+                return Operator::LessThan;
+            }
+
+            case TokenKind::OperatorGreaterThan: {
+                return Operator::GreaterThan;
+            }
+
             default: {
                 return std::nullopt;
             }

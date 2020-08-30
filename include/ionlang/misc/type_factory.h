@@ -5,17 +5,14 @@
 #include <ionlang/construct/type/void_type.h>
 #include <ionlang/construct/type/integer_type.h>
 
-namespace ionlang {
-    class TypeFactory {
-    public:
-        static ionshared::Ptr<IntegerType> typeInteger(IntegerKind integerKind, bool isSigned = true);
+namespace ionlang::type_factory {
+    ionshared::Ptr<IntegerType> typeInteger(IntegerKind integerKind, bool isSigned = true);
 
-        static ionshared::Ptr<BooleanType> typeBoolean();
+    ionshared::Ptr<BooleanType> typeBoolean();
 
-        static ionshared::Ptr<IntegerType> typeChar();
+    ionshared::Ptr<IntegerType> typeChar();
 
-        static ionshared::Ptr<Type> typeString();
+    ionshared::Ptr<Type> typeString();
 
-        static ionshared::Ptr<VoidType> typeVoid();
-    };
+    ionshared::Ptr<VoidType> typeVoid();
 }

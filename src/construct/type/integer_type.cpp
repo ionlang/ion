@@ -3,7 +3,7 @@
 
 namespace ionlang {
     IntegerType::IntegerType(IntegerKind kind, bool isSigned)
-        : Type(Util::resolveIntegerKindName(kind), TypeKind::Integer), kind(kind), isSigned(isSigned) {
+        : Type(util::resolveIntegerKindName(kind), TypeKind::Integer), kind(kind), isSigned(isSigned) {
         //
     }
 

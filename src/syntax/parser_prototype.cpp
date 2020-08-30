@@ -3,7 +3,7 @@
 
 namespace ionlang {
     ionshared::OptPtr<Args> Parser::parseArgs() {
-        ionshared::SymbolTable<Arg> args = {};
+        ionshared::SymbolTable<Arg> args = ionshared::SymbolTable<Arg>();
         bool isInfinite = false;
 
         do {
@@ -19,7 +19,7 @@ namespace ionlang {
                 }
 
                 // Skip over comma token.
-                this->stream.next();
+                this->tokenStream.next();
             }
 
             std::optional<Arg> argResult = this->parseArg();
@@ -53,7 +53,7 @@ namespace ionlang {
             args = *temporaryArgs;
         }
 
-        this->stream.skip();
+        this->tokenStream.skip();
 
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolArrow))
 

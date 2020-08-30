@@ -52,7 +52,7 @@ namespace ionlang::test::bootstrap {
     }
 
     ionshared::Ptr<Function> emptyFunction(std::vector<ionshared::Ptr<Statement>> statements) {
-        ionshared::Ptr<VoidType> returnType = TypeFactory::typeVoid();
+        ionshared::Ptr<VoidType> returnType = type_factory::typeVoid();
 
         // TODO: Consider support for module here.
         ionshared::Ptr<Prototype> prototype = std::make_shared<Prototype>(

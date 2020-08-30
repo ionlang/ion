@@ -68,13 +68,13 @@ namespace ionlang {
 
         void visitBlock(ionshared::Ptr<Block> node) override;
 
-        void visitIntegerValue(ionshared::Ptr<IntegerValue> node) override;
+        void visitIntegerValue(ionshared::Ptr<IntegerLiteral> node) override;
 
-        void visitCharValue(ionshared::Ptr<CharValue> node) override;
+        void visitCharValue(ionshared::Ptr<CharLiteral> node) override;
 
-        void visitStringValue(ionshared::Ptr<StringValue> node) override;
+        void visitStringValue(ionshared::Ptr<StringLiteral> node) override;
 
-        void visitBooleanValue(ionshared::Ptr<BooleanValue> node) override;
+        void visitBooleanValue(ionshared::Ptr<BooleanLiteral> node) override;
 
         void visitGlobal(ionshared::Ptr<Global> node) override;
 

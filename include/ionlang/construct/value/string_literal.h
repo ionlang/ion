@@ -7,12 +7,12 @@
 namespace ionlang {
     class Pass;
 
-    class StringValue : public Value<> {
+    class StringLiteral : public Value<> {
     private:
         std::string value;
 
     public:
-        explicit StringValue(std::string value);
+        explicit StringLiteral(std::string value);
 
         void accept(Pass &visitor) override;
 

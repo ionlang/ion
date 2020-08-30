@@ -13,7 +13,7 @@ namespace ionlang {
             std::string id,
 
             ionshared::PtrSymbolTable<Construct> symbolTable =
-                ionshared::Util::makePtrSymbolTable<Construct>()
+                ionshared::util::makePtrSymbolTable<Construct>()
         );
 
         void accept(Pass &visitor) override;

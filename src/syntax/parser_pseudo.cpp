@@ -6,10 +6,10 @@ namespace ionlang {
 
         IONIR_PARSER_EXPECT(TokenKind::Identifier)
 
-        Token id = this->stream.get();
+        Token id = this->tokenStream.get();
 
         // Skip over identifier token.
-        this->stream.skip();
+        this->tokenStream.skip();
 
         // Return the identifier's value.
         return id.getValue();

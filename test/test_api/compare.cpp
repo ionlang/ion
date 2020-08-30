@@ -27,7 +27,7 @@ namespace ionlang::test::compare {
     bool ir(const ionshared::Ptr<ionir::LlvmCodegenPass> &llvmCodegenPass, const std::string &fileName) {
         std::optional<llvm::Module *> llvmModuleBuffer = llvmCodegenPass->getModuleBuffer();
 
-        if (!ionshared::Util::hasValue(llvmModuleBuffer)) {
+        if (!ionshared::util::hasValue(llvmModuleBuffer)) {
             throw std::runtime_error("Module buffer in LlvmCodegenPass is not set");
         }
 

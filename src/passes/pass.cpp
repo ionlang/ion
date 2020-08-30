@@ -128,25 +128,25 @@ namespace ionlang {
     void Pass::visitValue(ionshared::Ptr<Value<>> node) {
         switch (node->getValueKind()) {
             case ValueKind::Character: {
-                this->visitCharValue(node->dynamicCast<CharValue>());
+                this->visitCharValue(node->dynamicCast<CharLiteral>());
 
                 break;
             }
 
             case ValueKind::Integer: {
-                this->visitIntegerValue(node->dynamicCast<IntegerValue>());
+                this->visitIntegerValue(node->dynamicCast<IntegerLiteral>());
 
                 break;
             }
 
             case ValueKind::String: {
-                this->visitStringValue(node->dynamicCast<StringValue>());
+                this->visitStringValue(node->dynamicCast<StringLiteral>());
 
                 break;
             }
 
             case ValueKind::Boolean: {
-                this->visitBooleanValue(node->dynamicCast<BooleanValue>());
+                this->visitBooleanValue(node->dynamicCast<BooleanLiteral>());
 
                 break;
             }
@@ -157,19 +157,19 @@ namespace ionlang {
         }
     }
 
-    void Pass::visitBooleanValue(ionshared::Ptr<BooleanValue> node) {
+    void Pass::visitBooleanValue(ionshared::Ptr<BooleanLiteral> node) {
         //
     }
 
-    void Pass::visitCharValue(ionshared::Ptr<CharValue> node) {
+    void Pass::visitCharValue(ionshared::Ptr<CharLiteral> node) {
         //
     }
 
-    void Pass::visitIntegerValue(ionshared::Ptr<IntegerValue> node) {
+    void Pass::visitIntegerValue(ionshared::Ptr<IntegerLiteral> node) {
         //
     }
 
-    void Pass::visitStringValue(ionshared::Ptr<StringValue> node) {
+    void Pass::visitStringValue(ionshared::Ptr<StringLiteral> node) {
         //
     }
 

@@ -17,10 +17,10 @@
 #include <ionlang/construct/expression/binary_operation.h>
 #include <ionlang/construct/expression/call_expr.h>
 #include <ionlang/construct/value.h>
-#include <ionlang/construct/value/boolean_value.h>
-#include <ionlang/construct/value/char_value.h>
-#include <ionlang/construct/value/integer_value.h>
-#include <ionlang/construct/value/string_value.h>
+#include <ionlang/construct/value/boolean_literal.h>
+#include <ionlang/construct/value/char_literal.h>
+#include <ionlang/construct/value/integer_literal.h>
+#include <ionlang/construct/value/string_literal.h>
 #include <ionlang/construct/type.h>
 #include <ionlang/construct/type/void_type.h>
 #include <ionlang/construct/type/boolean_type.h>
@@ -59,13 +59,13 @@ namespace ionlang {
 
         virtual void visitValue(ionshared::Ptr<Value<>> node);
 
-        virtual void visitIntegerValue(ionshared::Ptr<IntegerValue> node);
+        virtual void visitIntegerValue(ionshared::Ptr<IntegerLiteral> node);
 
-        virtual void visitCharValue(ionshared::Ptr<CharValue> node);
+        virtual void visitCharValue(ionshared::Ptr<CharLiteral> node);
 
-        virtual void visitStringValue(ionshared::Ptr<StringValue> node);
+        virtual void visitStringValue(ionshared::Ptr<StringLiteral> node);
 
-        virtual void visitBooleanValue(ionshared::Ptr<BooleanValue> node);
+        virtual void visitBooleanValue(ionshared::Ptr<BooleanLiteral> node);
 
         virtual void visitType(ionshared::Ptr<Type> node);
 

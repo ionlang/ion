@@ -1,8 +1,8 @@
 #include <ionshared/misc/util.h>
-#include <ionir/construct/value/integer_value.h>
-#include <ionir/construct/value/char_value.h>
-#include <ionir/construct/value/string_value.h>
-#include <ionir/construct/value/boolean_value.h>
+#include <ionir/construct/value/integer_literal.h>
+#include <ionir/construct/value/char_literal.h>
+#include <ionir/construct/value/string_literal.h>
+#include <ionir/construct/value/boolean_literal.h>
 #include <ionir/construct/function.h>
 #include <ionir/construct/global.h>
 #include <ionir/construct/extern.h>
@@ -14,7 +14,7 @@
 
 namespace ionlang {
     ionshared::Ptr<ionir::Module> IonIrCodegenPass::requireModule() {
-        if (!ionshared::Util::hasValue(this->moduleBuffer)) {
+        if (!ionshared::util::hasValue(this->moduleBuffer)) {
             throw std::runtime_error("Expected the module buffer to be set, but was nullptr");
         }
 
@@ -22,7 +22,7 @@ namespace ionlang {
     }
 
     ionshared::Ptr<ionir::Function> IonIrCodegenPass::requireFunction() {
-        if (!ionshared::Util::hasValue(this->functionBuffer)) {
+        if (!ionshared::util::hasValue(this->functionBuffer)) {
             throw std::runtime_error("Expected the function buffer to be set, but was nullptr");
         }
 
@@ -30,7 +30,7 @@ namespace ionlang {
     }
 
     ionshared::Ptr<ionir::BasicBlock> IonIrCodegenPass::requireBasicBlock() {
-        if (!ionshared::Util::hasValue(this->basicBlockBuffer)) {
+        if (!ionshared::util::hasValue(this->basicBlockBuffer)) {
             throw std::runtime_error("Expected the basic block buffer to be set, but was nullptr");
         }
 
@@ -122,7 +122,7 @@ namespace ionlang {
 
         // TODO: Awaiting verification implementation.
 //        if (!node->verify()) {
-//            throw ionshared::Util::quickError(
+//            throw ionshared::util::quickError(
 //                IONLANG_NOTICE_MISC_VERIFICATION_FAILED,
 //                "Function" // TODO: Hard-coded, should be using Util::getConstructName().
 //            );
@@ -131,7 +131,7 @@ namespace ionlang {
         std::string ionIrFunctionId = node->getPrototype()->getId();
 
         if (moduleBuffer->getContext()->getGlobalScope()->contains(ionIrFunctionId)) {
-            throw ionshared::Util::quickError(
+            throw ionshared::util::quickError(
                 IONLANG_NOTICE_FUNCTION_ALREADY_DEFINED,
                 ionIrFunctionId
             );
@@ -301,7 +301,7 @@ namespace ionlang {
         }
 
         // Push the basic block onto the stack.
-        if (!ionshared::Util::hasValue(ionIrFunctionBody)) {
+        if (!ionshared::util::hasValue(ionIrFunctionBody)) {
             this->constructStack.push(ionIrBasicBlock);
         }
         /**
@@ -321,7 +321,7 @@ namespace ionlang {
         }
     }
 
-    void IonIrCodegenPass::visitIntegerValue(ionshared::Ptr<IntegerValue> node) {
+    void IonIrCodegenPass::visitIntegerValue(ionshared::Ptr<IntegerLiteral> node) {
         ionshared::Ptr<Type> nodeType = node->getType();
 
         if (nodeType->getTypeKind() != TypeKind::Integer) {
@@ -333,32 +333,32 @@ namespace ionlang {
         ionshared::Ptr<ionir::IntegerType> ionIrIntegerType =
             this->typeStack.pop()->dynamicCast<ionir::IntegerType>();
 
-        ionshared::Ptr<ionir::IntegerValue> ionIrIntegerValue =
-            std::make_shared<ionir::IntegerValue>(ionIrIntegerType, node->getValue());
+        ionshared::Ptr<ionir::IntegerLiteral> ionIrIntegerLiteral =
+            std::make_shared<ionir::IntegerLiteral>(ionIrIntegerType, node->getValue());
 
         // Use static pointer cast when downcasting to ionir::Value<>.
-        this->constructStack.push(ionIrIntegerValue->staticCast<ionir::Value<>>());
+        this->constructStack.push(ionIrIntegerLiteral->staticCast<ionir::Value<>>());
     }
 
-    void IonIrCodegenPass::visitCharValue(ionshared::Ptr<CharValue> node) {
-        ionshared::Ptr<ionir::CharValue> ionIrCharValue =
-            std::make_shared<ionir::CharValue>(node->getValue());
+    void IonIrCodegenPass::visitCharValue(ionshared::Ptr<CharLiteral> node) {
+        ionshared::Ptr<ionir::CharLiteral> ionIrCharLiteral =
+            std::make_shared<ionir::CharLiteral>(node->getValue());
 
-        this->constructStack.push(ionIrCharValue->dynamicCast<ionir::Value<>>());
+        this->constructStack.push(ionIrCharLiteral->dynamicCast<ionir::Value<>>());
     }
 
-    void IonIrCodegenPass::visitStringValue(ionshared::Ptr<StringValue> node) {
-        ionshared::Ptr<ionir::StringValue> ionIrStringValue =
-            std::make_shared<ionir::StringValue>(node->getValue());
+    void IonIrCodegenPass::visitStringValue(ionshared::Ptr<StringLiteral> node) {
+        ionshared::Ptr<ionir::StringLiteral> ionIrStringLiteral =
+            std::make_shared<ionir::StringLiteral>(node->getValue());
 
-        this->constructStack.push(ionIrStringValue->dynamicCast<ionir::Value<>>());
+        this->constructStack.push(ionIrStringLiteral->dynamicCast<ionir::Value<>>());
     }
 
-    void IonIrCodegenPass::visitBooleanValue(ionshared::Ptr<BooleanValue> node) {
-        ionshared::Ptr<ionir::BooleanValue> ionIrBooleanValue =
-            std::make_shared<ionir::BooleanValue>(node->getValue());
+    void IonIrCodegenPass::visitBooleanValue(ionshared::Ptr<BooleanLiteral> node) {
+        ionshared::Ptr<ionir::BooleanLiteral> ionIrBooleanLiteral =
+            std::make_shared<ionir::BooleanLiteral>(node->getValue());
 
-        this->constructStack.push(ionIrBooleanValue->dynamicCast<ionir::Value<>>());
+        this->constructStack.push(ionIrBooleanLiteral->dynamicCast<ionir::Value<>>());
     }
 
     void IonIrCodegenPass::visitGlobal(ionshared::Ptr<Global> node) {
@@ -372,14 +372,14 @@ namespace ionlang {
         ionshared::OptPtr<ionir::Value<>> value = std::nullopt;
 
         // Assign value if applicable.
-        if (ionshared::Util::hasValue(nodeValue)) {
+        if (ionshared::util::hasValue(nodeValue)) {
             Pass::visitValue(*nodeValue);
 
             // Use static pointer cast when downcasting to ionir::Value<>.
             value = this->constructStack.pop()->staticCast<ionir::Value<>>();
 
             // Ensure cast value is not nullptr as a precaution.
-            if (!ionshared::Util::hasValue(value)) {
+            if (!ionshared::util::hasValue(value)) {
                 throw std::runtime_error("Value cast failed");
             }
         }
@@ -525,7 +525,7 @@ namespace ionlang {
         ionshared::OptPtr<ionir::Inst> ionIrLastInst =
             ionIrBasicBlockBuffer->findLastInst();
 
-        if (ionshared::Util::hasValue(ionIrLastInst)) {
+        if (ionshared::util::hasValue(ionIrLastInst)) {
             splitOrder = ionIrLastInst->get()->getOrder();
         }
 
@@ -585,7 +585,7 @@ namespace ionlang {
             ionIrValue = this->constructStack.pop()->staticCast<ionir::Value<>>();
 
             // Verify cast result isn't nullptr as a precaution.
-            if (!ionshared::Util::hasValue(ionIrValue)) {
+            if (!ionshared::util::hasValue(ionIrValue)) {
                 throw std::runtime_error("Could not upcast return value");
             }
         }

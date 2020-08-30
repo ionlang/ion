@@ -14,7 +14,7 @@
 namespace ionlang {
     class Parser {
     private:
-        TokenStream stream;
+        TokenStream tokenStream;
 
         ionshared::Ptr<ionshared::NoticeStack> noticeStack;
 
@@ -58,11 +58,11 @@ namespace ionlang {
         /**
          * Parses a integer literal in the form of long (or integer 64).
          */
-        ionshared::OptPtr<IntegerValue> parseInt();
+        ionshared::OptPtr<IntegerLiteral> parseIntegerLiteral();
 
-        ionshared::OptPtr<CharValue> parseChar();
+        ionshared::OptPtr<CharLiteral> parseCharLiteral();
 
-        ionshared::OptPtr<StringValue> parseString();
+        ionshared::OptPtr<StringLiteral> parseStringLiteral();
 
         std::optional<std::string> parseId();
 
@@ -84,13 +84,15 @@ namespace ionlang {
 
         ionshared::OptPtr<Global> parseGlobal();
 
-        ionshared::OptPtr<Value<>> parseLiteralValue();
+        ionshared::OptPtr<Value<>> parseLiteral();
 
         ionshared::OptPtr<Construct> parsePrimaryExpr(const ionshared::Ptr<Block> &parent);
 
         ionshared::OptPtr<Construct> parseParenthesesExpr(const ionshared::Ptr<Block> &parent);
 
         ionshared::OptPtr<Construct> parseIdExpr(const ionshared::Ptr<Block> &parent);
+
+        ionshared::OptPtr<BinaryOperation> parseBinaryOperation(const ionshared::Ptr<Block> &parent);
 
         ionshared::OptPtr<CallExpr> parseCallExpr(const ionshared::Ptr<Block> &parent);
 

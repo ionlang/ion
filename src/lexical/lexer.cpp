@@ -88,7 +88,7 @@ namespace ionlang {
              * as literal character and string capture values while skipping
              * certain characters.
              */
-            if (!ionshared::Util::stringStartsWith(input, match[IONLANG_MATCH_INDEX_MATCHED])) {
+            if (!ionshared::util::stringStartsWith(input, match[IONLANG_MATCH_INDEX_MATCHED])) {
                 // Return default result at this point.
                 return result;
             }
@@ -169,7 +169,7 @@ namespace ionlang {
                  * simple identifier. It is important that the initial value
                  * is escaped of any Regex special characters.
                  */
-                std::regex regex = ionshared::Util::createPureRegex(pair.first);
+                std::regex regex = ionshared::util::createPureRegex(pair.first);
 
                 /**
                  * If the match starts with an identifier character, ensure that
