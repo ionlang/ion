@@ -31,7 +31,7 @@ namespace ionlang {
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIf))
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
-        ionshared::OptPtr<Value<>> condition = this->parseValue();
+        ionshared::OptPtr<Value<>> condition = this->parseLiteralValue();
 
         IONIR_PARSER_ASSURE(condition)
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
@@ -79,7 +79,7 @@ namespace ionlang {
 
         // Return statement contains a value. Parse it and save it.
         if (!this->is(TokenKind::SymbolSemiColon)) {
-            value = this->parseValue();
+            value = this->parseLiteralValue();
 
             IONIR_PARSER_ASSURE(value)
         }

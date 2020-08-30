@@ -13,7 +13,9 @@
 #include <ionlang/construct/statement.h>
 #include <ionlang/construct/statement/if_statement.h>
 #include <ionlang/construct/statement/return_statement.h>
-#include <ionlang/construct/expr/call_expr.h>
+#include <ionlang/construct/expression.h>
+#include <ionlang/construct/expression/binary_operation.h>
+#include <ionlang/construct/expression/call_expr.h>
 #include <ionlang/construct/value.h>
 #include <ionlang/construct/value/boolean_value.h>
 #include <ionlang/construct/value/char_value.h>
@@ -46,6 +48,12 @@ namespace ionlang {
         virtual void visitIfStatement(ionshared::Ptr<IfStatement> node);
 
         virtual void visitReturnStatement(ionshared::Ptr<ReturnStatement> node);
+
+        virtual void visitExpression(ionshared::Ptr<Expression> node);
+
+        virtual void visitUnaryOperation(ionshared::Ptr<UnaryOperation> node);
+
+        virtual void visitBinaryOperation(ionshared::Ptr<BinaryOperation> node);
 
         virtual void visitCallExpr(ionshared::Ptr<CallExpr> node);
 

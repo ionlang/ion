@@ -84,9 +84,13 @@ namespace ionlang {
 
         ionshared::OptPtr<Global> parseGlobal();
 
-        ionshared::OptPtr<Value<>> parseValue();
+        ionshared::OptPtr<Value<>> parseLiteralValue();
 
-        ionshared::OptPtr<Construct> parsePrimaryExpr(ionshared::Ptr<Construct> parent);
+        ionshared::OptPtr<Construct> parsePrimaryExpr(const ionshared::Ptr<Block> &parent);
+
+        ionshared::OptPtr<Construct> parseParenthesesExpr(const ionshared::Ptr<Block> &parent);
+
+        ionshared::OptPtr<Construct> parseIdExpr(const ionshared::Ptr<Block> &parent);
 
         ionshared::OptPtr<CallExpr> parseCallExpr(const ionshared::Ptr<Block> &parent);
 

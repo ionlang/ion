@@ -85,6 +85,42 @@ namespace ionlang {
         //
     }
 
+    void Pass::visitExpression(ionshared::Ptr<Expression> node) {
+        switch (node->getExpressionKind()) {
+            case ExpressionKind::UnaryOperation: {
+                this->visitUnaryOperation(node->dynamicCast<UnaryOperation>());
+
+                break;
+            }
+
+            case ExpressionKind::BinaryOperation: {
+                this->visitBinaryOperation(node->dynamicCast<BinaryOperation>());
+
+                break;
+            }
+
+            case ExpressionKind::Call: {
+                this->visitCallExpr(node->dynamicCast<CallExpr>());
+
+                break;
+            }
+
+            // TODO: Add support for missing expression(s)...
+
+            default: {
+                throw std::runtime_error("Unknown expression kind");
+            }
+        }
+    }
+
+    void Pass::visitUnaryOperation(ionshared::Ptr<UnaryOperation> node) {
+        //
+    }
+
+    void Pass::visitBinaryOperation(ionshared::Ptr<BinaryOperation> node) {
+        //
+    }
+
     void Pass::visitCallExpr(ionshared::Ptr<CallExpr> node) {
         //
     }

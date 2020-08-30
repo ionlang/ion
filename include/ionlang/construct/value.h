@@ -12,7 +12,9 @@ namespace ionlang {
 
         String,
 
-        Boolean
+        Boolean,
+
+        Expression
     };
 
     template<typename T = Type>
@@ -23,8 +25,10 @@ namespace ionlang {
         ionshared::Ptr<T> type;
 
     public:
-        Value(ValueKind kind, ionshared::Ptr<T> type)
-            : Construct(ConstructKind::Value), kind(kind), type(type) {
+        Value(ValueKind kind, ionshared::Ptr<T> type) :
+            Construct(ConstructKind::Value),
+            kind(kind),
+            type(type) {
             //
         }
 

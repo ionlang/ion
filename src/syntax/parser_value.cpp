@@ -6,7 +6,7 @@
 #include <ionlang/misc/util.h>
 
 namespace ionlang {
-    ionshared::OptPtr<Value<>> Parser::parseValue() {
+    ionshared::OptPtr<Value<>> Parser::parseLiteralValue() {
         Token token = this->stream.get();
 
         /**
@@ -17,7 +17,7 @@ namespace ionlang {
             case TokenKind::LiteralInteger: {
                 ionshared::OptPtr<IntegerValue> integerValue = this->parseInt();
 
-                if (ionshared::Util::hasValue(integerValue)) {
+                if (ionshared::util::hasValue(integerValue)) {
                     return (*integerValue)->staticCast<Value<>>();
                 }
 
@@ -27,7 +27,7 @@ namespace ionlang {
             case TokenKind::LiteralCharacter: {
                 ionshared::OptPtr<CharValue> charValue = this->parseChar();
 
-                if (ionshared::Util::hasValue(charValue)) {
+                if (ionshared::util::hasValue(charValue)) {
                     return (*charValue)->staticCast<Value<>>();
                 }
 
@@ -38,7 +38,7 @@ namespace ionlang {
 
             default: {
                 // TODO: Return std::nullopt instead.
-                throw ionshared::Util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_TOKEN);
+                throw ionshared::util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_TOKEN);
             }
         }
     }

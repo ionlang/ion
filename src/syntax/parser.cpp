@@ -103,7 +103,7 @@ namespace ionlang {
             // Skip the equal symbol before continuing parsing.
             this->stream.skip();
 
-            value = this->parseValue();
+            value = this->parseLiteralValue();
 
             // Value must have been parsed at this point.
             if (!ionshared::Util::hasValue(value)) {
@@ -188,7 +188,7 @@ namespace ionlang {
         IONIR_PARSER_ASSURE(id)
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual))
 
-        ionshared::OptPtr<Value<>> value = this->parseValue();
+        ionshared::OptPtr<Value<>> value = this->parseLiteralValue();
 
         IONIR_PARSER_ASSURE(value)
 

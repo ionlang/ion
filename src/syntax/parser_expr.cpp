@@ -1,6 +1,39 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
+    ionshared::OptPtr<Construct> Parser::parsePrimaryExpr(const ionshared::Ptr<Block> &parent) {
+        if (this->is(TokenKind::SymbolParenthesesL)) {
+            return this->parseParenthesesExpr(parent);
+        }
+        else if (this->is(TokenKind::Identifier)) {
+            return this->parseIdExpr(parent);
+        }
+
+        // TODO: Support unary and binary operation parsing.
+
+        // Otherwise, it must be a literal value.
+        return this->parseLiteralValue();
+    }
+
+    ionshared::OptPtr<Construct> Parser::parseParenthesesExpr(const ionshared::Ptr<Block> &parent) {
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
+
+        ionshared::OptPtr<Construct> expr = this->parsePrimaryExpr(parent);
+
+        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
+
+        return expr;
+    }
+
+    ionshared::OptPtr<Construct> Parser::parseIdExpr(const ionshared::Ptr<Block> &parent) {
+        if (this->isNext(TokenKind::SymbolParenthesesL)) {
+            return this->parseCallExpr(parent);
+        }
+
+        // TODO: Is this the correct parent for the ref?
+        return this->parseRef(parent);
+    }
+
     ionshared::OptPtr<CallExpr> Parser::parseCallExpr(const ionshared::Ptr<Block> &parent) {
         std::optional<std::string> calleeId = this->parseId();
 
