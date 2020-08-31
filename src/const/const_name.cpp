@@ -33,7 +33,7 @@ namespace ionlang {
 
     const std::string ConstName::typeString = "str";
 
-    const std::string ConstName::statementReturn = "ret";
+    const std::string ConstName::statementReturn = "return";
 
     const std::string ConstName::statementIf = "if";
 }

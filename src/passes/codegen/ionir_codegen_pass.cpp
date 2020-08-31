@@ -252,7 +252,7 @@ namespace ionlang {
         ionir::BasicBlockKind ionIrBasicBlockKind = ionir::BasicBlockKind::Internal;
 
         // TODO: Use a counter or something, along with naming depending on the block's parent (ex. if statement parent => if_0, etc.).
-        std::string ionIrBasicBlockId = "FIX_ME_NAME";
+        std::string ionIrBasicBlockId = "tmp_block";
 
         if (node->isFunctionBody()) {
             // TODO: Make function body and push it onto the stack?
@@ -503,16 +503,11 @@ namespace ionlang {
     void IonIrCodegenPass::visitIfStatement(ionshared::Ptr<IfStatement> node) {
         ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlockBuffer = this->requireBasicBlock();
 
-        this->visitValue(node->getCondition());
+        this->visit(node->getCondition());
 
-        // Use static pointer cast when casting to ionir::Value<>.
-        ionshared::Ptr<ionir::Value<>> ionIrCondition =
-            this->constructStack.pop()->staticCast<ionir::Value<>>();
+        ionshared::Ptr<ionir::Construct> ionIrCondition = this->constructStack.pop();
 
-        // Ensure the cast was successful and not nullptr as a precaution.
-        if (ionIrCondition == nullptr) {
-            throw std::runtime_error("Could not cast condition; condition is nullptr");
-        }
+        // TODO: Should verify if ionIrCondition is either Ref<> or Value<>.
 
         /**
          * Transfer all previously emitted instructions into a new continuation
@@ -533,7 +528,9 @@ namespace ionlang {
 
         // TODO: Provide appropriate id for successor block.
         ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlockBufferSuccessor =
-            ionIrBasicBlockBuffer->split(splitOrder, "tmp_debug_name_change_me");
+            ionIrBasicBlockBuffer->split(splitOrder, "tmp_function_body_block_successor");
+
+        // TODO: CRITICAL When split, the new basic block (ionIrBasicBlockBufferSuccessor) is not registered on llvmIrCodegen pass' emittedEntities map (ionir::BasicBlock -> llvm::BasicBlock) thus it cannot be emitted to LLVM IR.
 
         // TODO: ~!!!~ When is ionIrBasicBlockBufferSuccessor emitted? Split only creates a new ionir::BasicBlock instance, and registers it on the parent's symbol table. ~!!!~
 
@@ -546,7 +543,11 @@ namespace ionlang {
          * Link the current buffered basic block with the if statement's
          * consequent basic block.
          */
-        ionIrBasicBlockBuffer->link(ionIrConsequentBasicBlock);
+        ionIrBasicBlockBuffer->createBuilder()->createBranch(
+            ionIrCondition,
+            ionIrConsequentBasicBlock,
+            ionIrBasicBlockBufferSuccessor
+        );
 
         /**
          * Link the consequent basic block with the newly created
@@ -618,6 +619,7 @@ namespace ionlang {
             this->constructStack.pop()->dynamicCast<ionir::Value<>>();
 
         ionir::PtrRef<ionir::AllocaInst> ionIrRef = std::make_shared<ionir::Ref<ionir::AllocaInst>>(
+            ionir::RefKind::Inst,
             node->getId(),
 
             // TODO: CRITICAL: Provide owner for ref!
@@ -643,6 +645,7 @@ namespace ionlang {
         ionshared::Ptr<ionir::CallInst> ionIrCallInst = ionIrInstBuilder->createCall(
             // TODO: Is basicBlockBuffer the correct owner for Ref in this case?
             std::make_shared<ionir::Ref<ionir::Function>>(
+                ionir::RefKind::Function,
                 ionIrCallee->getPrototype()->getId(),
                 *this->basicBlockBuffer,
                 ionIrCallee

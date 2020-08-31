@@ -6,7 +6,7 @@ namespace ionlang {
     class Pass;
 
     struct IfStatementOpts : StatementOpts {
-        ionshared::Ptr<Value<>> condition;
+        ionshared::Ptr<Construct> condition;
 
         ionshared::Ptr<Block> consequentBlock;
 
@@ -15,7 +15,7 @@ namespace ionlang {
 
     class IfStatement : public Statement {
     private:
-        ionshared::Ptr<Value<>> condition;
+        ionshared::Ptr<Construct> condition;
 
         ionshared::Ptr<Block> consequentBlock;
 
@@ -28,9 +28,9 @@ namespace ionlang {
 
         Ast getChildNodes() override;
 
-        [[nodiscard]] ionshared::Ptr<Value<>> getCondition() const noexcept;
+        [[nodiscard]] ionshared::Ptr<Construct> getCondition() const noexcept;
 
-        void setCondition(ionshared::Ptr<Value<>> value) noexcept;
+        void setCondition(ionshared::Ptr<Construct> condition) noexcept;
 
         [[nodiscard]] ionshared::Ptr<Block> getConsequentBlock() const noexcept;
 

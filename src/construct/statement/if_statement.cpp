@@ -1,8 +1,11 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    IfStatement::IfStatement(const IfStatementOpts &opts)
-        : Statement(opts.parent, StatementKind::If), condition(opts.condition), consequentBlock(opts.consequentBlock), alternativeBlock(opts.alternativeBlock) {
+    IfStatement::IfStatement(const IfStatementOpts &opts) :
+        Statement(opts.parent, StatementKind::If),
+        condition(opts.condition),
+        consequentBlock(opts.consequentBlock),
+        alternativeBlock(opts.alternativeBlock) {
         //
     }
 
@@ -16,11 +19,11 @@ namespace ionlang {
         };
     }
 
-    ionshared::Ptr<Value<>> IfStatement::getCondition() const noexcept {
+    ionshared::Ptr<Construct> IfStatement::getCondition() const noexcept {
         return this->condition;
     }
 
-    void IfStatement::setCondition(ionshared::Ptr<Value<>> condition) noexcept {
+    void IfStatement::setCondition(ionshared::Ptr<Construct> condition) noexcept {
         this->condition = std::move(condition);
     }
 

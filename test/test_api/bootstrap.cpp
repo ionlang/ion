@@ -62,13 +62,15 @@ namespace ionlang::test::bootstrap {
             nullptr
         );
 
+        // The parent will be filled in below.
         ionshared::Ptr<Block> body =
             std::make_shared<Block>(nullptr, std::move(statements));
 
         ionshared::Ptr<Function> function =
             std::make_shared<Function>(prototype, body);
 
-        body->setParent(body);
+        // Fill in the body's parent.
+        body->setParent(function);
 
         return function;
     }
