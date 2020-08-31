@@ -1,11 +1,12 @@
 #include <ionlang/misc/statement_builder.h>
 
 namespace ionlang {
-    StatementBuilder::StatementBuilder(ionshared::Ptr<Block> basicBlock) : basicBlock(basicBlock) {
+    StatementBuilder::StatementBuilder(ionshared::Ptr<Block> basicBlock) :
+        basicBlock(std::move(basicBlock)) {
         //
     }
 
-    ionshared::Ptr<Block> StatementBuilder::getSection() const {
+    ionshared::Ptr<Block> StatementBuilder::getSection() const noexcept {
         return this->basicBlock;
     }
 

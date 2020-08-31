@@ -1,8 +1,13 @@
 #include <ionlang/lexical/token.h>
 
 namespace ionlang {
-    Token::Token(TokenKind kind, std::string value, uint32_t startPosition, uint32_t lineNumber)
-        : BaseToken(kind, std::move(value), startPosition, lineNumber) {
+    Token::Token(
+        TokenKind kind,
+        std::string value,
+        uint32_t startPosition,
+        uint32_t lineNumber
+    ) :
+        BaseToken(kind, std::move(value), startPosition, lineNumber) {
         //
     }
 

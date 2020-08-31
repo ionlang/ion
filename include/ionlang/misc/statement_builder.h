@@ -13,7 +13,7 @@ namespace ionlang {
     public:
         explicit StatementBuilder(ionshared::Ptr<Block> basicBlock);
 
-        ionshared::Ptr<Block> getSection() const;
+        [[nodiscard]] ionshared::Ptr<Block> getSection() const noexcept;
 
         void insert(const ionshared::Ptr<Statement> &inst);
 

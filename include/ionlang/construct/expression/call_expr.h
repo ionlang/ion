@@ -1,27 +1,21 @@
 #pragma once
 
-#include "../statement.h"
-#include "../function.h"
+#include <ionlang/construct/expression.h>
+#include <ionlang/construct/function.h>
 
 namespace ionlang {
     class Pass;
 
-    struct CallExprOpts : StatementOpts {
-        PtrRef<Function> callee;
+    typedef std::vector<ionshared::Ptr<Value<>>> CallArgs;
 
-        ionshared::Ptr<Value<>> args;
-    };
-
-    typedef std::vector<Value<>> CallArgs;
-
-    class CallExpr : public Statement {
+    class CallExpr : public Expression {
     private:
         PtrRef<Function> callee;
 
-        ionshared::Ptr<CallArgs> args;
+        CallArgs args;
 
     public:
-        explicit CallExpr(const CallExprOpts &opts);
+        explicit CallExpr(PtrRef<Function> callee, CallArgs args);
 
         void accept(Pass &visitor) override;
 
@@ -29,8 +23,8 @@ namespace ionlang {
 
         void setCallee(PtrRef<Function> callee) noexcept;
 
-        [[nodiscard]] ionshared::Ptr<CallArgs> getArgs() const noexcept;
+        [[nodiscard]] CallArgs getArgs() const noexcept;
 
-        void setArgs(ionshared::Ptr<CallArgs> args) noexcept;
+        void setArgs(CallArgs args) noexcept;
     };
 }

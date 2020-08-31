@@ -94,14 +94,12 @@ namespace ionlang {
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
-        return std::make_shared<CallExpr>(CallExprOpts{
-            parent,
-
+        return std::make_shared<CallExpr>(
             // TODO: Is this the correct parent for the Ref<Function>?
             std::make_shared<Ref<Function>>(*calleeId, parent),
 
             // TODO: Parse call args.
-            nullptr
-        });
+            CallArgs()
+        );
     }
 }

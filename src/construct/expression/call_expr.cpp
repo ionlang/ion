@@ -1,8 +1,13 @@
+#include <utility>
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    CallExpr::CallExpr(const CallExprOpts &opts)
-        : Statement(opts.parent, StatementKind::Call), callee(opts.callee) {
+    CallExpr::CallExpr(PtrRef<Function> callee, CallArgs args) :
+        // TODO: Expression requires 'type' but since the callee is a PtrRef, it's type is not necessarily resolved yet. What to do?
+        Expression(ExpressionKind::Call, nullptr),
+
+        callee(std::move(callee)),
+        args(std::move(args)) {
         //
     }
 
@@ -18,11 +23,11 @@ namespace ionlang {
         this->callee = std::move(callee);
     }
 
-    ionshared::Ptr<CallArgs> CallExpr::getArgs() const noexcept {
+    CallArgs CallExpr::getArgs() const noexcept {
         return this->args;
     }
 
-    void CallExpr::setArgs(ionshared::Ptr<CallArgs> args) noexcept {
+    void CallExpr::setArgs(CallArgs args) noexcept {
         this->args = std::move(args);
     }
 }
