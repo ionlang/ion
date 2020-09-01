@@ -33,7 +33,7 @@ namespace ionlang {
 
         Ast getChildNodes() override;
 
-        std::vector<ionshared::Ptr<Statement>> &getStatements() noexcept;
+        [[nodiscard]] std::vector<ionshared::Ptr<Statement>> &getStatements() noexcept;
 
         // TODO: When statements are set, the symbol table must be cleared and re-populated.
         void setStatements(std::vector<ionshared::Ptr<Statement>> statements);
@@ -46,12 +46,12 @@ namespace ionlang {
          * Attempt to find the index location of an instruction.
          * Returns null if not found.
          */
-        std::optional<uint32_t> locate(ionshared::Ptr<Statement> statement) const;
+        [[nodiscard]] std::optional<uint32_t> locate(ionshared::Ptr<Statement> statement) const;
 
-        ionshared::Ptr<StatementBuilder> createBuilder();
+        [[nodiscard]] ionshared::Ptr<StatementBuilder> createBuilder();
 
-        ionshared::OptPtr<Statement> findTerminalStatement() const;
+        [[nodiscard]] ionshared::OptPtr<Statement> findTerminalStatement() const;
 
-        bool isFunctionBody() const;
+        [[nodiscard]] bool isFunctionBody() const;
     };
 }
