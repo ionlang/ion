@@ -35,6 +35,10 @@ namespace ionlang {
             // visitor.visitRef(this->dynamicCast<Ref<T>>());
         }
 
+        Ref<T> &operator=(T value) {
+            this->setValue(value);
+        }
+
         [[nodiscard]] ionshared::Ptr<Construct> getOwner() const noexcept {
             return this->owner;
         }
@@ -50,26 +54,21 @@ namespace ionlang {
         template<typename TValue>
         [[nodiscard]] ionshared::OptPtr<TValue> getValueAs() const {
             // TODO: Ensure T is or derives from Construct.
+            return this->isResolved()
+                ? std::dynamic_pointer_cast<TValue>(this->getValue()->get())
+                : std::nullopt;
+        }
 
-            ionshared::OptPtr<Construct> value = this->getValue();
+        void setValue(ionshared::OptPtr<T> value) noexcept {
+            this->value = value;
+        }
 
-            if (ionshared::util::hasValue(value)) {
-                return value->get()->dynamicCast<TValue>();
-            }
-
-            return std::nullopt;
+        void removeValue() noexcept {
+            this->setValue(std::nullopt);
         }
 
         [[nodiscard]] bool isResolved() noexcept {
             return ionshared::util::hasValue(this->value);
-        }
-
-        void resolve(ionshared::OptPtr<T> value) {
-            if (!ionshared::util::hasValue(value)) {
-                throw std::runtime_error("Cannot resolve reference with a nullptr");
-            }
-
-            this->value = value;
         }
     };
 
