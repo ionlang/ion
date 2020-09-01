@@ -6,6 +6,46 @@
 namespace ionlang {
     // TODO: Consider using Ref<> to register pending type reference if user-defined type is parsed?
     ionshared::OptPtr<Type> Parser::parseType() {
+        ionshared::Ptr<TypeQualifiers> qualifiers = std::make_shared<TypeQualifiers>();
+
+        // TODO: Simplify to support const mut &*type.
+
+        // 1st qualifier: const (constant).
+        if (this->is(TokenKind::QualifierConst)) {
+            this->tokenStream.skip();
+            qualifiers->insert(TypeQualifier::Constant);
+        }
+
+        // 2nd qualifier: mut (mutable reference or pointer).
+        if (this->is(TokenKind::QualifierMutable)) {
+            this->tokenStream.skip();
+
+            // Mutable reference.
+            if (this->is(TokenKind::SymbolAmpersand)) {
+                this->tokenStream.skip();
+                qualifiers->insert(TypeQualifier::Reference);
+            }
+            // Otherwise, it must be a pointer.
+            else {
+                IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolStar))
+
+                qualifiers->insert(TypeQualifier::Pointer);
+            }
+        }
+        // 3rd qualifier: reference
+        else if (this->is(TokenKind::SymbolAmpersand)) {
+            this->tokenStream.skip();
+            qualifiers->insert(TypeQualifier::Reference);
+        }
+
+        // 4th qualifier: pointer.
+        if (this->is(TokenKind::SymbolStar)) {
+            this->tokenStream.skip();
+            qualifiers->insert(TypeQualifier::Pointer);
+        }
+
+        // TODO: What about **?
+
         // Retrieve the current token.
         Token token = this->tokenStream.get();
 
@@ -37,23 +77,6 @@ namespace ionlang {
          */
         if (!ionshared::util::hasValue(type)) {
             type = std::make_shared<Type>(tokenValue, util::resolveTypeKind(tokenValue));
-            this->tokenStream.skip();
-        }
-
-        // If applicable, mark the type as a pointer.
-        if (this->is(TokenKind::SymbolStar)) {
-            // TODO: Use pointer type. (8/20/2020 new PointerType additions on IONIR, not here, but copy).
-            // TODO: CRITICAL: Pointer must be an expression, since what about **?
-            /**
-             * Only mark the type as a pointer if marked so
-             * by the star symbol. Since some types (for example
-             * the char type) are pointers by default, using a flag
-             * in this case would prevent it from being a pointer
-             * unless a star symbol is present.
-             */
-//            type->get()->setIsPointer(true);
-
-            // Skip from the star token.
             this->tokenStream.skip();
         }
 

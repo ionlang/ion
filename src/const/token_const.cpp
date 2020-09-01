@@ -142,13 +142,13 @@ namespace ionlang {
             {"extern", TokenKind::KeywordExtern},
             {"global", TokenKind::KeywordGlobal},
             {"else", TokenKind::KeywordElse},
-            {"mut", TokenKind::KeywordMutable},
+            {"unsafe", TokenKind::KeywordUnsafe},
 
             // Statement keywords.
             {ConstName::statementReturn, TokenKind::KeywordReturn},
             {ConstName::statementIf, TokenKind::KeywordIf},
 
-            // Types keywords.
+            // Type keywords.
             {ConstName::typeVoid, TokenKind::TypeVoid},
             {ConstName::typeBool, TokenKind::TypeBool},
             {ConstName::typeInt16, TokenKind::TypeInt16},
@@ -162,7 +162,11 @@ namespace ionlang {
             {ConstName::typeFloat32, TokenKind::TypeFloat32},
             {ConstName::typeFloat64, TokenKind::TypeFloat64},
             {ConstName::typeChar, TokenKind::TypeChar},
-            {ConstName::typeString, TokenKind::TypeString}
+            {ConstName::typeString, TokenKind::TypeString},
+
+            // Qualifier keywords.
+            {"const", TokenKind::QualifierConst},
+            {"mut", TokenKind::QualifierMutable}
         });
 
         // Merge simple maps.

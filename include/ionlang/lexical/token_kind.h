@@ -44,6 +44,8 @@ namespace ionlang {
 
         SymbolArrow,
 
+        SymbolAmpersand,
+
         KeywordFunction,
 
         KeywordExtern,
@@ -52,13 +54,13 @@ namespace ionlang {
 
         KeywordElse,
 
-        KeywordMutable,
-
         KeywordModule,
 
         KeywordGlobal,
 
         KeywordReturn,
+
+        KeywordUnsafe,
 
         TypeVoid,
 
@@ -81,6 +83,10 @@ namespace ionlang {
         TypeChar,
 
         TypeString,
+
+        QualifierConst,
+
+        QualifierMutable,
 
         OperatorAddition,
 
