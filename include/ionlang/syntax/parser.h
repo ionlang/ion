@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <string>
+#include <ionshared/misc/result.h>
 #include <ionshared/error_handling/notice_factory.h>
 #include <ionshared/syntax/parser_helpers.h>
 #include <ionir/misc/helpers.h>
@@ -12,6 +13,10 @@
 #include "scope.h"
 
 namespace ionlang {
+    // TODO
+//    template<typename T>
+//    using AstPtrResult = ionshared::PtrResult<T, ErrorMarker>;
+
     class Parser {
     private:
         TokenStream tokenStream;
@@ -25,7 +30,6 @@ namespace ionlang {
         // TODO
 //        Classifier classifier;
 
-    protected:
         bool is(TokenKind tokenKind) noexcept;
 
         bool isNext(TokenKind tokenKind);
@@ -36,7 +40,10 @@ namespace ionlang {
 
         ionshared::NoticeFactory createNoticeFactory() noexcept;
 
-        std::nullopt_t makeNotice(std::string message, ionshared::NoticeType type = ionshared::NoticeType::Error);
+        std::nullopt_t makeNotice(
+            std::string message,
+            ionshared::NoticeType type = ionshared::NoticeType::Error
+        );
 
     public:
         // TODO: Default value is hard-coded.

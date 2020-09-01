@@ -8,7 +8,7 @@
 using namespace ionlang;
 
 TEST(CodeGenTest, VisitExtern) {
-    ionshared::Ptr<IonIrCodegenPass> ionIrCodegenPass = test::bootstrap::ionIrCodegenPass();
+    ionshared::Ptr<IonIrLoweringPass> ionIrCodegenPass = test::bootstrap::ionIrCodegenPass();
     ionshared::Ptr<VoidType> returnType = std::make_shared<VoidType>();
     ionshared::Ptr<Args> args = std::make_shared<Args>();
 
@@ -35,7 +35,7 @@ TEST(CodeGenTest, VisitExtern) {
 }
 
 TEST(CodeGenTest, VisitIfStatement) {
-    ionshared::Ptr<IonIrCodegenPass> ionIrCodegenPass = test::bootstrap::ionIrCodegenPass();
+    ionshared::Ptr<IonIrLoweringPass> ionIrCodegenPass = test::bootstrap::ionIrCodegenPass();
 
     // The parent will be filled in below.
     ionshared::Ptr<Block> consequentBlock = std::make_shared<Block>(nullptr);

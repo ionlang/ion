@@ -32,7 +32,7 @@ namespace ionlang::test::bootstrap {
         return std::make_shared<ionir::Module>(identifier);
     }
 
-    ionshared::Ptr<IonIrCodegenPass> ionIrCodegenPass() {
+    ionshared::Ptr<IonIrLoweringPass> ionIrCodegenPass() {
         ionshared::Ptr<ionir::Module> module = ionIrModule();
 
         ionshared::PtrSymbolTable<ionir::Module> modules =
@@ -41,8 +41,8 @@ namespace ionlang::test::bootstrap {
         // TODO: Inserting module, but can be done inline above -- it's just a headache.
         modules->insert(module->getId(), module);
 
-        ionshared::Ptr<IonIrCodegenPass> ionIrCodegenPass =
-            std::make_shared<IonIrCodegenPass>(modules);
+        ionshared::Ptr<IonIrLoweringPass> ionIrCodegenPass =
+            std::make_shared<IonIrLoweringPass>(modules);
 
         if (!ionIrCodegenPass->setModuleBuffer(module->getId())) {
             throw std::runtime_error("Could not set active module buffer during bootstrap process");

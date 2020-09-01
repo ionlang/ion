@@ -5,7 +5,7 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    class IonIrCodegenPass : public Pass {
+    class IonIrLoweringPass : public Pass {
     private:
         ionshared::PtrSymbolTable<ionir::Module> modules;
 
@@ -39,12 +39,12 @@ namespace ionlang {
         void setBuilder(ionshared::Ptr<ionir::BasicBlock> basicBlock);
 
     public:
-        explicit IonIrCodegenPass(
+        explicit IonIrLoweringPass(
             ionshared::PtrSymbolTable<ionir::Module> modules =
                 std::make_shared<ionshared::SymbolTable<ionshared::Ptr<ionir::Module>>>()
         );
 
-        ~IonIrCodegenPass();
+        ~IonIrLoweringPass();
 
         ionshared::Ptr<ionshared::SymbolTable<ionshared::Ptr<ionir::Module>>> getModules() const;
 
