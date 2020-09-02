@@ -30,15 +30,15 @@ namespace ionlang {
         // TODO
 //        Classifier classifier;
 
-        bool is(TokenKind tokenKind) noexcept;
+        [[nodiscard]] bool is(TokenKind tokenKind) noexcept;
 
-        bool isNext(TokenKind tokenKind);
+        [[nodiscard]] bool isNext(TokenKind tokenKind);
 
         bool expect(TokenKind tokenKind);
 
         bool skipOver(TokenKind tokenKind);
 
-        ionshared::NoticeFactory createNoticeFactory() noexcept;
+        [[nodiscard]] ionshared::NoticeFactory createNoticeFactory() noexcept;
 
         std::nullopt_t makeNotice(
             std::string message,
@@ -56,64 +56,64 @@ namespace ionlang {
             std::string filePath = "anonymous"/*ConstName::anonymous*/
         );
 
-        ionshared::Ptr<NoticeSentinel> getNoticeSentinel() const;
+        [[nodiscard]] ionshared::Ptr<NoticeSentinel> getNoticeSentinel() const;
 
-        std::string getFilePath() const;
+        [[nodiscard]] std::string getFilePath() const;
 
-        ionshared::OptPtr<Construct> parseTopLevel(const ionshared::Ptr<Module> &parent);
+        AstPtrResult<Construct> parseTopLevel(const ionshared::Ptr<Module> &parent);
 
         /**
          * Parses a integer literal in the form of long (or integer 64).
          */
-        ionshared::OptPtr<IntegerLiteral> parseIntegerLiteral();
+        AstPtrResult<IntegerLiteral> parseIntegerLiteral();
 
-        ionshared::OptPtr<CharLiteral> parseCharLiteral();
+        AstPtrResult<CharLiteral> parseCharLiteral();
 
-        ionshared::OptPtr<StringLiteral> parseStringLiteral();
+        AstPtrResult<StringLiteral> parseStringLiteral();
 
         std::optional<std::string> parseId();
 
-        ionshared::OptPtr<Type> parseType();
+        AstPtrResult<Type> parseType();
 
-        ionshared::OptPtr<VoidType> parseVoidType();
+        AstPtrResult<VoidType> parseVoidType();
 
-        ionshared::OptPtr<IntegerType> parseIntegerType();
+        AstPtrResult<IntegerType> parseIntegerType();
 
         std::optional<Arg> parseArg();
 
-        ionshared::OptPtr<Args> parseArgs();
+        AstPtrResult<Args> parseArgs();
 
-        ionshared::OptPtr<Prototype> parsePrototype(const ionshared::Ptr<Module> &parent);
+        AstPtrResult<Prototype> parsePrototype(const ionshared::Ptr<Module> &parent);
 
-        ionshared::OptPtr<Extern> parseExtern(const ionshared::Ptr<Module> &parent);
+        AstPtrResult<Extern> parseExtern(const ionshared::Ptr<Module> &parent);
 
-        ionshared::OptPtr<Function> parseFunction(const ionshared::Ptr<Module> &parent);
+        AstPtrResult<Function> parseFunction(const ionshared::Ptr<Module> &parent);
 
-        ionshared::OptPtr<Global> parseGlobal();
+        AstPtrResult<Global> parseGlobal();
 
-        ionshared::OptPtr<Value<>> parseLiteral();
+        AstPtrResult<Value<>> parseLiteral();
 
-        ionshared::OptPtr<Construct> parsePrimaryExpr(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<Construct> parsePrimaryExpr(const ionshared::Ptr<Block> &parent);
 
-        ionshared::OptPtr<Construct> parseParenthesesExpr(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<Construct> parseParenthesesExpr(const ionshared::Ptr<Block> &parent);
 
-        ionshared::OptPtr<Construct> parseIdExpr(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<Construct> parseIdExpr(const ionshared::Ptr<Block> &parent);
 
-        ionshared::OptPtr<BinaryOperation> parseBinaryOperation(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<BinaryOperation> parseBinaryOperation(const ionshared::Ptr<Block> &parent);
 
-        ionshared::OptPtr<CallExpr> parseCallExpr(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<CallExpr> parseCallExpr(const ionshared::Ptr<Block> &parent);
 
-        ionshared::OptPtr<Block> parseBlock(const ionshared::Ptr<Construct> &parent);
+        AstPtrResult<Block> parseBlock(const ionshared::Ptr<Construct> &parent);
 
-        ionshared::OptPtr<Module> parseModule();
+        AstPtrResult<Module> parseModule();
 
-        ionshared::OptPtr<Statement> parseStatement(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<Statement> parseStatement(const ionshared::Ptr<Block> &parent);
 
-        ionshared::OptPtr<VariableDecl> parseVariableDecl(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<VariableDecl> parseVariableDecl(const ionshared::Ptr<Block> &parent);
 
-        ionshared::OptPtr<IfStatement> parseIfStatement(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<IfStatement> parseIfStatement(const ionshared::Ptr<Block> &parent);
 
-        ionshared::OptPtr<ReturnStatement> parseReturnStatement(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<ReturnStatement> parseReturnStatement(const ionshared::Ptr<Block> &parent);
 
         std::optional<std::string> parseLine();
 

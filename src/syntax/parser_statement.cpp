@@ -2,7 +2,7 @@
 #include <ionlang/lexical/classifier.h>
 
 namespace ionlang {
-    ionshared::OptPtr<Statement> Parser::parseStatement(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<Statement> Parser::parseStatement(const ionshared::Ptr<Block> &parent) {
         ionshared::OptPtr<Statement> statement = std::nullopt;
         ionshared::PtrSymbolTable<Statement> symbolTable = parent->getSymbolTable();
         TokenKind currentTokenKind = this->tokenStream.get().getKind();
@@ -27,7 +27,7 @@ namespace ionlang {
         return statement;
     }
 
-    ionshared::OptPtr<IfStatement> Parser::parseIfStatement(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<IfStatement> Parser::parseIfStatement(const ionshared::Ptr<Block> &parent) {
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIf))
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
@@ -72,7 +72,7 @@ namespace ionlang {
         return ifStatement;
     }
 
-    ionshared::OptPtr<ReturnStatement> Parser::parseReturnStatement(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<ReturnStatement> Parser::parseReturnStatement(const ionshared::Ptr<Block> &parent) {
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordReturn))
 
         ionshared::OptPtr<Value<>> value = std::nullopt;

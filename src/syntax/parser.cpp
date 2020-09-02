@@ -71,7 +71,7 @@ namespace ionlang {
         return this->filePath;
     }
 
-    ionshared::OptPtr<Construct> Parser::parseTopLevel(const ionshared::Ptr<Module> &parent) {
+    AstPtrResult<Construct> Parser::parseTopLevel(const ionshared::Ptr<Module> &parent) {
         switch (this->tokenStream.get().getKind()) {
             case TokenKind::KeywordFunction: {
                 return this->parseFunction(parent);
@@ -91,7 +91,7 @@ namespace ionlang {
         }
     }
 
-    ionshared::OptPtr<Global> Parser::parseGlobal() {
+    AstPtrResult<Global> Parser::parseGlobal() {
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordGlobal))
 
         ionshared::OptPtr<Type> type = this->parseType();
@@ -122,7 +122,7 @@ namespace ionlang {
         return std::make_shared<Global>(*type, *id, value);
     }
 
-    ionshared::OptPtr<Block> Parser::parseBlock(const ionshared::Ptr<Construct> &parent) {
+    AstPtrResult<Block> Parser::parseBlock(const ionshared::Ptr<Construct> &parent) {
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
         ionshared::Ptr<Block> block = std::make_shared<Block>(parent);
@@ -142,7 +142,7 @@ namespace ionlang {
         return block;
     }
 
-    ionshared::OptPtr<Module> Parser::parseModule() {
+    AstPtrResult<Module> Parser::parseModule() {
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordModule))
 
         std::optional<std::string> id = this->parseId();
@@ -184,7 +184,7 @@ namespace ionlang {
         return module;
     }
 
-    ionshared::OptPtr<VariableDecl> Parser::parseVariableDecl(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<VariableDecl> Parser::parseVariableDecl(const ionshared::Ptr<Block> &parent) {
         ionshared::OptPtr<Type> type = this->parseType();
 
         IONIR_PARSER_ASSURE(type)

@@ -2,11 +2,15 @@
 
 #include <ionshared/misc/named.h>
 #include <ionshared/tracking/scope_anchor.h>
-#include <ionlang/tracking/context.h>
+#include <ionshared/tracking/context.h>
 #include "construct.h"
 
 namespace ionlang {
     class Pass;
+
+    typedef ionshared::Scope<Construct> Scope;
+
+    typedef ionshared::Context<Construct> Context;
 
     class Module : public Construct, public ionshared::Named {
     private:
