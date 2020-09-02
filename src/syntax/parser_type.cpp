@@ -5,7 +5,7 @@
 
 namespace ionlang {
     // TODO: Consider using Ref<> to register pending type reference if user-defined type is parsed?
-    ionshared::OptPtr<Type> Parser::parseType() {
+    AstPtrResult<Type> Parser::parseType() {
         ionshared::Ptr<TypeQualifiers> qualifiers = std::make_shared<TypeQualifiers>();
 
         // TODO: Simplify to support const mut &*type.
@@ -84,7 +84,7 @@ namespace ionlang {
         return type;
     }
 
-    ionshared::OptPtr<VoidType> Parser::parseVoidType() {
+    AstPtrResult<VoidType> Parser::parseVoidType() {
         /**
          * Void type does not accept references nor pointer
          * specifiers, so just simply skip over its token.
@@ -94,7 +94,7 @@ namespace ionlang {
         return std::make_shared<VoidType>();
     }
 
-    ionshared::OptPtr<IntegerType> Parser::parseIntegerType() {
+    AstPtrResult<IntegerType> Parser::parseIntegerType() {
         TokenKind currentTokenKind = this->tokenStream.get().getKind();
 
         if (!Classifier::isIntegerType(currentTokenKind)) {

@@ -2,7 +2,7 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    ionshared::OptPtr<Args> Parser::parseArgs() {
+    AstPtrResult<Args> Parser::parseArgs() {
         ionshared::SymbolTable<Arg> args = ionshared::SymbolTable<Arg>();
         bool isInfinite = false;
 
@@ -24,7 +24,7 @@ namespace ionlang {
 
             std::optional<Arg> argResult = this->parseArg();
 
-            IONIR_PARSER_ASSURE(argResult)
+            IONLANG_PARSER_ASSERT(argResult.has_value(), Args)
 
             Arg arg = *argResult;
 
@@ -36,49 +36,51 @@ namespace ionlang {
         return std::make_shared<Args>(args, isInfinite);
     }
 
-    ionshared::OptPtr<Prototype> Parser::parsePrototype(const ionshared::Ptr<Module> &parent) {
+    AstPtrResult<Prototype> Parser::parsePrototype(const ionshared::Ptr<Module> &parent) {
         std::optional<std::string> id = this->parseId();
 
-        IONIR_PARSER_ASSURE(id)
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
+        IONLANG_PARSER_ASSERT(id.has_value(), Prototype)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL), Prototype)
 
         ionshared::Ptr<Args> args = std::make_shared<Args>();
 
         // Parse arguments if applicable.
         if (!this->is(TokenKind::SymbolParenthesesR)) {
-            ionshared::OptPtr<Args> temporaryArgs = this->parseArgs();
+            AstPtrResult<Args> temporaryArgs = this->parseArgs();
 
-            IONIR_PARSER_ASSURE(temporaryArgs)
+            IONLANG_PARSER_ASSERT(temporaryArgs.hasValue(), Prototype)
 
             args = *temporaryArgs;
         }
 
         this->tokenStream.skip();
 
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolArrow))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolArrow), Prototype)
 
-        ionshared::OptPtr<Type> returnType = this->parseType();
+        AstPtrResult<Type> returnType = this->parseType();
 
-        IONIR_PARSER_ASSURE(returnType)
+        IONLANG_PARSER_ASSERT(returnType.hasValue(), Prototype)
 
         return std::make_shared<Prototype>(*id, args, *returnType, parent);
     }
 
-    ionshared::OptPtr<Extern> Parser::parseExtern(const ionshared::Ptr<Module> &parent) {
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordExtern))
+    AstPtrResult<Extern> Parser::parseExtern(const ionshared::Ptr<Module> &parent) {
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordExtern), Extern)
 
-        ionshared::OptPtr<Prototype> prototype = this->parsePrototype(parent);
+        AstPtrResult<Prototype> prototype = this->parsePrototype(parent);
 
-        IONIR_PARSER_ASSURE(prototype)
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
+        IONLANG_PARSER_ASSERT(prototype.hasValue(), Extern)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), Extern)
 
         return std::make_shared<Extern>(*prototype);
     }
 
-    ionshared::OptPtr<Function> Parser::parseFunction(const ionshared::Ptr<Module> &parent) {
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordFunction))
+    AstPtrResult<Function> Parser::parseFunction(const ionshared::Ptr<Module> &parent) {
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordFunction), Function)
 
-        ionshared::OptPtr<Prototype> prototype = this->parsePrototype(parent);
+        AstPtrResult<Prototype> prototype = this->parsePrototype(parent);
+
+        IONLANG_PARSER_ASSERT(prototype.hasValue(), Function)
 
         /**
          * Create the resulting function construct here, to be provided
@@ -91,10 +93,9 @@ namespace ionlang {
             nullptr
         );
 
-        ionshared::OptPtr<Block> bodyResult = this->parseBlock(function);
+        AstPtrResult<Block> bodyResult = this->parseBlock(function);
 
-        IONIR_PARSER_ASSURE(prototype)
-        IONIR_PARSER_ASSURE(bodyResult)
+        IONLANG_PARSER_ASSERT(bodyResult.hasValue(), Function)
 
         // Fill in the nullptr body.
         function->setBody(*bodyResult);

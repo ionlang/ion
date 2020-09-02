@@ -71,7 +71,7 @@ namespace ionlang {
         return this->filePath;
     }
 
-    AstPtrResult<Construct> Parser::parseTopLevel(const ionshared::Ptr<Module> &parent) {
+    AstPtrResult<> Parser::parseTopLevel(const ionshared::Ptr<Module> &parent) {
         switch (this->tokenStream.get().getKind()) {
             case TokenKind::KeywordFunction: {
                 return this->parseFunction(parent);
@@ -94,7 +94,7 @@ namespace ionlang {
     AstPtrResult<Global> Parser::parseGlobal() {
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordGlobal))
 
-        ionshared::OptPtr<Type> type = this->parseType();
+        AstPtrResult<Type> type = this->parseType();
 
         IONIR_PARSER_ASSURE(type)
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#define IONLANG_PARSER_ASSERT(condition, T) if (!condition) { return std::make_shared<AstPtrResult<T>>(this->makeSyntaxRange()); }
+
 #include <optional>
 #include <string>
 #include <ionshared/misc/result.h>
@@ -43,6 +45,18 @@ namespace ionlang {
             std::string message,
             ionshared::NoticeType type = ionshared::NoticeType::Error
         );
+
+        [[nodiscard]] ionshared::Range makeSyntaxRange() const noexcept {
+            // TODO: Hard-coded 1 length.
+//            return {
+//                this->syntaxStartMarker,
+//                static_cast<uint32_t>(this->tokenStream.getIndex()) - this->syntaxStartMarker;
+//            };
+            return {
+                static_cast<uint32_t>(this->tokenStream.getIndex()),
+                1
+            };
+        }
 
     public:
         // TODO: Default value is hard-coded.

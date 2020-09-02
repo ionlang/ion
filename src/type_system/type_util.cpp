@@ -39,14 +39,6 @@ namespace ionlang::type_util {
 
             // TODO: Decimal types as well (copy integer code basically).
 
-            case TypeKind::Pointer: {
-                // TODO
-
-                throw std::runtime_error("Not implemented");
-
-                break;
-            }
-
             case TypeKind::UserDefined: {
                 // TODO
 

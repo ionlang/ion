@@ -2,17 +2,13 @@
 
 namespace ionlang {
     std::optional<std::string> Parser::parseId() {
-        this->skipOver(TokenKind::OperatorModulo);
-
         IONIR_PARSER_EXPECT(TokenKind::Identifier)
 
-        Token id = this->tokenStream.get();
+        std::string id = this->tokenStream.get().getValue();
 
-        // Skip over identifier token.
         this->tokenStream.skip();
 
-        // Return the identifier's value.
-        return id.getValue();
+        return id;
     }
 
     std::optional<Arg> Parser::parseArg() {
