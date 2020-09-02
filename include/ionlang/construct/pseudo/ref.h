@@ -35,7 +35,7 @@ namespace ionlang {
             // visitor.visitRef(this->dynamicCast<Ref<T>>());
         }
 
-        Ref<T> &operator=(T value) {
+        Ref<T> &operator=(ionshared::Ptr<T> value) {
             this->setValue(value);
         }
 

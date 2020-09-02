@@ -59,8 +59,9 @@ namespace ionlang {
         template<class T>
         static Ast convertChildren(ionshared::SymbolTable<T> symbolTable) {
             Ast children = {};
+            auto symbolTableEntries = symbolTable.unwrap();
 
-            for (const auto &[key, value] : symbolTable.unwrap()) {
+            for (const auto &[key, value] : symbolTableEntries) {
                 children.push_back(value);
             }
 
@@ -89,5 +90,15 @@ namespace ionlang {
         virtual void accept(Pass &visitor) = 0;
 
         virtual Ast getChildNodes();
+
+        /**
+         * Verify the members and properties of the node, and it's children.
+         * Without an implementation by the derived class, this will return
+         * true if all the child nodes are successfully verified. If there
+         * are no child nodes, the result will be true by default.
+         */
+        virtual bool verify();
+
+        std::optional<std::string> getConstructName();
     };
 }
