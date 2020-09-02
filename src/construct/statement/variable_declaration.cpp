@@ -2,8 +2,16 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    VariableDecl::VariableDecl(ionshared::Ptr<Block> parent, ionshared::Ptr<Type> type, std::string id, ionshared::Ptr<Value<>> value)
-        : Statement(std::move(parent), StatementKind::VariableDeclaration), ionshared::Named(std::move(id)), type(std::move(type)), value(std::move(value)) {
+    VariableDecl::VariableDecl(
+        ionshared::Ptr<Block> parent,
+        ionshared::Ptr<Type> type,
+        std::string id,
+        ionshared::Ptr<Construct> value
+    ) :
+        Statement(std::move(parent), StatementKind::VariableDeclaration),
+        ionshared::Named(std::move(id)),
+        type(std::move(type)),
+        value(std::move(value)) {
         //
     }
 
@@ -19,11 +27,11 @@ namespace ionlang {
         this->type = std::move(type);
     }
 
-    ionshared::Ptr<Value<>> VariableDecl::getValue() const noexcept {
+    ionshared::Ptr<Construct> VariableDecl::getValue() const noexcept {
         return this->value;
     }
 
-    void VariableDecl::setValue(ionshared::Ptr<Value<>> value) noexcept {
+    void VariableDecl::setValue(ionshared::Ptr<Construct> value) noexcept {
         this->value = std::move(value);
     }
 }

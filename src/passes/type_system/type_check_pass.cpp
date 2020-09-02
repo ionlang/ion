@@ -82,7 +82,7 @@ namespace ionlang {
         }
     }
 
-    void TypeCheckPass::visitStoreInst(ionshared::Ptr<StoreInst> node) {
+    void TypeCheckPass::visitVariableDecl(ionshared::Ptr<VariableDecl> node) {
         std::string targetId = node->getTarget()->getId();
 
         if (!node->getTarget()->isResolved()) {

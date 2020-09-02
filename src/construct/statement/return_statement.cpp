@@ -1,8 +1,9 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    ReturnStatement::ReturnStatement(const ReturnStatementOpts &opts)
-        : Statement(opts.parent, StatementKind::Return), value(opts.value) {
+    ReturnStatement::ReturnStatement(const ReturnStatementOpts &opts) :
+        Statement(opts.parent, StatementKind::Return),
+        value(opts.value) {
         //
     }
 
@@ -20,11 +21,11 @@ namespace ionlang {
         };
     }
 
-    ionshared::OptPtr<Value<>> ReturnStatement::getValue() const noexcept {
+    ionshared::OptPtr<Construct> ReturnStatement::getValue() const noexcept {
         return this->value;
     }
 
-    void ReturnStatement::setValue(ionshared::OptPtr<Value<>> value) noexcept {
+    void ReturnStatement::setValue(ionshared::OptPtr<Construct> value) noexcept {
         this->value = std::move(value);
     }
 

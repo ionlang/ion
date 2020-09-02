@@ -2,7 +2,7 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    ionshared::OptPtr<Construct> Parser::parsePrimaryExpr(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<Construct> Parser::parsePrimaryExpr(const ionshared::Ptr<Block> &parent) {
         if (this->is(TokenKind::SymbolParenthesesL)) {
             return this->parseParenthesesExpr(parent);
         }
@@ -16,7 +16,7 @@ namespace ionlang {
         return this->parseLiteral();
     }
 
-    ionshared::OptPtr<Construct> Parser::parseParenthesesExpr(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<Construct> Parser::parseParenthesesExpr(const ionshared::Ptr<Block> &parent) {
         IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
         ionshared::OptPtr<Construct> expr = this->parsePrimaryExpr(parent);
@@ -26,7 +26,7 @@ namespace ionlang {
         return expr;
     }
 
-    ionshared::OptPtr<Construct> Parser::parseIdExpr(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<Construct> Parser::parseIdExpr(const ionshared::Ptr<Block> &parent) {
         if (this->isNext(TokenKind::SymbolParenthesesL)) {
             return this->parseCallExpr(parent);
         }
@@ -35,7 +35,7 @@ namespace ionlang {
         return this->parseRef(parent);
     }
 
-    ionshared::OptPtr<BinaryOperation> Parser::parseBinaryOperation(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<BinaryOperation> Parser::parseBinaryOperation(const ionshared::Ptr<Block> &parent) {
         while (true) {
             std::optional<Operator> operation =
                 util::findOperator(this->tokenStream.get().getKind());
@@ -76,7 +76,7 @@ namespace ionlang {
         }
     }
 
-    ionshared::OptPtr<CallExpr> Parser::parseCallExpr(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<CallExpr> Parser::parseCallExpr(const ionshared::Ptr<Block> &parent) {
         std::optional<std::string> calleeId = this->parseId();
 
         IONIR_PARSER_ASSURE(calleeId)

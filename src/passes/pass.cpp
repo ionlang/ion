@@ -85,6 +85,10 @@ namespace ionlang {
         //
     }
 
+    void Pass::visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> node) {
+        //
+    }
+
     void Pass::visitExpression(ionshared::Ptr<Expression> node) {
         switch (node->getExpressionKind()) {
             case ExpressionKind::UnaryOperation: {

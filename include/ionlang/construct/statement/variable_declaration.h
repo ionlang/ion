@@ -14,24 +14,24 @@ namespace ionlang {
     private:
         ionshared::Ptr<Type> type;
 
-        ionshared::Ptr<Value<>> value;
+        ionshared::Ptr<Construct> value;
 
     public:
         VariableDecl(
             ionshared::Ptr<Block> parent,
             ionshared::Ptr<Type> type,
             std::string id,
-            ionshared::Ptr<Value<>> value
+            ionshared::Ptr<Construct> value
         );
 
         void accept(Pass &visitor) override;
 
-        ionshared::Ptr<Type> getType() const noexcept;
+        [[nodiscard]] ionshared::Ptr<Type> getType() const noexcept;
 
         void setType(ionshared::Ptr<Type> type) noexcept;
 
-        ionshared::Ptr<Value<>> getValue() const noexcept;
+        [[nodiscard]] ionshared::Ptr<Construct> getValue() const noexcept;
 
-        void setValue(ionshared::Ptr<Value<>> value) noexcept;
+        void setValue(ionshared::Ptr<Construct> value) noexcept;
     };
 }

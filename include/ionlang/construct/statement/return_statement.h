@@ -7,12 +7,12 @@ namespace ionlang {
     class Pass;
 
     struct ReturnStatementOpts : StatementOpts {
-        ionshared::OptPtr<Value<>> value;
+        ionshared::OptPtr<Construct> value;
     };
 
     class ReturnStatement : public Statement {
     private:
-        ionshared::OptPtr<Value<>> value;
+        ionshared::OptPtr<Construct> value;
 
     public:
         explicit ReturnStatement(const ReturnStatementOpts &opts);
@@ -21,9 +21,9 @@ namespace ionlang {
 
         Ast getChildNodes() override;
 
-        ionshared::OptPtr<Value<>> getValue() const noexcept;
+        ionshared::OptPtr<Construct> getValue() const noexcept;
 
-        void setValue(ionshared::OptPtr<Value<>> value) noexcept;
+        void setValue(ionshared::OptPtr<Construct> value) noexcept;
 
         bool hasValue() const noexcept;
     };

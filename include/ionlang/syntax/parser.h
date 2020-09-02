@@ -10,7 +10,6 @@
 #include <ionlang/error_handling/notice_sentinel.h>
 #include <ionlang/lexical/token.h>
 #include <ionlang/passes/pass.h>
-#include "scope.h"
 
 namespace ionlang {
     // TODO

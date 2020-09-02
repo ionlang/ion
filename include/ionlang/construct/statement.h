@@ -17,6 +17,8 @@ namespace ionlang {
 
         VariableDeclaration,
 
+        Assignment,
+
         Call
     };
 

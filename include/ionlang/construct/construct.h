@@ -57,12 +57,12 @@ namespace ionlang {
         }
 
         template<class T>
-        static Ast convertChildren(ionshared::SymbolTable<T> symbolTable) {
+        static Ast convertChildren(ionshared::PtrSymbolTable<T> symbolTable) {
             Ast children = {};
-            auto symbolTableEntries = symbolTable.unwrap();
+            auto symbolTableEntries = symbolTable->unwrap();
 
-            for (const auto &[key, value] : symbolTableEntries) {
-                children.push_back(value);
+            for (const auto &[id, construct] : symbolTableEntries) {
+                children.push_back(construct);
             }
 
             return children;

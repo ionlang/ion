@@ -9,6 +9,6 @@ namespace ionlang {
 
         void visitReturnStatement(ionshared::Ptr<ReturnStatement> node) override;
 
-        void visitStoreInst(ionshared::Ptr<StoreInst> node) override;
+        void visitVariableDecl(ionshared::Ptr<VariableDecl> node) override;
     };
 }
