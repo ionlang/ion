@@ -11,15 +11,18 @@ namespace ionlang {
         }
 
         std::vector<ionshared::Ptr<Statement>> statements = functionBody->get()->getStatements();
-        ionshared::OptPtr<Statement> terminalInst = functionBody->get()->findTerminalInst();
+
+        // TODO: CRITICAL! There may be more than a single terminal statement on blocks.
+        ionshared::OptPtr<Statement> terminalStatement = functionBody->get()->findTerminalStatement();
 
         // All basic blocks must contain at least a terminal instruction.
-        if (statements.empty() || !ionshared::util::hasValue(terminalInst)) {
+        if (statements.empty() || !ionshared::util::hasValue(terminalStatement)) {
             throw std::runtime_error("Section must contain at least a terminal instruction");
         }
     }
 
     void TypeCheckPass::visitReturnStatement(ionshared::Ptr<ReturnStatement> node) {
+        // TODO: Check function (parent) is actually ConstructKind::Function since blocks can have different parents.
         ionshared::Ptr<Function> function = node->getParent()->getParent()->getParent();
         ionshared::Ptr<Type> functionReturnType = function->getPrototype()->getReturnType();
         ionshared::OptPtr<Construct> returnStatementValue = node->getValue();

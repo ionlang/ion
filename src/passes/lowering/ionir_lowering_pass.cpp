@@ -104,7 +104,7 @@ namespace ionlang {
 
         // Proceed to visit all the module's children (top-level constructs).
         std::map<std::string, ionshared::Ptr<Construct>> moduleSymbolTable =
-            node->getSymbolTable()->unwrap();
+            node->getContext()->getGlobalScope()->unwrap();
 
         for (const auto &[id, topLevelConstruct] : moduleSymbolTable) {
             this->visit(topLevelConstruct);
@@ -580,7 +580,7 @@ namespace ionlang {
         ionshared::OptPtr<ionir::Value<>> ionIrValue = std::nullopt;
 
         if (node->hasValue()) {
-            Pass::visitValue(*node->getValue());
+            Pass::visit(*node->getValue());
 
             // Use a static pointer cast to cast to ionir::Value<>.
             ionIrValue = this->constructStack.pop()->staticCast<ionir::Value<>>();
@@ -613,7 +613,7 @@ namespace ionlang {
         this->constructStack.push(ionIrAllocaInst);
 
         // Lastly, then create a IonIR store inst, and push it onto the stack.
-        Pass::visitValue(node->getValue());
+        Pass::visit(node->getValue());
 
         ionshared::Ptr<ionir::Value<>> ionIrValue =
             this->constructStack.pop()->dynamicCast<ionir::Value<>>();
