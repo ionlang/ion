@@ -2,7 +2,7 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    AstPtrResult<Construct> Parser::parsePrimaryExpr(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<> Parser::parsePrimaryExpr(const ionshared::Ptr<Block> &parent) {
         if (this->is(TokenKind::SymbolParenthesesL)) {
             return this->parseParenthesesExpr(parent);
         }
@@ -16,12 +16,12 @@ namespace ionlang {
         return this->parseLiteral();
     }
 
-    AstPtrResult<Construct> Parser::parseParenthesesExpr(const ionshared::Ptr<Block> &parent) {
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
+    AstPtrResult<> Parser::parseParenthesesExpr(const ionshared::Ptr<Block> &parent) {
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL), Construct)
 
-        ionshared::OptPtr<Construct> expr = this->parsePrimaryExpr(parent);
+        AstPtrResult<> expr = this->parsePrimaryExpr(parent);
 
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR), Construct)
 
         return expr;
     }
@@ -40,13 +40,13 @@ namespace ionlang {
             std::optional<Operator> operation =
                 util::findOperator(this->tokenStream.get().getKind());
 
-            IONIR_PARSER_ASSURE(operation)
+            IONLANG_PARSER_ASSERT(operation.has_value(), BinaryOperation)
 
             this->tokenStream.skip();
 
-            ionshared::OptPtr<Construct> rightSide = this->parsePrimaryExpr(parent);
+            AstPtrResult<> rightSide = this->parsePrimaryExpr(parent);
 
-            IONIR_PARSER_ASSURE(rightSide)
+            IONLANG_PARSER_ASSERT(rightSide.hasValue(), BinaryOperation)
 
             // TODO: UNFINISHED!!!! ---------------------------------------
             // ------------------------------------------------------------
@@ -79,8 +79,8 @@ namespace ionlang {
     AstPtrResult<CallExpr> Parser::parseCallExpr(const ionshared::Ptr<Block> &parent) {
         std::optional<std::string> calleeId = this->parseId();
 
-        IONIR_PARSER_ASSURE(calleeId)
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
+        IONLANG_PARSER_ASSERT(calleeId.has_value(), CallExpr)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL), CallExpr)
 
         // Call contains no arguments.
         if (this->is(TokenKind::SymbolParenthesesR)) {
@@ -91,8 +91,8 @@ namespace ionlang {
             throw std::runtime_error("Not implemented; Currently not supported call with arguments");
         }
 
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR), CallExpr)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), CallExpr)
 
         return std::make_shared<CallExpr>(
             // TODO: Is this the correct parent for the Ref<Function>?

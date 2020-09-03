@@ -6,7 +6,6 @@
 #include <string>
 #include <ionshared/misc/result.h>
 #include <ionshared/error_handling/notice_factory.h>
-#include <ionshared/syntax/parser_helpers.h>
 #include <ionir/misc/helpers.h>
 #include <ionir/const/const_name.h>
 #include <ionlang/error_handling/notice_sentinel.h>
@@ -106,11 +105,11 @@ namespace ionlang {
 
         AstPtrResult<Value<>> parseLiteral();
 
-        AstPtrResult<Construct> parsePrimaryExpr(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<> parsePrimaryExpr(const ionshared::Ptr<Block> &parent);
 
-        AstPtrResult<Construct> parseParenthesesExpr(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<> parseParenthesesExpr(const ionshared::Ptr<Block> &parent);
 
-        AstPtrResult<Construct> parseIdExpr(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<> parseIdExpr(const ionshared::Ptr<Block> &parent);
 
         AstPtrResult<BinaryOperation> parseBinaryOperation(const ionshared::Ptr<Block> &parent);
 
@@ -133,10 +132,10 @@ namespace ionlang {
         // TODO: Add comment-parsing support.
 
         template<typename T = Construct>
-        ionshared::OptPtr<Ref<T>> parseRef(ionshared::Ptr<Construct> owner) {
+        AstPtrResult<Ref<T>> parseRef(ionshared::Ptr<Construct> owner) {
             std::optional<std::string> id = this->parseId();
 
-            IONIR_PARSER_ASSURE(id)
+            IONLANG_PARSER_ASSERT(id.has_value(), Ref<T>)
 
             return std::make_shared<Ref<T>>(*id, owner);
         }

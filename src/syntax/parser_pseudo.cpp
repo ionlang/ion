@@ -2,7 +2,9 @@
 
 namespace ionlang {
     std::optional<std::string> Parser::parseId() {
-        IONIR_PARSER_EXPECT(TokenKind::Identifier)
+        if (!this->is(TokenKind::Identifier)) {
+            return std::nullopt;
+        }
 
         std::string id = this->tokenStream.get().getValue();
 
@@ -12,13 +14,21 @@ namespace ionlang {
     }
 
     std::optional<Arg> Parser::parseArg() {
-        std::optional<ionshared::Ptr<Type>> type = this->parseType();
+        AstPtrResult<Type> type = this->parseType();
 
-        IONIR_PARSER_ASSURE(type)
+        // TODO: Function returns std::optional<>.
+//        IONIR_PARSER_ASSSERT(type.hasValue(), Arg)
+        if (!type.hasValue()) {
+            return std::nullopt;
+        }
 
         std::optional<std::string> id = this->parseId();
 
-        IONIR_PARSER_ASSURE(id)
+        // TODO: Function returns std::optional<>.
+        //        IONIR_PARSER_ASSSERT(id.hasValue(), Arg)
+        if (!id.has_value()) {
+            return std::nullopt;
+        }
 
         return std::make_pair(*type, *id);
     }

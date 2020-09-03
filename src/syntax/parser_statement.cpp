@@ -3,7 +3,7 @@
 
 namespace ionlang {
     AstPtrResult<Statement> Parser::parseStatement(const ionshared::Ptr<Block> &parent) {
-        ionshared::OptPtr<Statement> statement = std::nullopt;
+        AstPtrResult<Statement> statement = nullptr;
         ionshared::PtrSymbolTable<Statement> symbolTable = parent->getSymbolTable();
         TokenKind currentTokenKind = this->tokenStream.get().getKind();
 
@@ -28,30 +28,29 @@ namespace ionlang {
     }
 
     AstPtrResult<IfStatement> Parser::parseIfStatement(const ionshared::Ptr<Block> &parent) {
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIf))
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIf), IfStatement)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL), IfStatement)
 
-        ionshared::OptPtr<Value<>> condition = this->parseLiteral();
+        AstPtrResult<Value<>> condition = this->parseLiteral();
 
-        IONIR_PARSER_ASSURE(condition)
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
+        IONLANG_PARSER_ASSERT(condition.hasValue(), IfStatement)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR), IfStatement)
 
         // The block's parent will be filled below.
-        ionshared::OptPtr<Block> consequentBlockResult =
-            this->parseBlock(nullptr);
+        AstPtrResult<Block> consequentBlockResult = this->parseBlock(nullptr);
 
-        IONIR_PARSER_ASSURE(consequentBlockResult)
+        IONLANG_PARSER_ASSERT(consequentBlockResult.hasValue(), IfStatement)
 
         ionshared::Ptr<Block> consequentBlock = *consequentBlockResult;
 
         // Parse the alternative block if the else keyword is present.
-        ionshared::OptPtr<Block> alternativeBlock = std::nullopt;
+        AstPtrResult<Block> alternativeBlockResult = nullptr;
 
         if (this->is(TokenKind::KeywordElse)) {
-            IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordElse))
+            IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordElse), IfStatement)
 
             // The block's parent will be filled below.
-            alternativeBlock = this->parseBlock(nullptr);
+            alternativeBlockResult = this->parseBlock(nullptr);
         }
 
         // Make the if statement construct.
@@ -59,36 +58,36 @@ namespace ionlang {
             parent,
             *condition,
             consequentBlock,
-            alternativeBlock
+            *alternativeBlockResult
         });
 
         // Finally, fill in the gaps.
         consequentBlock->setParent(ifStatement);
 
-        if (ionshared::util::hasValue(alternativeBlock)) {
-            alternativeBlock->get()->setParent(ifStatement);
+        if (alternativeBlockResult.hasValue()) {
+            alternativeBlockResult.getValueOrNullptr()->setParent(ifStatement);
         }
 
         return ifStatement;
     }
 
     AstPtrResult<ReturnStatement> Parser::parseReturnStatement(const ionshared::Ptr<Block> &parent) {
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordReturn))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordReturn), ReturnStatement)
 
-        ionshared::OptPtr<Value<>> value = std::nullopt;
+        AstPtrResult<Value<>> value = std::nullopt;
 
         // Return statement contains a value. Parse it and save it.
         if (!this->is(TokenKind::SymbolSemiColon)) {
             value = this->parseLiteral();
 
-            IONIR_PARSER_ASSURE(value)
+            IONLANG_PARSER_ASSERT(value.hasValue(), ReturnStatement)
         }
 
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), ReturnStatement)
 
         return std::make_shared<ReturnStatement>(ReturnStatementOpts{
             parent,
-            value
+            *value
         });
     }
 }
