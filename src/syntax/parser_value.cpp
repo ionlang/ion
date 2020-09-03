@@ -6,7 +6,7 @@
 #include <ionlang/misc/util.h>
 
 namespace ionlang {
-    ionshared::OptPtr<Value<>> Parser::parseLiteral() {
+    AstPtrResult<Value<>> Parser::parseLiteral() {
         Token token = this->tokenStream.get();
 
         /**
@@ -15,26 +15,22 @@ namespace ionlang {
          */
         switch (token.getKind()) {
             case TokenKind::LiteralInteger: {
-                ionshared::OptPtr<IntegerLiteral> integerValue = this->parseIntegerLiteral();
+                AstPtrResult<IntegerLiteral> integerLiteralResult = this->parseIntegerLiteral();
 
-                if (ionshared::util::hasValue(integerValue)) {
-                    return (*integerValue)->staticCast<Value<>>();
-                }
+                IONLANG_PARSER_ASSERT(util::hasValue(integerLiteralResult), Value<>)
 
-                return std::nullopt;
+                return util::getResultValue(integerLiteralResult)->staticCast<Value<>>();
             }
 
             case TokenKind::LiteralCharacter: {
-                ionshared::OptPtr<CharLiteral> charValue = this->parseCharLiteral();
+                AstPtrResult<CharLiteral> charLiteralResult = this->parseCharLiteral();
 
-                if (ionshared::util::hasValue(charValue)) {
-                    return (*charValue)->staticCast<Value<>>();
-                }
+                IONLANG_PARSER_ASSERT(util::hasValue(charLiteralResult), Value<>)
 
-                return std::nullopt;
+                return util::getResultValue(charLiteralResult)->staticCast<Value<>>();
             }
 
-            // TODO: Missing values.
+            // TODO: Missing literals.
 
             default: {
                 // TODO: Return std::nullopt instead.
@@ -43,8 +39,8 @@ namespace ionlang {
         }
     }
 
-    ionshared::OptPtr<IntegerLiteral> Parser::parseIntegerLiteral() {
-        IONIR_PARSER_EXPECT(TokenKind::LiteralInteger)
+    AstPtrResult<IntegerLiteral> Parser::parseIntegerLiteral() {
+        IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralInteger), IntegerLiteral)
 
         /**
          * Abstract the token's value to be used in the
@@ -70,7 +66,8 @@ namespace ionlang {
         }
         catch (std::exception &exception) {
             // Value conversion failed.
-            return this->makeNotice("Could not convert string to value, integer may be invalid or too large");
+            // TODO: Use proper exception.
+            throw std::runtime_error("Could not convert string to value, integer may be invalid or too large");
         }
 
         // Calculate the value's bit-length and it's corresponding integer kind.
@@ -80,7 +77,8 @@ namespace ionlang {
             util::calculateIntegerKindFromBitLength(valueBitLength);
 
         if (!valueIntegerKind.has_value()) {
-            return this->makeNotice("Integer value's type kind could not be determined");
+            // TODO: Use proper exception.
+            throw std::runtime_error("Integer value's type kind could not be determined");
         }
 
         // Create a long integer type for the value.
@@ -98,8 +96,8 @@ namespace ionlang {
         return integer;
     }
 
-    ionshared::OptPtr<CharLiteral> Parser::parseCharLiteral() {
-        IONIR_PARSER_EXPECT(TokenKind::LiteralCharacter);
+    AstPtrResult<CharLiteral> Parser::parseCharLiteral() {
+        IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralCharacter), CharLiteral)
 
         // Extract the value from the character token.
         std::string stringValue = this->tokenStream.get().getValue();
@@ -109,15 +107,16 @@ namespace ionlang {
 
         // Ensure extracted value only contains a single character.
         if (stringValue.length() > 1) {
-            return this->makeNotice("Character value length must be at most 1 character");
+            // TODO: Use proper exception.
+            throw std::runtime_error("Character value length must be at most 1 character");
         }
 
         // Create the character construct with the first and only character of the captured value.
         return std::make_shared<CharLiteral>(stringValue[0]);
     }
 
-    ionshared::OptPtr<StringLiteral> Parser::parseStringLiteral() {
-        IONIR_PARSER_EXPECT(TokenKind::LiteralString);
+    AstPtrResult<StringLiteral> Parser::parseStringLiteral() {
+        IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralString), StringLiteral)
 
         // Extract the value from the string token.
         std::string value = this->tokenStream.get().getValue();

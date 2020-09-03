@@ -1,23 +1,24 @@
-#include <ionlang/syntax/parser.h>
 #include <ionlang/lexical/classifier.h>
+#include <ionlang/misc/util.h>
+#include <ionlang/syntax/parser.h>
 
 namespace ionlang {
     AstPtrResult<Statement> Parser::parseStatement(const ionshared::Ptr<Block> &parent) {
-        AstPtrResult<Statement> statement = nullptr;
+        AstPtrResult<Statement> statement;
         ionshared::PtrSymbolTable<Statement> symbolTable = parent->getSymbolTable();
         TokenKind currentTokenKind = this->tokenStream.get().getKind();
 
         // A built-in type at this position can only mean a variable declaration.
         if (Classifier::isBuiltInType(currentTokenKind)) {
-            statement = this->parseVariableDecl(parent);
+            statement = util::getResultValue(this->parseVariableDecl(parent));
         }
         // If statement.
         else if (currentTokenKind == TokenKind::KeywordIf) {
-            statement = this->parseIfStatement(parent);
+            statement = util::getResultValue(this->parseIfStatement(parent));
         }
         // Return statement.
         else if (currentTokenKind == TokenKind::KeywordReturn) {
-            statement = this->parseReturnStatement(parent);
+            statement = util::getResultValue(this->parseReturnStatement(parent));
         }
         // TODO: Use Ast(Ptr)Result<>.
         //        else {
@@ -33,18 +34,18 @@ namespace ionlang {
 
         AstPtrResult<Value<>> condition = this->parseLiteral();
 
-        IONLANG_PARSER_ASSERT(condition.hasValue(), IfStatement)
+        IONLANG_PARSER_ASSERT(util::hasValue(condition), IfStatement)
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR), IfStatement)
 
         // The block's parent will be filled below.
         AstPtrResult<Block> consequentBlockResult = this->parseBlock(nullptr);
 
-        IONLANG_PARSER_ASSERT(consequentBlockResult.hasValue(), IfStatement)
+        IONLANG_PARSER_ASSERT(util::hasValue(consequentBlockResult), IfStatement)
 
-        ionshared::Ptr<Block> consequentBlock = *consequentBlockResult;
+        ionshared::Ptr<Block> consequentBlock = util::getResultValue(consequentBlockResult);
 
         // Parse the alternative block if the else keyword is present.
-        AstPtrResult<Block> alternativeBlockResult = nullptr;
+        AstPtrResult<Block> alternativeBlockResult;
 
         if (this->is(TokenKind::KeywordElse)) {
             IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordElse), IfStatement)
@@ -56,16 +57,16 @@ namespace ionlang {
         // Make the if statement construct.
         ionshared::Ptr<IfStatement> ifStatement = std::make_shared<IfStatement>(IfStatementOpts{
             parent,
-            *condition,
+            util::getResultValue(condition),
             consequentBlock,
-            *alternativeBlockResult
+            util::getResultValue(alternativeBlockResult)
         });
 
         // Finally, fill in the gaps.
         consequentBlock->setParent(ifStatement);
 
-        if (alternativeBlockResult.hasValue()) {
-            alternativeBlockResult.getValueOrNullptr()->setParent(ifStatement);
+        if (util::hasValue(alternativeBlockResult)) {
+            util::getResultValue(alternativeBlockResult)->setParent(ifStatement);
         }
 
         return ifStatement;
@@ -74,20 +75,26 @@ namespace ionlang {
     AstPtrResult<ReturnStatement> Parser::parseReturnStatement(const ionshared::Ptr<Block> &parent) {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordReturn), ReturnStatement)
 
-        AstPtrResult<Value<>> value = std::nullopt;
+        AstPtrResult<> valueResult;
 
         // Return statement contains a value. Parse it and save it.
         if (!this->is(TokenKind::SymbolSemiColon)) {
-            value = this->parseLiteral();
+            valueResult = this->parsePrimaryExpr(parent);
 
-            IONLANG_PARSER_ASSERT(value.hasValue(), ReturnStatement)
+            IONLANG_PARSER_ASSERT(util::hasValue(valueResult), ReturnStatement)
         }
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), ReturnStatement)
 
+        ionshared::OptPtr<Construct> finalValue = std::nullopt;
+
+        if (util::hasValue(valueResult)) {
+            finalValue = util::getResultValue(valueResult);
+        }
+
         return std::make_shared<ReturnStatement>(ReturnStatementOpts{
             parent,
-            *value
+            finalValue
         });
     }
 }

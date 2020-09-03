@@ -1,6 +1,6 @@
 #include <vector>
 #include <ionir/passes/codegen/llvm_codegen_pass.h>
-#include <ionlang/passes/codegen/ionir_codegen_pass.h>
+#include <ionlang/passes/lowering/ionir_lowering_pass.h>
 #include "test_api/bootstrap.h"
 #include "test_api/compare.h"
 #include "test_api/const.h"

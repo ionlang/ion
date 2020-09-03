@@ -1,3 +1,4 @@
+#include <ionlang/misc/util.h>
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
@@ -18,7 +19,7 @@ namespace ionlang {
 
         // TODO: Function returns std::optional<>.
 //        IONIR_PARSER_ASSSERT(type.hasValue(), Arg)
-        if (!type.hasValue()) {
+        if (!util::hasValue(type)) {
             return std::nullopt;
         }
 
@@ -30,6 +31,6 @@ namespace ionlang {
             return std::nullopt;
         }
 
-        return std::make_pair(*type, *id);
+        return std::make_pair(util::getResultValue(type), *id);
     }
 }

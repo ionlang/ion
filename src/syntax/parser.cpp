@@ -74,66 +74,72 @@ namespace ionlang {
     AstPtrResult<> Parser::parseTopLevel(const ionshared::Ptr<Module> &parent) {
         switch (this->tokenStream.get().getKind()) {
             case TokenKind::KeywordFunction: {
-                return this->parseFunction(parent);
+                return util::getResultValue(this->parseFunction(parent));
             }
 
             case TokenKind::KeywordGlobal: {
-                return this->parseGlobal();
+                return util::getResultValue(this->parseGlobal());
             }
 
             case TokenKind::KeywordExtern: {
-                return this->parseExtern(parent);
+                return util::getResultValue(this->parseExtern(parent));
             }
 
             default: {
-                return this->makeNotice("Unknown top-level construct");
+                // TODO: Use proper exception.
+                throw std::runtime_error("Unknown top-level construct");
             }
         }
     }
 
     AstPtrResult<Global> Parser::parseGlobal() {
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordGlobal))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordGlobal), Global)
 
-        AstPtrResult<Type> type = this->parseType();
+        AstPtrResult<Type> typeResult = this->parseType();
 
-        IONIR_PARSER_ASSURE(type)
+        IONLANG_PARSER_ASSERT(util::hasValue(typeResult), Global)
 
         std::optional<std::string> id = this->parseId();
 
-        IONIR_PARSER_ASSURE(id)
+        IONLANG_PARSER_ASSERT(id.has_value(), Global)
 
-        ionshared::OptPtr<Value<>> value = std::nullopt;
+        AstPtrResult<Value<>> valueResult;
 
         // Global is being initialized inline with a value. Parse & process the value.
         if (this->is(TokenKind::SymbolEqual)) {
             // Skip the equal symbol before continuing parsing.
             this->tokenStream.skip();
 
-            value = this->parseLiteral();
+            valueResult = this->parseLiteral();
 
             // Value must have been parsed at this point.
-            if (!ionshared::util::hasValue(value)) {
-                return std::nullopt;
+            if (!util::hasValue(valueResult)) {
+                // TODO: Use proper exception/error.
+                throw std::runtime_error("Could not parse literal");
             }
         }
 
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), Global)
 
-        return std::make_shared<Global>(*type, *id, value);
+        return std::make_shared<Global>(
+            util::getResultValue(typeResult),
+            *id,
+            util::getResultValue(valueResult)
+        );
     }
 
     AstPtrResult<Block> Parser::parseBlock(const ionshared::Ptr<Construct> &parent) {
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL), Block)
 
         ionshared::Ptr<Block> block = std::make_shared<Block>(parent);
         std::vector<ionshared::Ptr<Statement>> statements = {};
 
         while (!this->is(TokenKind::SymbolBraceR)) {
-            ionshared::OptPtr<Statement> statement = this->parseStatement(block);
+            AstPtrResult<Statement> statement = this->parseStatement(block);
 
-            IONIR_PARSER_ASSURE(statement)
+            IONLANG_PARSER_ASSERT(util::hasValue(statement), Block)
 
-            statements.push_back(*statement);
+            statements.push_back(util::getResultValue(statement));
         }
 
         this->tokenStream.skip();
@@ -143,24 +149,24 @@ namespace ionlang {
     }
 
     AstPtrResult<Module> Parser::parseModule() {
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::KeywordModule))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordModule), Module)
 
         std::optional<std::string> id = this->parseId();
 
-        IONIR_PARSER_ASSURE(id)
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
+        IONLANG_PARSER_ASSERT(id.has_value(), Module)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL), Module)
 
-        ionshared::PtrSymbolTable<Construct> symbolTable =
+        Scope globalScope =
             std::make_shared<ionshared::SymbolTable<ionshared::Ptr<Construct>>>();
 
-        ionshared::Ptr<Module> module = std::make_shared<Module>(*id, symbolTable);
+        ionshared::Ptr<Module> module = std::make_shared<Module>(*id, std::make_shared<Context>(globalScope));
 
         while (!this->is(TokenKind::SymbolBraceR)) {
-            ionshared::OptPtr<Construct> topLevelConstructResult = this->parseTopLevel(module);
+            AstPtrResult<> topLevelConstructResult = this->parseTopLevel(module);
 
             // TODO: Make notice if it has no value? Or is it enough with the notice under 'parseTopLevel()'?
-            if (ionshared::util::hasValue(topLevelConstructResult)) {
-                ionshared::Ptr<Construct> topLevelConstruct = *topLevelConstructResult;
+            if (util::hasValue(topLevelConstructResult)) {
+                ionshared::Ptr<Construct> topLevelConstruct = util::getResultValue(topLevelConstructResult);
                 std::optional<std::string> name = util::findConstructId(topLevelConstruct);
 
                 if (!name.has_value()) {
@@ -168,7 +174,7 @@ namespace ionlang {
                 }
 
                 // TODO: Ensure we're not re-defining something, issue a notice otherwise.
-                symbolTable->insert(*name, topLevelConstruct);
+                globalScope->insert(*name, topLevelConstruct);
             }
 
             // No more tokens to process.
@@ -179,32 +185,36 @@ namespace ionlang {
             }
         }
 
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceR))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceR), Module)
 
         return module;
     }
 
     AstPtrResult<VariableDecl> Parser::parseVariableDecl(const ionshared::Ptr<Block> &parent) {
-        ionshared::OptPtr<Type> type = this->parseType();
+        AstPtrResult<Type> typeResult = this->parseType();
 
-        IONIR_PARSER_ASSURE(type)
+        IONLANG_PARSER_ASSERT(util::hasValue(typeResult), VariableDecl)
 
         std::optional<std::string> id = this->parseId();
 
-        IONIR_PARSER_ASSURE(id)
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual))
+        IONLANG_PARSER_ASSERT(id.has_value(), VariableDecl)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual), VariableDecl)
 
-        ionshared::OptPtr<Value<>> value = this->parseLiteral();
+        AstPtrResult<Value<>> valueResult = this->parseLiteral();
 
-        IONIR_PARSER_ASSURE(value)
+        IONLANG_PARSER_ASSERT(util::hasValue(valueResult), VariableDecl)
 
-        ionshared::Ptr<VariableDecl> variableDecl =
-            std::make_shared<VariableDecl>(parent, *type, *id, *value);
+        ionshared::Ptr<VariableDecl> variableDecl = std::make_shared<VariableDecl>(
+            parent,
+            util::getResultValue(typeResult),
+            *id,
+            util::getResultValue(valueResult)
+        );
 
         // Register the statement on the resulting block's symbol table.
         parent->getSymbolTable()->insert(variableDecl->getId(), variableDecl);
 
-        IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), VariableDecl)
 
         return variableDecl;
     }

@@ -1,6 +1,6 @@
 #pragma once
 
-#define IONLANG_PARSER_ASSERT(condition, T) if (!condition) { return std::make_shared<AstPtrResult<T>>(this->makeSyntaxRange()); }
+#define IONLANG_PARSER_ASSERT(condition, T) if (!condition) { return AstPtrResult<T>(std::make_shared<ErrorMarker>(this->makeSyntaxRange())); }
 
 #include <optional>
 #include <string>

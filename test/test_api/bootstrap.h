@@ -3,7 +3,7 @@
 #include <vector>
 #include <ionshared/llvm/llvm_module.h>
 #include <ionir/misc/helpers.h>
-#include <ionlang/passes/codegen/ionir_codegen_pass.h>
+#include <ionlang/passes/lowering/ionir_lowering_pass.h>
 #include <ionlang/lexical/token.h>
 #include <ionir/lexical/token_kind.h>
 #include <ionlang/syntax/parser.h>

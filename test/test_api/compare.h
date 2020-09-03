@@ -3,7 +3,7 @@
 #include <iostream>
 #include <array>
 #include <string>
-#include <ionlang/passes/codegen/ionir_codegen_pass.h>
+#include <ionlang/passes/lowering/ionir_lowering_pass.h>
 #include <ionlang/lexical/token.h>
 #include "util.h"
 #include "../pch.h"

@@ -1,4 +1,5 @@
 #include <ionlang/const/const_name.h>
+#include <ionlang/misc/util.h>
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
@@ -48,9 +49,9 @@ namespace ionlang {
         if (!this->is(TokenKind::SymbolParenthesesR)) {
             AstPtrResult<Args> temporaryArgs = this->parseArgs();
 
-            IONLANG_PARSER_ASSERT(temporaryArgs.hasValue(), Prototype)
+            IONLANG_PARSER_ASSERT(util::hasValue(temporaryArgs), Prototype)
 
-            args = *temporaryArgs;
+            args = util::getResultValue(temporaryArgs);
         }
 
         this->tokenStream.skip();
@@ -59,9 +60,9 @@ namespace ionlang {
 
         AstPtrResult<Type> returnType = this->parseType();
 
-        IONLANG_PARSER_ASSERT(returnType.hasValue(), Prototype)
+        IONLANG_PARSER_ASSERT(util::hasValue(returnType), Prototype)
 
-        return std::make_shared<Prototype>(*id, args, *returnType, parent);
+        return std::make_shared<Prototype>(*id, args, util::getResultValue(returnType), parent);
     }
 
     AstPtrResult<Extern> Parser::parseExtern(const ionshared::Ptr<Module> &parent) {
@@ -69,25 +70,25 @@ namespace ionlang {
 
         AstPtrResult<Prototype> prototype = this->parsePrototype(parent);
 
-        IONLANG_PARSER_ASSERT(prototype.hasValue(), Extern)
+        IONLANG_PARSER_ASSERT(util::hasValue(prototype), Extern)
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), Extern)
 
-        return std::make_shared<Extern>(*prototype);
+        return std::make_shared<Extern>(util::getResultValue(prototype));
     }
 
     AstPtrResult<Function> Parser::parseFunction(const ionshared::Ptr<Module> &parent) {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordFunction), Function)
 
-        AstPtrResult<Prototype> prototype = this->parsePrototype(parent);
+        AstPtrResult<Prototype> prototypeResult = this->parsePrototype(parent);
 
-        IONLANG_PARSER_ASSERT(prototype.hasValue(), Function)
+        IONLANG_PARSER_ASSERT(util::hasValue(prototypeResult), Function)
 
         /**
          * Create the resulting function construct here, to be provided
          * as the parent when parsing the body block.
          */
         ionshared::Ptr<Function> function = std::make_shared<Function>(
-            *prototype,
+            util::getResultValue(prototypeResult),
 
             // To be filled below.
             nullptr
@@ -95,10 +96,10 @@ namespace ionlang {
 
         AstPtrResult<Block> bodyResult = this->parseBlock(function);
 
-        IONLANG_PARSER_ASSERT(bodyResult.hasValue(), Function)
+        IONLANG_PARSER_ASSERT(util::hasValue(bodyResult), Function)
 
         // Fill in the nullptr body.
-        function->setBody(*bodyResult);
+        function->setBody(util::getResultValue(bodyResult));
 
         return function;
     }

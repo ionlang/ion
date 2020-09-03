@@ -13,7 +13,14 @@ namespace ionlang {
         // TODO: Support unary and binary operation parsing.
 
         // Otherwise, it must be a literal value.
-        return this->parseLiteral();
+        AstPtrResult<Value<>> literal = this->parseLiteral();
+
+        if (!util::hasValue(literal)) {
+            // TODO: Use proper exception.
+            throw std::runtime_error("Literal has no value");
+        }
+
+        return util::castAstPtrResult<Value<>, Construct>(literal, true);
     }
 
     AstPtrResult<> Parser::parseParenthesesExpr(const ionshared::Ptr<Block> &parent) {
@@ -26,13 +33,13 @@ namespace ionlang {
         return expr;
     }
 
-    AstPtrResult<Construct> Parser::parseIdExpr(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<> Parser::parseIdExpr(const ionshared::Ptr<Block> &parent) {
         if (this->isNext(TokenKind::SymbolParenthesesL)) {
-            return this->parseCallExpr(parent);
+            return util::getResultValue(this->parseCallExpr(parent));
         }
 
         // TODO: Is this the correct parent for the ref?
-        return this->parseRef(parent);
+        return util::getResultValue(this->parseRef(parent));
     }
 
     AstPtrResult<BinaryOperation> Parser::parseBinaryOperation(const ionshared::Ptr<Block> &parent) {
@@ -44,9 +51,9 @@ namespace ionlang {
 
             this->tokenStream.skip();
 
-            AstPtrResult<> rightSide = this->parsePrimaryExpr(parent);
+            AstPtrResult<> rightSideResult = this->parsePrimaryExpr(parent);
 
-            IONLANG_PARSER_ASSERT(rightSide.hasValue(), BinaryOperation)
+            IONLANG_PARSER_ASSERT(util::hasValue(rightSideResult), BinaryOperation)
 
             // TODO: UNFINISHED!!!! ---------------------------------------
             // ------------------------------------------------------------
@@ -62,7 +69,7 @@ namespace ionlang {
                 nullptr,
                 *operation,
                 nullptr,
-                *rightSide
+                util::getResultValue(rightSideResult)
             });
 
             // ------------------------------------------------------------

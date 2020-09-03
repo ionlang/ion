@@ -27,7 +27,7 @@ namespace ionlang {
             }
             // Otherwise, it must be a pointer.
             else {
-                IONIR_PARSER_ASSERT(this->skipOver(TokenKind::SymbolStar))
+                IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolStar), Type)
 
                 qualifiers->insert(TypeQualifier::Pointer);
             }
@@ -53,18 +53,18 @@ namespace ionlang {
         std::string tokenValue = token.getValue();
         TokenKind tokenKind = token.getKind();
 
-        IONIR_PARSER_ASSERT((
+        IONLANG_PARSER_ASSERT((
             Classifier::isBuiltInType(tokenKind)
                 || tokenKind == TokenKind::Identifier
-        ))
+        ), Type)
 
-        ionshared::OptPtr<Type> type;
+        AstPtrResult<Type> type;
 
         if (tokenKind == TokenKind::TypeVoid) {
-            type = this->parseVoidType();
+            type = util::getResultValue(this->parseVoidType());
         }
         else if (Classifier::isIntegerType(tokenKind)) {
-            type = this->parseIntegerType();
+            type = util::getResultValue(this->parseIntegerType());
         }
 
         // TODO: Add support for missing types.
@@ -75,7 +75,7 @@ namespace ionlang {
          * from the token's value, otherwise default to an
          * user-defined type assumption.
          */
-        if (!ionshared::util::hasValue(type)) {
+        if (!util::hasValue(type)) {
             type = std::make_shared<Type>(tokenValue, util::resolveTypeKind(tokenValue));
             this->tokenStream.skip();
         }
@@ -98,7 +98,8 @@ namespace ionlang {
         TokenKind currentTokenKind = this->tokenStream.get().getKind();
 
         if (!Classifier::isIntegerType(currentTokenKind)) {
-            return std::nullopt;
+            // TODO: Use proper exception/error.
+            throw std::runtime_error("Not an integer type");
         }
 
         // TODO: Missing support for is signed or not, as well as is pointer.
@@ -106,7 +107,8 @@ namespace ionlang {
         std::optional<IntegerKind> integerKind = Const::getIntegerKind(currentTokenKind);
 
         if (!integerKind.has_value()) {
-            return std::nullopt;
+            // TODO: Use proper exception/error.
+            throw std::runtime_error("Integer kind has no value");
         }
 
         // Skip over the type token.
