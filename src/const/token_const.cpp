@@ -176,12 +176,18 @@ namespace ionlang {
 
         // Initialize complex maps.
         TokenConst::complex = {
-            {Regex::identifier, TokenKind::Identifier},
             {Regex::string, TokenKind::LiteralString},
             {Regex::decimal, TokenKind::LiteralDecimal},
             {Regex::integer, TokenKind::LiteralInteger},
+            {Regex::boolean, TokenKind::LiteralBoolean},
             {Regex::character, TokenKind::LiteralCharacter},
-            {Regex::whitespace, TokenKind::Whitespace}
+            {Regex::whitespace, TokenKind::Whitespace},
+
+            /**
+             * Identifier regex MUST be placed last, otherwise it will gain
+             * precedence over other regexes, for example booleans.
+             */
+            {Regex::identifier, TokenKind::Identifier}
         };
 
         /**

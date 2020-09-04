@@ -18,6 +18,8 @@ namespace ionlang {
 
         LiteralCharacter,
 
+        LiteralBoolean,
+
         SymbolDollar,
 
         SymbolHash,

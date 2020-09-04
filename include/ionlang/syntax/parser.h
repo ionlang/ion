@@ -79,6 +79,8 @@ namespace ionlang {
          */
         AstPtrResult<IntegerLiteral> parseIntegerLiteral();
 
+        AstPtrResult<BooleanLiteral> parseBooleanLiteral();
+
         AstPtrResult<CharLiteral> parseCharLiteral();
 
         AstPtrResult<StringLiteral> parseStringLiteral();

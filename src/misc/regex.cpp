@@ -9,6 +9,8 @@ namespace ionlang {
 
     const std::regex Regex::integer = std::regex("^([0-9]+)");
 
+    const std::regex Regex::boolean = std::regex("^(true|false)");
+
     const std::regex Regex::character = std::regex("^'([^'\\n\\\\]{0,1})'");
 
     const std::regex Regex::whitespace = std::regex("^([\\s]+)");

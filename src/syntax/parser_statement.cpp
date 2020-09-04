@@ -57,12 +57,18 @@ namespace ionlang {
             alternativeBlockResult = this->parseBlock(nullptr);
         }
 
+        ionshared::OptPtr<Block> alternativeBlock = std::nullopt;
+
+        if (util::hasValue(alternativeBlockResult)) {
+            alternativeBlock = util::getResultValue(alternativeBlockResult);
+        }
+
         // Make the if statement construct.
         ionshared::Ptr<IfStatement> ifStatement = std::make_shared<IfStatement>(IfStatementOpts{
             parent,
             util::getResultValue(condition),
             consequentBlock,
-            util::getResultValue(alternativeBlockResult)
+            alternativeBlock
         });
 
         // Finally, fill in the gaps.

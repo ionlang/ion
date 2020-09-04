@@ -14,8 +14,8 @@ namespace ionlang {
 
         void accept(Pass &visitor) override;
 
-        bool getValue() const;
+        [[nodiscard]] bool getValue() const noexcept;
 
-        void setValue(bool value);
+        void setValue(bool value) noexcept;
     };
 }

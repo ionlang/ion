@@ -13,6 +13,8 @@ namespace ionlang {
 
         const static std::regex integer;
 
+        const static std::regex boolean;
+
         const static std::regex character;
 
         const static std::regex whitespace;

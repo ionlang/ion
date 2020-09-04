@@ -5,6 +5,11 @@ namespace ionlang {
 
     const std::string ConstName::main = "main";
 
+    // TODO: Bools are also hard-coded on it's corresponding regex.
+    const std::string ConstName::booleanTrue = "true";
+
+    const std::string ConstName::booleanFalse = "false";
+
     const std::string ConstName::typeVoid = "void";
 
     const std::string ConstName::typeBool = "bool";

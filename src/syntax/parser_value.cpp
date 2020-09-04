@@ -30,6 +30,14 @@ namespace ionlang {
                 return util::getResultValue(charLiteralResult)->staticCast<Value<>>();
             }
 
+            case TokenKind::LiteralBoolean: {
+                AstPtrResult<BooleanLiteral> booleanLiteralResult = this->parseBooleanLiteral();
+
+                IONLANG_PARSER_ASSERT(util::hasValue(booleanLiteralResult), Value<>)
+
+                return util::getResultValue(booleanLiteralResult)->staticCast<Value<>>();
+            }
+
             // TODO: Missing literals.
 
             default: {
@@ -94,6 +102,24 @@ namespace ionlang {
 
         // Finally, return the result.
         return integer;
+    }
+
+    AstPtrResult<BooleanLiteral> Parser::parseBooleanLiteral() {
+        IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralBoolean), BooleanLiteral)
+
+        std::string value = this->tokenStream.get().getValue();
+
+        this->tokenStream.skip();
+
+        if (value == ConstName::booleanTrue) {
+            return std::make_shared<BooleanLiteral>(true);
+        }
+        else if (value == ConstName::booleanFalse) {
+            return std::make_shared<BooleanLiteral>(false);
+        }
+
+        // TODO: Use internal errors.
+        throw std::runtime_error("Unexpected token value");
     }
 
     AstPtrResult<CharLiteral> Parser::parseCharLiteral() {

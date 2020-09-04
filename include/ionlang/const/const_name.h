@@ -9,6 +9,10 @@ namespace ionlang {
 
         static const std::string main;
 
+        static const std::string booleanTrue;
+
+        static const std::string booleanFalse;
+
         static const std::string typeVoid;
 
         static const std::string typeBool;
