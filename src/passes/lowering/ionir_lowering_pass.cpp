@@ -52,14 +52,24 @@ namespace ionlang {
         this->basicBlockBuffer = basicBlock;
     }
 
-    IonIrLoweringPass::IonIrLoweringPass(ionshared::PtrSymbolTable<ionir::Module> modules)
-        : modules(std::move(modules)), constructStack(), typeStack(), moduleBuffer(std::nullopt), functionBuffer(std::nullopt), basicBlockBuffer(std::nullopt), builderBuffer(std::nullopt) {
+    uint32_t IonIrLoweringPass::getNameCounter() noexcept {
+        return this->nameCounter++;
+    }
+
+    IonIrLoweringPass::IonIrLoweringPass(ionshared::PtrSymbolTable<ionir::Module> modules) :
+        modules(std::move(modules)),
+        constructStack(),
+        typeStack(),
+        moduleBuffer(std::nullopt),
+        functionBuffer(std::nullopt),
+        basicBlockBuffer(std::nullopt),
+        builderBuffer(std::nullopt),
+        nameCounter(0) {
         //
     }
 
-    IonIrLoweringPass::~IonIrLoweringPass() {
-        // TODO
-    }
+    // TODO
+    IonIrLoweringPass::~IonIrLoweringPass() = default;
 
     ionshared::Stack<ionshared::Ptr<ionir::Construct>> IonIrLoweringPass::getConstructStack() const noexcept {
         return this->constructStack;
@@ -156,6 +166,7 @@ namespace ionlang {
 
         this->visitBlock(node->getBody());
 
+        // TODO: Redundant Repetitive assignment?
         // Set the function buffer.
         this->functionBuffer = ionIrFunction;
 
@@ -252,7 +263,7 @@ namespace ionlang {
         ionir::BasicBlockKind ionIrBasicBlockKind = ionir::BasicBlockKind::Internal;
 
         // TODO: Use a counter or something, along with naming depending on the block's parent (ex. if statement parent => if_0, etc.).
-        std::string ionIrBasicBlockId = "tmp_block";
+        std::string ionIrBasicBlockId = "tmp_block_" + std::to_string(this->getNameCounter());
 
         if (node->isFunctionBody()) {
             // TODO: Make function body and push it onto the stack?
@@ -505,34 +516,49 @@ namespace ionlang {
 
         this->visit(node->getCondition());
 
+        ionshared::Ptr<Block> parentBlock = node->getParent();
         ionshared::Ptr<ionir::Construct> ionIrCondition = this->constructStack.pop();
 
-        // TODO: Should verify if ionIrCondition is either Ref<> or Value<>.
+        // TODO: Should verify if ionIrCondition is either Ref<> or Value<> here? Or in typecheck?
 
         /**
          * Transfer all previously emitted instructions into a new continuation
          * block for the buffered block, then link the buffered block with the
          * new block.
          */
-        uint32_t splitOrder = 0;
-
-        // TODO: What about THIS instruction?
-        ionshared::OptPtr<ionir::Inst> ionIrLastInst =
-            ionIrBasicBlockBuffer->findLastInst();
-
-        if (ionshared::util::hasValue(ionIrLastInst)) {
-            splitOrder = ionIrLastInst->get()->getOrder();
-        }
+        uint32_t splitOrder = node->getOrder() + 1;
 
         // TODO: What if, before splitting, the current basic block buffer already has a terminal inst? But that'd mean that there are more insts after a terminal inst which is an error. Who will catch that? Maybe not really needed to be catched here, instead in typecheck pass or something.
 
-        // TODO: Provide appropriate id for successor block.
-        ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlockBufferSuccessor =
-            ionIrBasicBlockBuffer->split(splitOrder, "tmp_function_body_block_successor");
+        // TODO: What if successor block is considered function body (split inherits?) then no value is pushed onto stack?
+        ionshared::Ptr<Block> successorBlock;
 
-        // TODO: CRITICAL When split, the new basic block (ionIrBasicBlockBufferSuccessor) is not registered on llvmIrCodegen pass' emittedEntities map (ionir::BasicBlock -> llvm::BasicBlock) thus it cannot be emitted to LLVM IR.
+        // TODO: What about the symbol table? It needs to be migrated from the split statements onwards.
 
-        // TODO: ~!!!~ When is ionIrBasicBlockBufferSuccessor emitted? Split only creates a new ionir::BasicBlock instance, and registers it on the parent's symbol table. ~!!!~
+        /**
+         * Split the block from after this if statement, if there are
+         * more statements after this if statement.
+         */
+        if (parentBlock->getStatements().size() - 1 >= splitOrder) {
+            // TODO: Symbol table not being migrated (split does not do this).
+            successorBlock = parentBlock->split(splitOrder);
+        }
+        /**
+         * There are no more upcoming statements after this if statement.
+         * Simply create an empty block, with the same parent.
+         */
+        else {
+            // TODO: Symbol table not being migrated.
+            successorBlock = std::make_shared<Block>(parentBlock->getParent());
+        }
+
+        // TODO: Hotfix to avoid function body (thus overriding bufferFunction's body).
+        successorBlock->setParent(node);
+
+        this->visitBlock(successorBlock);
+
+        ionshared::Ptr<ionir::BasicBlock> ionIrSuccessorBasicBlock =
+            this->constructStack.pop()->dynamicCast<ionir::BasicBlock>();
 
         this->visitBlock(node->getConsequentBlock());
 
@@ -541,19 +567,20 @@ namespace ionlang {
 
         /**
          * Link the current buffered basic block with the if statement's
-         * consequent basic block.
+         * consequent basic block. Create a new builder, as the previously
+         * buffered one might have been replaced when visiting other blocks.
          */
         ionIrBasicBlockBuffer->createBuilder()->createBranch(
             ionIrCondition,
             ionIrConsequentBasicBlock,
-            ionIrBasicBlockBufferSuccessor
+            ionIrSuccessorBasicBlock
         );
 
         /**
          * Link the consequent basic block with the newly created
          * buffered basic block's successor.
          */
-        ionIrConsequentBasicBlock->link(ionIrBasicBlockBufferSuccessor);
+        ionIrConsequentBasicBlock->link(ionIrSuccessorBasicBlock);
 
         if (node->hasAlternativeBlock()) {
             this->visitBlock(*node->getAlternativeBlock());
@@ -565,14 +592,8 @@ namespace ionlang {
              * Link the alternative basic block with the buffered basic
              * block's successor.
              */
-            ionIrAlternativeBlock->link(ionIrBasicBlockBufferSuccessor);
+            ionIrAlternativeBlock->link(ionIrSuccessorBasicBlock);
         }
-
-        // TODO: What to put for alternative block? Remember currently there's only 1 block bound to be function body... is that even in context/matters?
-//        ionIrInstBuilder->createBranch(ionIrCondition, ionIrConsequentBasicBlock, NULLPTR);
-
-        // TODO: Continue implementation. A block needs to be provided to continue function body's statements, figure out how to do that.
-//        throw std::runtime_error("Implementation not complete");
     }
 
     void IonIrLoweringPass::visitReturnStatement(ionshared::Ptr<ReturnStatement> node) {
@@ -618,19 +639,9 @@ namespace ionlang {
         ionshared::Ptr<ionir::Value<>> ionIrValue =
             this->constructStack.pop()->dynamicCast<ionir::Value<>>();
 
-        ionir::PtrRef<ionir::AllocaInst> ionIrRef = std::make_shared<ionir::Ref<ionir::AllocaInst>>(
-            ionir::RefKind::Inst,
-            node->getId(),
-
-            // TODO: CRITICAL: Provide owner for ref!
-            nullptr,
-
-            ionIrAllocaInst
-        );
-
         ionshared::Ptr<ionir::StoreInst> ionIrStoreInst = ionIrInstBuilder->createStore(
             ionIrValue,
-            ionIrRef
+            ionIrAllocaInst
         );
     }
 

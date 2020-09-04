@@ -5,7 +5,10 @@
 namespace ionlang {
     AstPtrResult<Statement> Parser::parseStatement(const ionshared::Ptr<Block> &parent) {
         AstPtrResult<Statement> statement;
-        ionshared::PtrSymbolTable<Statement> symbolTable = parent->getSymbolTable();
+
+        // TODO: Symbol table is not being used. Variable decls should be registered?
+        ionshared::PtrSymbolTable<VariableDecl> symbolTable = parent->getSymbolTable();
+
         TokenKind currentTokenKind = this->tokenStream.get().getKind();
 
         // A built-in type at this position can only mean a variable declaration.

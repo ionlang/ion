@@ -8,7 +8,7 @@
 using namespace ionlang;
 
 TEST(CodeGenTest, VisitExtern) {
-    ionshared::Ptr<IonIrLoweringPass> ionIrCodegenPass = test::bootstrap::ionIrCodegenPass();
+    ionshared::Ptr<IonIrLoweringPass> ionIrCodegenPass = test::bootstrap::ionIrLoweringPass();
     ionshared::Ptr<VoidType> returnType = std::make_shared<VoidType>();
     ionshared::Ptr<Args> args = std::make_shared<Args>();
 
@@ -35,7 +35,7 @@ TEST(CodeGenTest, VisitExtern) {
 }
 
 TEST(CodeGenTest, VisitIfStatement) {
-    ionshared::Ptr<IonIrLoweringPass> ionIrCodegenPass = test::bootstrap::ionIrCodegenPass();
+    ionshared::Ptr<IonIrLoweringPass> ionIrLoweringPass = test::bootstrap::ionIrLoweringPass();
 
     // The parent will be filled in below.
     ionshared::Ptr<Block> consequentBlock = std::make_shared<Block>(nullptr);
@@ -44,7 +44,7 @@ TEST(CodeGenTest, VisitIfStatement) {
         // The parent will be filled in below.
         nullptr,
 
-        std::make_shared<IntegerLiteral>(std::make_shared<IntegerType>(IntegerKind::Int32), 1),
+        std::make_shared<BooleanLiteral>(true),
         consequentBlock
     });
 
@@ -57,9 +57,9 @@ TEST(CodeGenTest, VisitIfStatement) {
     ifStatement->setParent(function->getBody());
 
     // Visit the function.
-    ionIrCodegenPass->visitFunction(function);
+    ionIrLoweringPass->visitFunction(function);
 
-    ionshared::OptPtr<ionir::Module> ionIrModuleBuffer = ionIrCodegenPass->getModuleBuffer();
+    ionshared::OptPtr<ionir::Module> ionIrModuleBuffer = ionIrLoweringPass->getModuleBuffer();
 
     EXPECT_TRUE(ionshared::util::hasValue(ionIrModuleBuffer));
 

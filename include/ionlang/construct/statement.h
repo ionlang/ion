@@ -37,10 +37,12 @@ namespace ionlang {
 
         virtual void accept(Pass &visitor) = 0;
 
-        StatementKind getStatementKind() const noexcept;
+        [[nodiscard]] StatementKind getStatementKind() const noexcept;
 
-        ionshared::OptPtr<Statement> getYields() const noexcept;
+        [[nodiscard]] ionshared::OptPtr<Statement> getYields() const noexcept;
 
-        bool isTerminal() const noexcept;
+        [[nodiscard]] bool isTerminal() const noexcept;
+
+        [[nodiscard]] uint32_t getOrder();
     };
 }

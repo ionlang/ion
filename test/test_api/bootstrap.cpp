@@ -32,7 +32,7 @@ namespace ionlang::test::bootstrap {
         return std::make_shared<ionir::Module>(identifier);
     }
 
-    ionshared::Ptr<IonIrLoweringPass> ionIrCodegenPass() {
+    ionshared::Ptr<IonIrLoweringPass> ionIrLoweringPass() {
         ionshared::Ptr<ionir::Module> module = ionIrModule();
 
         ionshared::PtrSymbolTable<ionir::Module> modules =

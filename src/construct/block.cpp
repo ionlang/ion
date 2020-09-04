@@ -3,8 +3,14 @@
 #include <ionlang/misc/statement_builder.h>
 
 namespace ionlang {
-    Block::Block(ionshared::Ptr<Construct> parent, std::vector<ionshared::Ptr<Statement>> statements, ionshared::PtrSymbolTable<Statement> symbolTable)
-        : ChildConstruct<Construct>(std::move(parent), ConstructKind::Block), ionshared::ScopeAnchor<Statement>(std::move(symbolTable)), statements(std::move(statements)) {
+    Block::Block(
+        ionshared::Ptr<Construct> parent,
+        std::vector<ionshared::Ptr<Statement>> statements,
+        ionshared::PtrSymbolTable<VariableDecl> symbolTable
+    ) :
+        ChildConstruct<Construct>(std::move(parent), ConstructKind::Block),
+        ionshared::ScopeAnchor<VariableDecl>(std::move(symbolTable)),
+        statements(std::move(statements)) {
         //
     }
 
@@ -28,19 +34,15 @@ namespace ionlang {
     void Block::insertStatement(const ionshared::Ptr<Statement> &statement) {
         this->statements.push_back(statement);
 
-        bool isNamed = false;
-
-        // Certain types of statements are named.
+        /**
+         * Variable declaration statements should be registered on
+         * the local symbol table.
+         */
         if (statement->getStatementKind() == StatementKind::VariableDeclaration) {
-            isNamed = true;
-        }
+            ionshared::Ptr<VariableDecl> variableDecl =
+                statement->dynamicCast<VariableDecl>();
 
-        // Register the named statement in the symbol table, if applicable.
-        if (isNamed) {
-            ionshared::Ptr<ionshared::Named> namedStatement =
-                statement->dynamicCast<ionshared::Named>();
-
-            this->getSymbolTable()->insert(namedStatement->getId(), statement);
+            this->getSymbolTable()->insert(variableDecl->getId(), variableDecl);
         }
     }
 
@@ -54,6 +56,35 @@ namespace ionlang {
         }
 
         return count;
+    }
+
+    ionshared::Ptr<Block> Block::split(uint32_t atOrder) {
+        // TODO: If insts are empty, atOrder parameter is ignored (useless). Address that.
+
+        if (!this->statements.empty() && (atOrder < 0 || atOrder > this->statements.size() - 1)) {
+            throw std::out_of_range("Provided order is outsize of bounds");
+        }
+
+        std::vector<ionshared::Ptr<Statement>> statements = {};
+
+        if (!this->statements.empty()) {
+            auto from = this->statements.begin() + atOrder;
+            auto to = this->statements.end();
+
+            statements = std::vector<ionshared::Ptr<Statement>>(from, to);
+
+            // Erase the instructions from the local basic block.
+            this->statements.erase(from, to);
+        }
+
+        ionshared::Ptr<Block> newBlock = std::make_shared<Block>(Block{
+            this->getParent(),
+            statements
+
+            // TODO: The symbol table needs to be relocated as well!
+        });
+
+        return newBlock;
     }
 
     std::optional<uint32_t> Block::locate(ionshared::Ptr<Statement> construct) const {
@@ -72,6 +103,22 @@ namespace ionlang {
             if (statement->isTerminal()) {
                 return statement;
             }
+        }
+
+        return std::nullopt;
+    }
+
+    ionshared::OptPtr<Statement> Block::findFirstStatement() noexcept {
+        if (!this->statements.empty()) {
+            return this->statements.front();
+        }
+
+        return std::nullopt;
+    }
+
+    ionshared::OptPtr<Statement> Block::findLastStatement() noexcept {
+        if (!this->statements.empty()) {
+            return this->statements.back();
         }
 
         return std::nullopt;

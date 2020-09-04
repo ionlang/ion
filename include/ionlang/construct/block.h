@@ -15,7 +15,7 @@ namespace ionlang {
     class StatementBuilder;
 
     // TODO: Must be verified to contain a single terminal instruction at the end?
-    class Block : public ChildConstruct<>, public ionshared::ScopeAnchor<Statement> {
+    class Block : public ChildConstruct<>, public ionshared::ScopeAnchor<VariableDecl> {
     private:
         std::vector<ionshared::Ptr<Statement>> statements;
 
@@ -25,8 +25,8 @@ namespace ionlang {
 
             std::vector<ionshared::Ptr<Statement>> statements = {},
 
-            ionshared::PtrSymbolTable<Statement> symbolTable =
-                ionshared::util::makePtrSymbolTable<Statement>()
+            ionshared::PtrSymbolTable<VariableDecl> symbolTable =
+                ionshared::util::makePtrSymbolTable<VariableDecl>()
         );
 
         void accept(Pass &visitor) override;
@@ -43,6 +43,14 @@ namespace ionlang {
         uint32_t relocateStatements(Block &target, uint32_t from = 0);
 
         /**
+         * Splits the local basic block, relocating all instructions
+         * at and after the provided index to a new basic block with
+         * the provided id, having the same parent as the local basic
+         * block.
+         */
+        [[nodiscard]] ionshared::Ptr<Block> split(uint32_t atOrder);
+
+        /**
          * Attempt to find the index location of an instruction.
          * Returns null if not found.
          */
@@ -51,6 +59,10 @@ namespace ionlang {
         [[nodiscard]] ionshared::Ptr<StatementBuilder> createBuilder();
 
         [[nodiscard]] ionshared::OptPtr<Statement> findTerminalStatement() const;
+
+        [[nodiscard]] ionshared::OptPtr<Statement> findFirstStatement() noexcept;
+
+        [[nodiscard]] ionshared::OptPtr<Statement> findLastStatement() noexcept;
 
         [[nodiscard]] bool isFunctionBody() const;
     };

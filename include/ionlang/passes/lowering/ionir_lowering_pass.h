@@ -24,6 +24,8 @@ namespace ionlang {
 
         ionshared::OptPtr<ionir::InstBuilder> builderBuffer;
 
+        uint32_t nameCounter;
+
         ionshared::Ptr<ionir::Module> requireModule();
 
         ionshared::Ptr<ionir::Function> requireFunction();
@@ -37,6 +39,8 @@ namespace ionlang {
          * will also set/update the active IonIR basic block buffer.
          */
         void setBuilder(ionshared::Ptr<ionir::BasicBlock> basicBlock);
+
+        [[nodiscard]] uint32_t getNameCounter() noexcept;
 
     public:
         explicit IonIrLoweringPass(

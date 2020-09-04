@@ -18,7 +18,7 @@ namespace ionlang::test::bootstrap {
 
     ionshared::Ptr<ionir::Module> ionIrModule(const std::string &identifier = "test");
 
-    ionshared::Ptr<IonIrLoweringPass> ionIrCodegenPass();
+    ionshared::Ptr<IonIrLoweringPass> ionIrLoweringPass();
 
     ionshared::Ptr<Function> emptyFunction(std::vector<ionshared::Ptr<Statement>> statements = {});
 }
