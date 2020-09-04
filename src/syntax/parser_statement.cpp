@@ -42,7 +42,7 @@ namespace ionlang {
 
         // The block's parent will be filled below.
         AstPtrResult<Block> consequentBlockResult = this->parseBlock(nullptr);
-
+ 
         IONLANG_PARSER_ASSERT(util::hasValue(consequentBlockResult), IfStatement)
 
         ionshared::Ptr<Block> consequentBlock = util::getResultValue(consequentBlockResult);

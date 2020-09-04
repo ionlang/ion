@@ -52,6 +52,13 @@ namespace ionlang {
         this->basicBlockBuffer = basicBlock;
     }
 
+    void IonIrLoweringPass::lockBuilder(std::function<void()> callback) {
+        ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlockBuffer = this->requireBasicBlock();
+
+        callback();
+        this->setBuilder(ionIrBasicBlockBuffer);
+    }
+
     uint32_t IonIrLoweringPass::getNameCounter() noexcept {
         return this->nameCounter++;
     }
