@@ -58,7 +58,13 @@ namespace ionlang {
 
         [[nodiscard]] ionshared::Ptr<StatementBuilder> createBuilder();
 
-        [[nodiscard]] ionshared::OptPtr<Statement> findTerminalStatement() const;
+        /**
+         * Loops through all statements collecting terminal statements
+         * (or expressions) such as function calls or return statements.
+         * Search will be performed only on the local symbol table, so
+         * nested blocks will be ignored.
+         */
+        [[nodiscard]] std::vector<ionshared::Ptr<Statement>> findTerminals() const;
 
         [[nodiscard]] ionshared::OptPtr<Statement> findFirstStatement() noexcept;
 

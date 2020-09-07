@@ -35,9 +35,9 @@ namespace ionlang {
     public:
         CodeBacktrack(std::string input, TokenStream stream);
 
-        std::string getInput() const;
+        [[nodiscard]] std::string getInput() const;
 
-        TokenStream getTokenStream() const;
+        [[nodiscard]] TokenStream getTokenStream() const;
 
         std::optional<CodeBlock> createCodeBlockNear(
             uint32_t lineNumber,
@@ -50,7 +50,7 @@ namespace ionlang {
         );
 
         std::optional<CodeBlock> createCodeBlockNear(
-            const ionshared::NoticeContext &noticeContext,
+            const ionshared::SourceLocation &sourceLocation,
             uint32_t grace = IONLANG_CODE_BACKTRACK_DEFAULT_GRACE
         );
 

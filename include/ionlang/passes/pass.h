@@ -28,6 +28,7 @@
 #include <ionlang/construct/type/boolean_type.h>
 #include <ionlang/construct/function.h>
 #include <ionlang/construct/global.h>
+#include <ionlang/construct/attribute.h>
 
 namespace ionlang {
     class Pass : public ionshared::BasePass<Construct> {
@@ -89,6 +90,8 @@ namespace ionlang {
         virtual void visitGlobal(ionshared::Ptr<Global> node);
 
         virtual void visitErrorMarker(ionshared::Ptr<ErrorMarker> node);
+
+        virtual void visitAttribute(ionshared::Ptr<Attribute> node);
     };
 
     typedef ionshared::BasePassManager<Pass, Construct> PassManager;

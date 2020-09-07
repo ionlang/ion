@@ -7,7 +7,7 @@ namespace ionlang {
     class Pass;
 
     struct ReturnStatementOpts : StatementOpts {
-        ionshared::OptPtr<Construct> value;
+        ionshared::OptPtr<Construct> value = std::nullopt;
     };
 
     class ReturnStatement : public Statement {

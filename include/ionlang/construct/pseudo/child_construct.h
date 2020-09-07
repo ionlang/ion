@@ -15,11 +15,13 @@ namespace ionlang {
         ionshared::Ptr<T> parent;
 
     public:
-        ChildConstruct(ionshared::Ptr<T> parent, ConstructKind kind) : Construct(kind), parent(parent) {
+        ChildConstruct(ionshared::Ptr<T> parent, ConstructKind kind) :
+            Construct(kind),
+            parent(parent) {
             //
         }
 
-        ionshared::Ptr<T> getParent() const noexcept {
+        [[nodiscard]] ionshared::Ptr<T> getParent() const noexcept {
             return this->parent;
         }
 

@@ -216,4 +216,8 @@ namespace ionlang {
     void Pass::visitErrorMarker(ionshared::Ptr<ErrorMarker> node) {
         //
     }
+
+    void Pass::visitAttribute(ionshared::Ptr<Attribute> node) {
+        //
+    }
 }

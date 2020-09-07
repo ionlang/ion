@@ -98,14 +98,16 @@ namespace ionlang {
         return std::make_shared<StatementBuilder>(this->dynamicCast<Block>());
     }
 
-    ionshared::OptPtr<Statement> Block::findTerminalStatement() const {
+    std::vector<ionshared::Ptr<Statement>> Block::findTerminals() const {
+        std::vector<ionshared::Ptr<Statement>> terminalStatements = {};
+
         for (const auto &statement : this->statements) {
             if (statement->isTerminal()) {
-                return statement;
+                terminalStatements.push_back(statement);
             }
         }
 
-        return std::nullopt;
+        return terminalStatements;
     }
 
     ionshared::OptPtr<Statement> Block::findFirstStatement() noexcept {

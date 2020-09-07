@@ -6,7 +6,6 @@
 #include <string>
 #include <ionshared/misc/result.h>
 #include <ionshared/error_handling/notice_factory.h>
-#include <ionir/misc/helpers.h>
 #include <ionir/const/const_name.h>
 #include <ionlang/error_handling/notice_sentinel.h>
 #include <ionlang/lexical/token.h>
@@ -96,6 +95,10 @@ namespace ionlang {
         std::optional<Arg> parseArg();
 
         AstPtrResult<Args> parseArgs();
+
+        AstPtrResult<Attribute> parseAttribute(const ionshared::Ptr<Construct> &parent);
+
+        AstResult<Attributes> parseAttributes(const ionshared::Ptr<Construct> &parent);
 
         AstPtrResult<Prototype> parsePrototype(const ionshared::Ptr<Module> &parent);
 

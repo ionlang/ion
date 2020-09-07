@@ -22,17 +22,26 @@ namespace ionlang {
             std::string id,
             ionshared::Ptr<Args> args,
             ionshared::Ptr<Type> returnType,
+
+            // TODO: Make parent first arg.
             ionshared::Ptr<Construct> parent
         );
 
         void accept(Pass &visitor) override;
 
-        ionshared::Ptr<Args> getArgs() const noexcept;
+        [[nodiscard]] ionshared::Ptr<Args> getArguments() const noexcept;
 
         void setArgs(ionshared::Ptr<Args> args) noexcept;
 
-        ionshared::Ptr<Type> getReturnType() const noexcept;
+        [[nodiscard]] ionshared::Ptr<Type> getReturnType() const noexcept;
 
         void setReturnType(ionshared::Ptr<Type> returnType) noexcept;
+
+        // TODO: Move this method to IonIR, since it has no use here.
+        /**
+         * Returns a mangled identifier if the parent is either an
+         * extern or function.
+         */
+        [[nodiscard]] std::optional<std::string> getMangledId();
     };
 }

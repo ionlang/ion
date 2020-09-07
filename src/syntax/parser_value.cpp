@@ -7,13 +7,11 @@
 
 namespace ionlang {
     AstPtrResult<Value<>> Parser::parseLiteral() {
-        Token token = this->tokenStream.get();
-
         /**
          * Always use static pointer cast when downcasting to Value<>,
          * otherwise the cast result will be nullptr.
          */
-        switch (token.getKind()) {
+        switch (this->tokenStream.get().getKind()) {
             case TokenKind::LiteralInteger: {
                 AstPtrResult<IntegerLiteral> integerLiteralResult = this->parseIntegerLiteral();
 
@@ -88,6 +86,13 @@ namespace ionlang {
             // TODO: Use proper exception.
             throw std::runtime_error("Integer value's type kind could not be determined");
         }
+        /**
+         * Default literal integers to have a bit-length of 32 bits,
+         * if they can fit on it.
+         */
+        else if (*valueIntegerKind <= IntegerKind::Int32) {
+            valueIntegerKind = IntegerKind::Int32;
+        }
 
         // Create a long integer type for the value.
         ionshared::Ptr<IntegerType> type =
@@ -98,7 +103,7 @@ namespace ionlang {
             std::make_shared<IntegerLiteral>(type, value);
 
         // Skip current token.
-        this->tokenStream.tryNext();
+        this->tokenStream.skip();
 
         // Finally, return the result.
         return integer;

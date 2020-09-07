@@ -15,6 +15,8 @@ namespace ionlang {
         {"{", TokenKind::SymbolBraceL},
         {"}", TokenKind::SymbolBraceR},
         {"->", TokenKind::SymbolArrow},
-        {"&", TokenKind::SymbolAmpersand}
+        {"&", TokenKind::SymbolAmpersand},
+        {"@", TokenKind::SymbolAt},
+        {"...", TokenKind::SymbolVariableArgs}
     }));
 }

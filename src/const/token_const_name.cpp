@@ -23,6 +23,8 @@ namespace ionlang {
         {TokenKind::SymbolBraceR, "SymbolBraceR"},
         {TokenKind::SymbolArrow, "SymbolArrow"},
         {TokenKind::SymbolAmpersand, "SymbolAmpersand"},
+        {TokenKind::SymbolAt, "SymbolAt"},
+        {TokenKind::SymbolVariableArgs, "SymbolVariableArgs"},
         {TokenKind::KeywordFunction, "KeywordFunction"},
         {TokenKind::KeywordExtern, "KeywordExtern"},
         {TokenKind::KeywordElse, "KeywordElse"},

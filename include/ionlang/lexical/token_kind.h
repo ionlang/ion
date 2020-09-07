@@ -48,6 +48,10 @@ namespace ionlang {
 
         SymbolAmpersand,
 
+        SymbolAt,
+
+        SymbolVariableArgs,
+
         KeywordFunction,
 
         KeywordExtern,

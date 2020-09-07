@@ -11,19 +11,21 @@ namespace ionlang {
 
     class Args {
     private:
-        ionshared::SymbolTable<Arg> items;
+        ionshared::Ptr<ionshared::SymbolTable<Arg>> items;
 
         bool isVariable;
 
     public:
         explicit Args(
-            ionshared::SymbolTable<Arg> items = ionshared::SymbolTable<Arg>(),
+            ionshared::Ptr<ionshared::SymbolTable<Arg>> items =
+                std::make_shared<ionshared::SymbolTable<Arg>>(),
+
             bool isVariable = false
         );
 
-        [[nodiscard]] ionshared::SymbolTable<Arg> getItems() const noexcept;
+        [[nodiscard]] ionshared::Ptr<ionshared::SymbolTable<Arg>> getItems() const noexcept;
 
-        void setItems(ionshared::SymbolTable<Arg> items) noexcept;
+        void setItems(ionshared::Ptr<ionshared::SymbolTable<Arg>> items) noexcept;
 
         [[nodiscard]] bool getIsVariable() const noexcept;
 

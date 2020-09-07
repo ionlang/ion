@@ -37,11 +37,17 @@ namespace ionlang {
         // Abstract current Token for easier access.
         Token token = this->tokenStream.get();
 
-        return ionshared::NoticeFactory(ionshared::NoticeContext{
-                this->filePath,
+        return ionshared::NoticeFactory(ionshared::SourceLocation(
+                // TODO: File path.
+//                this->filePath,
+
                 token.getLineNumber(),
-                token.getStartPosition()
-            }
+
+                ionshared::Span(
+                    token.getStartPosition(),
+                    token.getEndPosition() - token.getStartPosition()
+                )
+            )
         );
     }
 

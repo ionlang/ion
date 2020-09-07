@@ -1,8 +1,9 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    Extern::Extern(ionshared::Ptr<Prototype> prototype)
-        : Construct(ConstructKind::Extern), prototype(prototype) {
+    Extern::Extern(ionshared::Ptr<Module> parent, ionshared::Ptr<Prototype> prototype) :
+        ChildConstruct<Module>(std::move(parent), ConstructKind::Extern),
+        prototype(std::move(prototype)) {
         //
     }
 
@@ -21,6 +22,6 @@ namespace ionlang {
     }
 
     void Extern::setPrototype(ionshared::Ptr<Prototype> prototype) noexcept {
-        this->prototype = prototype;
+        this->prototype = std::move(prototype);
     }
 }

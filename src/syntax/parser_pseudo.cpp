@@ -18,7 +18,7 @@ namespace ionlang {
         AstPtrResult<Type> type = this->parseType();
 
         // TODO: Function returns std::optional<>.
-//        IONIR_PARSER_ASSSERT(type.hasValue(), Arg)
+//        IONIR_PARSER_ASSERT(type.hasValue(), Arg)
         if (!util::hasValue(type)) {
             return std::nullopt;
         }
@@ -26,7 +26,7 @@ namespace ionlang {
         std::optional<std::string> id = this->parseId();
 
         // TODO: Function returns std::optional<>.
-        //        IONIR_PARSER_ASSSERT(id.hasValue(), Arg)
+        //        IONIR_PARSER_ASSERT(id.hasValue(), Arg)
         if (!id.has_value()) {
             return std::nullopt;
         }

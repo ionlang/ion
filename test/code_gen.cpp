@@ -1,9 +1,7 @@
 #include <vector>
 #include <ionir/passes/codegen/llvm_codegen_pass.h>
 #include <ionlang/passes/lowering/ionir_lowering_pass.h>
-#include "test_api/bootstrap.h"
-#include "test_api/compare.h"
-#include "test_api/const.h"
+#include "pch.h"
 
 using namespace ionlang;
 
@@ -15,7 +13,8 @@ TEST(CodeGenTest, VisitExtern) {
     ionshared::Ptr<Prototype> prototype =
         std::make_shared<Prototype>(test::constant::foobar, args, returnType, nullptr);
 
-    ionshared::Ptr<Extern> externConstruct = std::make_shared<Extern>(prototype);
+    // TODO: No parent module.
+    ionshared::Ptr<Extern> externConstruct = std::make_shared<Extern>(nullptr, prototype);
 
     ionIrCodegenPass->visitExtern(externConstruct);
 
@@ -70,9 +69,46 @@ TEST(CodeGenTest, VisitIfStatement) {
     // Visit the resulting IonIR module buffer from our own codegen pass.
     ionIrLlvmCodegenPass->visitModule(*ionIrModuleBuffer);
 
-    // TODO: Debugging.
+    // TODO: Debugging. It messes up with statements on original and successor/consequent blocks. Fix that, then remove this.
     ionshared::LlvmModule(*ionIrLlvmCodegenPass->getModuleBuffer()).print();
 
     // Then proceed to compare, as LLVM entities will have been emitted inside the ionir::LlvmCodegenPass.
     EXPECT_TRUE(test::compare::ir(ionIrLlvmCodegenPass, "statement_if"));
+}
+
+TEST(CodeGenTest, VisitVariableDecl) {
+    ionshared::Ptr<IonIrLoweringPass> ionIrLoweringPass = test::bootstrap::ionIrLoweringPass();
+
+    ionshared::Ptr<VariableDecl> variableDecl = std::make_shared<VariableDecl>(
+        // The parent will be filled in below.
+        nullptr,
+
+        std::make_shared<BooleanType>(),
+        test::constant::foo,
+        std::make_shared<BooleanLiteral>(true)
+    );
+
+    ionshared::Ptr<Function> function = test::bootstrap::emptyFunction({
+        variableDecl
+    });
+
+    // Set the variable declaration parent.
+    variableDecl->setParent(function->getBody());
+
+    // Visit the function.
+    ionIrLoweringPass->visitFunction(function);
+
+    ionshared::OptPtr<ionir::Module> ionIrModuleBuffer = ionIrLoweringPass->getModuleBuffer();
+
+    EXPECT_TRUE(ionshared::util::hasValue(ionIrModuleBuffer));
+
+    // Now, make the ionir::LlvmCodegenPass.
+    ionshared::Ptr<ionir::LlvmCodegenPass> ionIrLlvmCodegenPass =
+        std::make_shared<ionir::LlvmCodegenPass>();
+
+    // Visit the resulting IonIR module buffer from our own codegen pass.
+    ionIrLlvmCodegenPass->visitModule(*ionIrModuleBuffer);
+
+    // Then proceed to compare, as LLVM entities will have been emitted inside the ionir::LlvmCodegenPass.
+    EXPECT_TRUE(test::compare::ir(ionIrLlvmCodegenPass, "variable_decl"));
 }

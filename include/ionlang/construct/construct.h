@@ -33,7 +33,9 @@ namespace ionlang {
 
         Statement,
 
-        ErrorMarker
+        ErrorMarker,
+
+        Attribute
     };
 
     class Construct;

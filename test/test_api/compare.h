@@ -3,6 +3,7 @@
 #include <iostream>
 #include <array>
 #include <string>
+#include <ionir/passes/codegen/llvm_codegen_pass.h>
 #include <ionlang/passes/lowering/ionir_lowering_pass.h>
 #include <ionlang/lexical/token.h>
 #include "util.h"

@@ -40,7 +40,7 @@ namespace ionlang {
          */
         void setBuilder(ionshared::Ptr<ionir::BasicBlock> basicBlock);
 
-        void lockBuilder(std::function<void()> callback);
+        void lockBuilder(const std::function<void()> &callback);
 
         [[nodiscard]] uint32_t getNameCounter() noexcept;
 

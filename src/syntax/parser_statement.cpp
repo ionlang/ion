@@ -1,6 +1,7 @@
 #include <ionlang/lexical/classifier.h>
 #include <ionlang/misc/util.h>
 #include <ionlang/syntax/parser.h>
+#include <ionlang/const/notice.h>
 
 namespace ionlang {
     AstPtrResult<Statement> Parser::parseStatement(const ionshared::Ptr<Block> &parent) {
@@ -24,9 +25,9 @@ namespace ionlang {
             statement = util::getResultValue(this->parseReturnStatement(parent));
         }
         // TODO: Use Ast(Ptr)Result<>.
-        //        else {
-        //            throw ionshared::util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_TOKEN);
-        //        }
+        else {
+            throw ionshared::util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_TOKEN);
+        }
 
         return statement;
     }
@@ -42,7 +43,7 @@ namespace ionlang {
 
         // The block's parent will be filled below.
         AstPtrResult<Block> consequentBlockResult = this->parseBlock(nullptr);
- 
+
         IONLANG_PARSER_ASSERT(util::hasValue(consequentBlockResult), IfStatement)
 
         ionshared::Ptr<Block> consequentBlock = util::getResultValue(consequentBlockResult);
