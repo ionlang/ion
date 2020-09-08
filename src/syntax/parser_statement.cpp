@@ -24,6 +24,10 @@ namespace ionlang {
         else if (currentTokenKind == TokenKind::KeywordReturn) {
             statement = util::getResultValue(this->parseReturnStatement(parent));
         }
+        // Assignment statement.
+        else if (currentTokenKind == TokenKind::Identifier && this->isNext(TokenKind::SymbolEqual)) {
+            statement = util::getResultValue(this->parseAssignmentStatement(parent));
+        }
         // TODO: Use Ast(Ptr)Result<>.
         else {
             throw ionshared::util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_TOKEN);
@@ -106,5 +110,23 @@ namespace ionlang {
             parent,
             finalValue
         });
+    }
+
+    AstPtrResult<AssignmentStatement> Parser::parseAssignmentStatement(const ionshared::Ptr<Block> &parent) {
+        std::optional<std::string> id = this->parseId();
+
+        IONLANG_PARSER_ASSERT(id.has_value(), AssignmentStatement)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual), AssignmentStatement)
+
+        AstPtrResult<> value = this->parsePrimaryExpr(parent);
+
+        IONLANG_PARSER_ASSERT(util::hasValue(value), AssignmentStatement)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), AssignmentStatement)
+
+        return std::make_shared<AssignmentStatement>(
+            parent,
+            std::make_shared<Ref<VariableDecl>>(*id, parent, RefKind::Variable),
+            util::getResultValue(value)
+        );
     }
 }

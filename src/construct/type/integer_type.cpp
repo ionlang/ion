@@ -2,8 +2,10 @@
 #include <ionlang/misc/util.h>
 
 namespace ionlang {
-    IntegerType::IntegerType(IntegerKind kind, bool isSigned)
-        : Type(util::resolveIntegerKindName(kind), TypeKind::Integer), kind(kind), isSigned(isSigned) {
+    IntegerType::IntegerType(IntegerKind kind, bool isSigned, ionshared::Ptr<TypeQualifiers> qualifiers) :
+        Type(util::resolveIntegerKindName(kind), TypeKind::Integer, std::move(qualifiers)),
+        kind(kind),
+        isSigned(isSigned) {
         //
     }
 

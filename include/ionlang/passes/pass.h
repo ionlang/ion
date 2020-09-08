@@ -83,7 +83,7 @@ namespace ionlang {
 
         virtual void visitVariableDecl(ionshared::Ptr<VariableDecl> node);
 
-        virtual void visitScopeAnchor(ionshared::Ptr<ionshared::ScopeAnchor<Construct>> node);
+        virtual void visitScopeAnchor(ionshared::Ptr<ionshared::Scoped<Construct>> node);
 
         virtual void visitIntegerType(ionshared::Ptr<IntegerType> node);
 

@@ -6,16 +6,16 @@ namespace ionlang {
     Block::Block(
         ionshared::Ptr<Construct> parent,
         std::vector<ionshared::Ptr<Statement>> statements,
-        ionshared::PtrSymbolTable<VariableDecl> symbolTable
+        const ionshared::PtrSymbolTable<VariableDecl> &symbolTable
     ) :
         ChildConstruct<Construct>(std::move(parent), ConstructKind::Block),
-        ionshared::ScopeAnchor<VariableDecl>(std::move(symbolTable)),
+        ionshared::Scoped<VariableDecl>(symbolTable),
         statements(std::move(statements)) {
         //
     }
 
     void Block::accept(Pass &visitor) {
-        visitor.visitScopeAnchor(this->dynamicCast<ionshared::ScopeAnchor<Construct>>());
+        visitor.visitScopeAnchor(this->dynamicCast<ionshared::Scoped<Construct>>());
         visitor.visitBlock(this->dynamicCast<Block>());
     }
 

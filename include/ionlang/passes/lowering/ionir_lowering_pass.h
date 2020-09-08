@@ -2,6 +2,7 @@
 
 #include <ionshared/container/stack.h>
 #include <ionir/construct/basic_block.h>
+#include <ionlang/misc/ionir_emitted_entities.h>
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
@@ -23,6 +24,8 @@ namespace ionlang {
         ionshared::OptPtr<ionir::BasicBlock> basicBlockBuffer;
 
         ionshared::OptPtr<ionir::InstBuilder> builderBuffer;
+
+        IonIrEmittedEntities symbolTable;
 
         uint32_t nameCounter;
 
@@ -95,6 +98,8 @@ namespace ionlang {
         void visitIfStatement(ionshared::Ptr<IfStatement> node) override;
 
         void visitReturnStatement(ionshared::Ptr<ReturnStatement> node) override;
+
+        void visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> node) override;
 
         void visitVariableDecl(ionshared::Ptr<VariableDecl> node) override;
 

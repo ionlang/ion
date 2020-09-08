@@ -18,6 +18,7 @@ namespace ionlang {
     TokenKindVector TokenConst::types = {
         TokenKind::TypeVoid,
         TokenKind::TypeBool,
+        TokenKind::TypeInt8,
         TokenKind::TypeInt16,
         TokenKind::TypeInt32,
         TokenKind::TypeInt64,
@@ -151,9 +152,11 @@ namespace ionlang {
             // Type keywords.
             {ConstName::typeVoid, TokenKind::TypeVoid},
             {ConstName::typeBool, TokenKind::TypeBool},
+            {ConstName::typeInt8, TokenKind::TypeInt8},
             {ConstName::typeInt16, TokenKind::TypeInt16},
             {ConstName::typeInt32, TokenKind::TypeInt32},
             {ConstName::typeInt64, TokenKind::TypeInt64},
+            // TODO: Int128?
             // TODO
 //            {ConstName::typeUnsignedInt16, TokenKind::TypeUnsignedInt16},
 //            {ConstName::typeUnsignedInt32, TokenKind::TypeUnsignedInt32},

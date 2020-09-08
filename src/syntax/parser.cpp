@@ -33,26 +33,9 @@ namespace ionlang {
         return true;
     }
 
-    ionshared::NoticeFactory Parser::createNoticeFactory() noexcept {
-        // Abstract current Token for easier access.
-        Token token = this->tokenStream.get();
-
-        return ionshared::NoticeFactory(ionshared::SourceLocation(
-                // TODO: File path.
-//                this->filePath,
-
-                token.getLineNumber(),
-
-                ionshared::Span(
-                    token.getStartPosition(),
-                    token.getEndPosition() - token.getStartPosition()
-                )
-            )
-        );
-    }
-
     std::nullopt_t Parser::makeNotice(std::string message, ionshared::NoticeType type) {
-        this->noticeStack->push(this->createNoticeFactory().make(type, std::move(message)));
+        // TODO
+        throw std::runtime_error(message);
 
         return std::nullopt;
     }

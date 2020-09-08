@@ -23,13 +23,15 @@ namespace ionlang {
 
     void Pass::visitChildren(ionshared::Ptr<Construct> node) {
         // TODO: Will it cause StackOverflow error with large ASTs?
+        Ast children = node->getChildNodes();
+
         /**
          * After visiting the node, attempt to
          * visit all its children as well.
          */
-        for (const auto child : node->getChildNodes()) {
+        for (const auto &child : children) {
             // TODO: CRITICAL: What if 'child' (AstNode) is not boxed under Construct?
-            this->visit(child->staticCast<Construct>());
+            this->visit(child);
         }
     }
 
@@ -65,6 +67,12 @@ namespace ionlang {
 
             case StatementKind::VariableDeclaration: {
                 this->visitVariableDecl(node->dynamicCast<VariableDecl>());
+
+                break;
+            }
+
+            case StatementKind::Assignment: {
+                this->visitAssignmentStatement(node->dynamicCast<AssignmentStatement>());
 
                 break;
             }
@@ -201,7 +209,7 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitScopeAnchor(ionshared::Ptr<ionshared::ScopeAnchor<Construct>> node) {
+    void Pass::visitScopeAnchor(ionshared::Ptr<ionshared::Scoped<Construct>> node) {
         //
     }
 

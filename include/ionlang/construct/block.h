@@ -4,7 +4,7 @@
 #include <ionshared/misc/named.h>
 #include <ionshared/misc/helpers.h>
 #include <ionshared/tracking/symbol_table.h>
-#include <ionshared/tracking/scope_anchor.h>
+#include <ionshared/tracking/scoped.h>
 #include <ionlang/construct/pseudo/child_construct.h>
 #include "ionlang/construct/statement/variable_declaration.h"
 #include "statement.h"
@@ -15,7 +15,7 @@ namespace ionlang {
     class StatementBuilder;
 
     // TODO: Must be verified to contain a single terminal instruction at the end?
-    class Block : public ChildConstruct<>, public ionshared::ScopeAnchor<VariableDecl> {
+    class Block : public ChildConstruct<>, public ionshared::Scoped<VariableDecl> {
     private:
         std::vector<ionshared::Ptr<Statement>> statements;
 
@@ -25,7 +25,7 @@ namespace ionlang {
 
             std::vector<ionshared::Ptr<Statement>> statements = {},
 
-            ionshared::PtrSymbolTable<VariableDecl> symbolTable =
+            const ionshared::PtrSymbolTable<VariableDecl> &symbolTable =
                 ionshared::util::makePtrSymbolTable<VariableDecl>()
         );
 

@@ -71,6 +71,7 @@ namespace ionlang {
         functionBuffer(std::nullopt),
         basicBlockBuffer(std::nullopt),
         builderBuffer(std::nullopt),
+        symbolTable(),
         nameCounter(0) {
         //
     }
@@ -614,6 +615,31 @@ namespace ionlang {
         this->constructStack.push(ionIrReturnInst);
     }
 
+    void IonIrLoweringPass::visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> node) {
+        ionshared::Ptr<ionir::InstBuilder> ionIrBuilderBuffer = this->requireBuilder();
+
+        if (!node->getVariableDecl()->isResolved()) {
+            // TODO: Better error.
+            throw std::runtime_error("Expected variable declaration reference to be resolved");
+        }
+        else if (!this->symbolTable.contains(*node->getVariableDecl()->getValue())) {
+            // TODO: Better error.
+            throw std::runtime_error("Could not find corresponding IonIR alloca instruction on the symbol table");
+        }
+
+        ionshared::Ptr<VariableDecl> variableDecl = *node->getVariableDecl()->getValue();
+
+        ionshared::Ptr<ionir::AllocaInst> ionIrAllocaInst =
+            *this->symbolTable.find<ionir::AllocaInst>(variableDecl);
+
+        this->visit(node->getValue());
+
+        ionIrBuilderBuffer->createStore(
+            this->constructStack.pop()->staticCast<ionir::Value<>>(),
+            ionIrAllocaInst
+        );
+    }
+
     void IonIrLoweringPass::visitVariableDecl(ionshared::Ptr<VariableDecl> node) {
         this->requireBuilder();
 
@@ -627,6 +653,7 @@ namespace ionlang {
         ionshared::Ptr<ionir::AllocaInst> ionIrAllocaInst =
             ionIrInstBuilder->createAlloca(node->getId(), ionIrType);
 
+        this->symbolTable.set(node, ionIrAllocaInst);
         this->constructStack.push(ionIrAllocaInst);
 
         // Lastly, then create a IonIR store inst, and push it onto the stack.
@@ -636,7 +663,8 @@ namespace ionlang {
         ionshared::Ptr<ionir::Value<>> ionIrValue =
             this->constructStack.pop()->staticCast<ionir::Value<>>();
 
-        ionshared::Ptr<ionir::StoreInst> ionIrStoreInst = ionIrInstBuilder->createStore(
+        // TODO: Store inst not being pushed onto construct stack. Should it be pushed, or just AllocaInst?
+        ionIrInstBuilder->createStore(
             ionIrValue,
             ionIrAllocaInst
         );

@@ -24,7 +24,7 @@ namespace ionlang {
 
         void visitModule(ionshared::Ptr<Module> node) override;
 
-        void visitScopeAnchor(ionshared::Ptr<ionshared::ScopeAnchor<Construct>> node) override;
+        void visitScopeAnchor(ionshared::Ptr<ionshared::Scoped<Construct>> node) override;
 
         void visitRef(PtrRef<> node) override;
 

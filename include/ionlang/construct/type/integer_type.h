@@ -24,13 +24,17 @@ namespace ionlang {
         bool isSigned;
 
     public:
-        explicit IntegerType(IntegerKind kind, bool isSigned = true);
+        explicit IntegerType(
+            IntegerKind kind,
+            bool isSigned = true,
+            ionshared::Ptr<TypeQualifiers> qualifiers = std::make_shared<TypeQualifiers>()
+        );
 
         void accept(Pass &pass) override;
 
-        IntegerKind getIntegerKind() const noexcept;
+        [[nodiscard]] IntegerKind getIntegerKind() const noexcept;
 
-        bool getIsSigned() const noexcept;
+        [[nodiscard]] bool getIsSigned() const noexcept;
 
         void setIsSigned(bool isSigned) noexcept;
     };

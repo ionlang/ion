@@ -63,8 +63,11 @@ namespace ionlang {
         if (tokenKind == TokenKind::TypeVoid) {
             type = util::getResultValue(this->parseVoidType());
         }
-        else if (Classifier::isIntegerType(tokenKind)) {
-            type = util::getResultValue(this->parseIntegerType());
+        else if (tokenKind == TokenKind::TypeBool) {
+            type = util::getResultValue(this->parseBooleanType(qualifiers));
+        }
+        if (Classifier::isIntegerType(tokenKind)) {
+            type = util::getResultValue(this->parseIntegerType(qualifiers));
         }
 
         // TODO: Add support for missing types.
@@ -89,12 +92,18 @@ namespace ionlang {
          * Void type does not accept references nor pointer
          * specifiers, so just simply skip over its token.
          */
-        this->skipOver(TokenKind::TypeVoid);
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::TypeVoid), VoidType)
 
         return std::make_shared<VoidType>();
     }
 
-    AstPtrResult<IntegerType> Parser::parseIntegerType() {
+    AstPtrResult<BooleanType> Parser::parseBooleanType(const ionshared::Ptr<TypeQualifiers> &qualifiers) {
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::TypeBool), BooleanType)
+
+        return std::make_shared<BooleanType>(qualifiers);
+    }
+
+    AstPtrResult<IntegerType> Parser::parseIntegerType(const ionshared::Ptr<TypeQualifiers> &qualifiers) {
         TokenKind currentTokenKind = this->tokenStream.get().getKind();
 
         if (!Classifier::isIntegerType(currentTokenKind)) {
@@ -102,7 +111,7 @@ namespace ionlang {
             throw std::runtime_error("Not an integer type");
         }
 
-        // TODO: Missing support for is signed or not, as well as is pointer.
+        // TODO: Missing support for is signed or not?
 
         std::optional<IntegerKind> integerKind = Const::getIntegerKind(currentTokenKind);
 
@@ -114,6 +123,6 @@ namespace ionlang {
         // Skip over the type token.
         this->tokenStream.skip();
 
-        return std::make_shared<IntegerType>(*integerKind);
+        return std::make_shared<IntegerType>(*integerKind, false, qualifiers);
     }
 }

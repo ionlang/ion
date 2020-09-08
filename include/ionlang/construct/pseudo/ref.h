@@ -10,22 +10,32 @@ namespace ionlang {
     // TODO: What if 'pass.h' is never included?
     class Pass;
 
+    enum class RefKind {
+        Variable,
+
+        Function
+    };
+
     template<typename T = Construct>
     class Ref : public Construct, public ionshared::Named {
     private:
         ionshared::Ptr<Construct> owner;
+
+        RefKind kind;
 
         ionshared::OptPtr<T> value;
 
     public:
         Ref(
             const std::string &id,
-            ionshared::Ptr<Construct> owner,
+            ionshared::Ptr<Construct> scope, // TODO: Change type to Scope (or Context for deeper lookup?).
+            RefKind kind,
             ionshared::OptPtr<T> value = std::nullopt
         ) :
             Construct(ConstructKind::Ref),
             Named(id),
-            owner(std::move(owner)),
+            owner(std::move(scope)),
+            kind(kind),
             value(value) {
             //
         }
@@ -36,7 +46,7 @@ namespace ionlang {
         }
 
         Ref<T> &operator=(ionshared::Ptr<T> value) {
-            this->setValue(value);
+            this->resolve(value);
         }
 
         [[nodiscard]] ionshared::Ptr<Construct> getOwner() const noexcept {
@@ -45,6 +55,10 @@ namespace ionlang {
 
         void setOwner(ionshared::Ptr<Construct> owner) noexcept {
             this->owner = std::move(owner);
+        }
+
+        [[nodiscard]] RefKind getRefKind() const noexcept {
+            return this->kind;
         }
 
         [[nodiscard]] ionshared::OptPtr<T> getValue() const noexcept {
@@ -59,12 +73,12 @@ namespace ionlang {
                 : std::nullopt;
         }
 
-        void setValue(ionshared::OptPtr<T> value) noexcept {
+        void resolve(ionshared::OptPtr<T> value) noexcept {
             this->value = value;
         }
 
         void removeValue() noexcept {
-            this->setValue(std::nullopt);
+            this->resolve(std::nullopt);
         }
 
         [[nodiscard]] bool isResolved() noexcept {

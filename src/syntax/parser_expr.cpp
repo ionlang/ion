@@ -103,7 +103,7 @@ namespace ionlang {
 
         return std::make_shared<CallExpr>(
             // TODO: Is this the correct parent for the Ref<Function>?
-            std::make_shared<Ref<Function>>(*calleeId, parent),
+            std::make_shared<Ref<Function>>(*calleeId, parent, RefKind::Function),
 
             // TODO: Parse call args.
             CallArgs()

@@ -5,7 +5,6 @@
 #include <optional>
 #include <string>
 #include <ionshared/misc/result.h>
-#include <ionshared/error_handling/notice_factory.h>
 #include <ionir/const/const_name.h>
 #include <ionlang/error_handling/notice_sentinel.h>
 #include <ionlang/lexical/token.h>
@@ -36,8 +35,6 @@ namespace ionlang {
         bool expect(TokenKind tokenKind);
 
         bool skipOver(TokenKind tokenKind);
-
-        [[nodiscard]] ionshared::NoticeFactory createNoticeFactory() noexcept;
 
         std::nullopt_t makeNotice(
             std::string message,
@@ -90,7 +87,13 @@ namespace ionlang {
 
         AstPtrResult<VoidType> parseVoidType();
 
-        AstPtrResult<IntegerType> parseIntegerType();
+        AstPtrResult<BooleanType> parseBooleanType(
+            const ionshared::Ptr<TypeQualifiers> &qualifiers = std::make_shared<TypeQualifiers>()
+        );
+
+        AstPtrResult<IntegerType> parseIntegerType(
+            const ionshared::Ptr<TypeQualifiers> &qualifiers = std::make_shared<TypeQualifiers>()
+        );
 
         std::optional<Arg> parseArg();
 
@@ -132,6 +135,8 @@ namespace ionlang {
 
         AstPtrResult<ReturnStatement> parseReturnStatement(const ionshared::Ptr<Block> &parent);
 
+        AstPtrResult<AssignmentStatement> parseAssignmentStatement(const ionshared::Ptr<Block> &parent);
+
         std::optional<std::string> parseLine();
 
         // TODO: Add comment-parsing support.
@@ -142,7 +147,7 @@ namespace ionlang {
 
             IONLANG_PARSER_ASSERT(id.has_value(), Ref<T>)
 
-            return std::make_shared<Ref<T>>(*id, owner);
+            return std::make_shared<Ref<T>>(*id, owner, RefKind::Variable);
         }
     };
 }
