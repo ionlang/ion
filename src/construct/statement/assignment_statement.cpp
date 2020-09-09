@@ -2,27 +2,29 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    AssignmentStatement::AssignmentStatement(
-        ionshared::Ptr<Block> parent,
-        PtrRef<VariableDecl> variableDecl,
-        ionshared::Ptr<Construct> value
-    ) :
-        Statement(std::move(parent), StatementKind::Assignment),
-        variableDecl(std::move(variableDecl)),
-        value(std::move(value)) {
+    AssignmentStatement::AssignmentStatement(const AssignmentStatementOpts &opts) :
+        Statement(opts.parent, StatementKind::Assignment),
+        variableDeclStatementRef(opts.variableDeclStatementRef),
+        value(opts.value) {
         //
     }
 
     void AssignmentStatement::accept(Pass &visitor) {
-        visitor.visitVariableDecl(this->dynamicCast<VariableDecl>());
+        visitor.visitVariableDecl(this->dynamicCast<VariableDeclStatement>());
     }
 
-    PtrRef<VariableDecl> AssignmentStatement::getVariableDecl() const noexcept {
-        return this->variableDecl;
+    Ast AssignmentStatement::getChildNodes() {
+        return {
+            this->variableDeclStatementRef
+        };
     }
 
-    void AssignmentStatement::setVariableDecl(PtrRef<VariableDecl> variableDecl) noexcept {
-        this->variableDecl = std::move(variableDecl);
+    PtrRef<VariableDeclStatement> AssignmentStatement::getVariableDeclStatement() const noexcept {
+        return this->variableDeclStatementRef;
+    }
+
+    void AssignmentStatement::setVariableDeclStatement(PtrRef<VariableDeclStatement> variableDeclStatement) noexcept {
+        this->variableDeclStatementRef = std::move(variableDeclStatement);
     }
 
     ionshared::Ptr<Construct> AssignmentStatement::getValue() const noexcept {

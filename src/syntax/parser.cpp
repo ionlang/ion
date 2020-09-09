@@ -121,18 +121,16 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL), Block)
 
         ionshared::Ptr<Block> block = std::make_shared<Block>(parent);
-        std::vector<ionshared::Ptr<Statement>> statements = {};
 
         while (!this->is(TokenKind::SymbolBraceR)) {
             AstPtrResult<Statement> statement = this->parseStatement(block);
 
             IONLANG_PARSER_ASSERT(util::hasValue(statement), Block)
 
-            statements.push_back(util::getResultValue(statement));
+            block->appendStatement(util::getResultValue(statement));
         }
 
         this->tokenStream.skip();
-        block->setStatements(statements);
 
         return block;
     }
@@ -163,7 +161,7 @@ namespace ionlang {
                 }
 
                 // TODO: Ensure we're not re-defining something, issue a notice otherwise.
-                globalScope->insert(*name, topLevelConstruct);
+                globalScope->set(*name, topLevelConstruct);
             }
 
             // No more tokens to process.
@@ -179,31 +177,31 @@ namespace ionlang {
         return module;
     }
 
-    AstPtrResult<VariableDecl> Parser::parseVariableDecl(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<VariableDeclStatement> Parser::parseVariableDecl(const ionshared::Ptr<Block> &parent) {
         AstPtrResult<Type> typeResult = this->parseType();
 
-        IONLANG_PARSER_ASSERT(util::hasValue(typeResult), VariableDecl)
+        IONLANG_PARSER_ASSERT(util::hasValue(typeResult), VariableDeclStatement)
 
         std::optional<std::string> id = this->parseId();
 
-        IONLANG_PARSER_ASSERT(id.has_value(), VariableDecl)
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual), VariableDecl)
+        IONLANG_PARSER_ASSERT(id.has_value(), VariableDeclStatement)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual), VariableDeclStatement)
 
         AstPtrResult<Value<>> valueResult = this->parseLiteral();
 
-        IONLANG_PARSER_ASSERT(util::hasValue(valueResult), VariableDecl)
+        IONLANG_PARSER_ASSERT(util::hasValue(valueResult), VariableDeclStatement)
 
-        ionshared::Ptr<VariableDecl> variableDecl = std::make_shared<VariableDecl>(
+        ionshared::Ptr<VariableDeclStatement> variableDecl = std::make_shared<VariableDeclStatement>(VariableDeclStatementOpts{
             parent,
             util::getResultValue(typeResult),
             *id,
             util::getResultValue(valueResult)
-        );
+        });
 
         // Register the statement on the resulting block's symbol table.
-        parent->getSymbolTable()->insert(variableDecl->getId(), variableDecl);
+        parent->getSymbolTable()->set(variableDecl->getId(), variableDecl);
 
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), VariableDecl)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), VariableDeclStatement)
 
         return variableDecl;
     }

@@ -5,31 +5,33 @@
 #include <ionlang/construct/pseudo/ref.h>
 #include <ionlang/construct/value.h>
 #include <ionlang/construct/statement.h>
-#include "variable_declaration.h"
+#include "variable_decl_statement.h"
 
 namespace ionlang {
     class Pass;
 
-    // TODO: Use StatementOpts struct for constructor options?
+    struct AssignmentStatementOpts : StatementOpts {
+        PtrRef<VariableDeclStatement> variableDeclStatementRef;
+
+        ionshared::Ptr<Construct> value;
+    };
 
     class AssignmentStatement : public Statement {
     private:
-        PtrRef<VariableDecl> variableDecl;
+        PtrRef<VariableDeclStatement> variableDeclStatementRef;
 
         ionshared::Ptr<Construct> value;
 
     public:
-        AssignmentStatement(
-            ionshared::Ptr<Block> parent,
-            PtrRef<VariableDecl> variableDecl,
-            ionshared::Ptr<Construct> value
-        );
+        explicit AssignmentStatement(const AssignmentStatementOpts &opts);
 
         void accept(Pass &visitor) override;
 
-        [[nodiscard]] PtrRef<VariableDecl> getVariableDecl() const noexcept;
+        Ast getChildNodes() override;
 
-        void setVariableDecl(PtrRef<VariableDecl> variableDecl) noexcept;
+        [[nodiscard]] PtrRef<VariableDeclStatement> getVariableDeclStatement() const noexcept;
+
+        void setVariableDeclStatement(PtrRef<VariableDeclStatement> variableDeclStatement) noexcept;
 
         ionshared::Ptr<Construct> getValue() const noexcept;
 

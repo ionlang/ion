@@ -8,21 +8,22 @@
 namespace ionlang {
     class Pass;
 
-    // TODO: Use StatementOpts struct for constructor options.
+    struct VariableDeclStatementOpts : StatementOpts {
+        ionshared::Ptr<Type> type;
 
-    class VariableDecl : public Statement, public ionshared::Named {
+        std::string id;
+
+        ionshared::Ptr<Construct> value;
+    };
+
+    class VariableDeclStatement : public Statement, public ionshared::Named {
     private:
         ionshared::Ptr<Type> type;
 
         ionshared::Ptr<Construct> value;
 
     public:
-        VariableDecl(
-            ionshared::Ptr<Block> parent,
-            ionshared::Ptr<Type> type,
-            std::string id,
-            ionshared::Ptr<Construct> value
-        );
+        explicit VariableDeclStatement(const VariableDeclStatementOpts &opts);
 
         void accept(Pass &visitor) override;
 

@@ -7,7 +7,7 @@ namespace ionlang {
     }
 
     void IonIrEmittedEntities::set(const ionshared::Ptr<Construct> &key, const ionshared::Ptr<ionir::Construct> &value) {
-        this->entities.insert(key, value, true);
+        this->entities.set(key, value, true);
     }
 
     bool IonIrEmittedEntities::contains(ionshared::Ptr<Construct> key) const {

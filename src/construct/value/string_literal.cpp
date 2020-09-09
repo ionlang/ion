@@ -1,5 +1,5 @@
 #include <ionlang/passes/pass.h>
-#include <ionlang/misc/type_factory.h>
+#include <ionlang/type_system/type_factory.h>
 
 namespace ionlang {
     StringLiteral::StringLiteral(std::string value)

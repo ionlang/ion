@@ -21,7 +21,7 @@ namespace ionlang {
         template<typename T = ionir::Construct>
         [[nodiscard]] std::optional<ionshared::Ptr<T>> find(const ionshared::Ptr<Construct> &construct) {
             if (this->contains(construct)) {
-                ionshared::Ptr<T> castResult = this->entities[construct]->dynamicCast<T>();
+                ionshared::Ptr<T> castResult = this->entities.lookup(construct)->get()->dynamicCast<T>();
 
                 if (castResult != nullptr) {
                     return castResult;

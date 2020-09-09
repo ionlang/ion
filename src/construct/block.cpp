@@ -6,10 +6,10 @@ namespace ionlang {
     Block::Block(
         ionshared::Ptr<Construct> parent,
         std::vector<ionshared::Ptr<Statement>> statements,
-        const ionshared::PtrSymbolTable<VariableDecl> &symbolTable
+        const ionshared::PtrSymbolTable<VariableDeclStatement> &symbolTable
     ) :
         ChildConstruct<Construct>(std::move(parent), ConstructKind::Block),
-        ionshared::Scoped<VariableDecl>(symbolTable),
+        ionshared::Scoped<VariableDeclStatement>(symbolTable),
         statements(std::move(statements)) {
         //
     }
@@ -31,7 +31,7 @@ namespace ionlang {
         this->statements = std::move(statements);
     }
 
-    void Block::insertStatement(const ionshared::Ptr<Statement> &statement) {
+    void Block::appendStatement(const ionshared::Ptr<Statement> &statement) {
         this->statements.push_back(statement);
 
         /**
@@ -39,10 +39,10 @@ namespace ionlang {
          * the local symbol table.
          */
         if (statement->getStatementKind() == StatementKind::VariableDeclaration) {
-            ionshared::Ptr<VariableDecl> variableDecl =
-                statement->dynamicCast<VariableDecl>();
+            ionshared::Ptr<VariableDeclStatement> variableDecl =
+                statement->dynamicCast<VariableDeclStatement>();
 
-            this->getSymbolTable()->insert(variableDecl->getId(), variableDecl);
+            this->getSymbolTable()->set(variableDecl->getId(), variableDecl);
         }
     }
 

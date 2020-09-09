@@ -64,6 +64,7 @@ namespace ionlang {
     }
 
     IonIrLoweringPass::IonIrLoweringPass(ionshared::PtrSymbolTable<ionir::Module> modules) :
+        Pass(),
         modules(std::move(modules)),
         constructStack(),
         typeStack(),
@@ -118,7 +119,7 @@ namespace ionlang {
         this->moduleBuffer = std::make_shared<ionir::Module>(node->getId());
 
         // Set the module on the modules symbol table.
-        this->modules->insert(node->getId(), *this->moduleBuffer);
+        this->modules->set(node->getId(), *this->moduleBuffer);
 
         // Proceed to visit all the module's children (top-level constructs).
         std::map<std::string, ionshared::Ptr<Construct>> moduleSymbolTable =
@@ -214,7 +215,7 @@ namespace ionlang {
          * Register the IonIR extern on the module buffer's symbol table.
          * This will allow the IonIR codegen pass to visit the extern.
          */
-        moduleBufferSymbolTable->insert(prototype->getId(), ionIrExtern);
+        moduleBufferSymbolTable->set(prototype->getId(), ionIrExtern);
 
         this->constructStack.push(ionIrExtern);
     }
@@ -234,7 +235,7 @@ namespace ionlang {
         for (const auto &[id, argument] : nativeArguments) {
             this->visitType(argument.first);
 
-            ionIrArguments->getItems()->insert(
+            ionIrArguments->getItems()->set(
                 argument.second,
                 std::make_pair(this->typeStack.pop(), argument.second)
             );
@@ -314,7 +315,7 @@ namespace ionlang {
          */
         else {
             // Register the IonIR basic block on the function body's symbol table.
-            ionIrFunctionBody->get()->getSymbolTable()->insert(
+            ionIrFunctionBody->get()->getSymbolTable()->set(
                 ionIrBasicBlockId,
                 ionIrBasicBlock
             );
@@ -396,7 +397,7 @@ namespace ionlang {
          * This will allow it to be visited and emitted to LLVM IR during the
          * IonIR codegen phase.
          */
-        ionIrModuleBuffer->getContext()->getGlobalScope()->insert(
+        ionIrModuleBuffer->getContext()->getGlobalScope()->set(
             ionIrGlobalVariable->getId(),
             ionIrGlobalVariable
         );
@@ -618,16 +619,16 @@ namespace ionlang {
     void IonIrLoweringPass::visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> node) {
         ionshared::Ptr<ionir::InstBuilder> ionIrBuilderBuffer = this->requireBuilder();
 
-        if (!node->getVariableDecl()->isResolved()) {
+        if (!node->getVariableDeclStatement()->isResolved()) {
             // TODO: Better error.
             throw std::runtime_error("Expected variable declaration reference to be resolved");
         }
-        else if (!this->symbolTable.contains(*node->getVariableDecl()->getValue())) {
+        else if (!this->symbolTable.contains(*node->getVariableDeclStatement()->getValue())) {
             // TODO: Better error.
             throw std::runtime_error("Could not find corresponding IonIR alloca instruction on the symbol table");
         }
 
-        ionshared::Ptr<VariableDecl> variableDecl = *node->getVariableDecl()->getValue();
+        ionshared::Ptr<VariableDeclStatement> variableDecl = *node->getVariableDeclStatement()->getValue();
 
         ionshared::Ptr<ionir::AllocaInst> ionIrAllocaInst =
             *this->symbolTable.find<ionir::AllocaInst>(variableDecl);
@@ -640,7 +641,7 @@ namespace ionlang {
         );
     }
 
-    void IonIrLoweringPass::visitVariableDecl(ionshared::Ptr<VariableDecl> node) {
+    void IonIrLoweringPass::visitVariableDecl(ionshared::Ptr<VariableDeclStatement> node) {
         this->requireBuilder();
 
         ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = *this->builderBuffer;

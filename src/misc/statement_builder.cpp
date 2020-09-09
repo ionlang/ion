@@ -1,24 +1,56 @@
 #include <ionlang/misc/statement_builder.h>
 
 namespace ionlang {
-    StatementBuilder::StatementBuilder(ionshared::Ptr<Block> basicBlock) :
-        basicBlock(std::move(basicBlock)) {
+    StatementBuilder::StatementBuilder(ionshared::Ptr<Block> block) :
+        block(std::move(block)) {
         //
     }
 
-    ionshared::Ptr<Block> StatementBuilder::getSection() const noexcept {
-        return this->basicBlock;
+    ionshared::Ptr<Block> StatementBuilder::getBlock() const noexcept {
+        return this->block;
     }
 
-    void StatementBuilder::insert(const ionshared::Ptr<Statement> &inst) {
-        this->basicBlock->getStatements().push_back(inst);
+    void StatementBuilder::appendStatement(const ionshared::Ptr<Statement> &statement) {
+        this->block->getStatements().push_back(statement);
     }
 
-    // TODO
-//    ionshared::Ptr<ReturnInst> InstBuilder::createReturn(ionshared::OptPtr<Value<>> value) {
-//        return this->make<ReturnInst, ReturnInstOpts>(ReturnInstOpts{
-//            this->basicBlock,
-//            value
-//        });
-//    }
+    ionshared::Ptr<VariableDeclStatement> StatementBuilder::createVariableDecl(ionshared::Ptr<Type> type, std::string id, ionshared::Ptr<Construct> value) {
+        return this->make<VariableDeclStatement, VariableDeclStatementOpts>(VariableDeclStatementOpts{
+            this->block,
+            std::move(type),
+            std::move(id),
+            std::move(value)
+        });
+    }
+
+    ionshared::Ptr<AssignmentStatement> StatementBuilder::createAssignment(ionshared::Ptr<VariableDeclStatement> variableDeclStatement, ionshared::Ptr<Construct> value) {
+        return this->make<AssignmentStatement, AssignmentStatementOpts>(AssignmentStatementOpts{
+            this->block,
+
+            std::make_shared<Ref<VariableDeclStatement>>(
+                variableDeclStatement->getId(),
+                this->block,
+                RefKind::Variable,
+                variableDeclStatement
+            ),
+
+            std::move(value)
+        });
+    }
+
+    ionshared::Ptr<IfStatement> StatementBuilder::createIf(ionshared::Ptr<Construct> condition, ionshared::Ptr<Block> consequentBlock, ionshared::OptPtr<Block> alternativeBlock) {
+        return this->make<IfStatement, IfStatementOpts>(IfStatementOpts{
+            this->block,
+            std::move(condition),
+            std::move(consequentBlock),
+            std::move(alternativeBlock)
+        });
+    }
+
+    ionshared::Ptr<ReturnStatement> StatementBuilder::createReturn(ionshared::OptPtr<Construct> value) {
+        return this->make<ReturnStatement, ReturnStatementOpts>(ReturnStatementOpts{
+            this->block,
+            std::move(value)
+        });
+    }
 }

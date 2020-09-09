@@ -79,14 +79,14 @@ TEST(CodeGenTest, VisitIfStatement) {
 TEST(CodeGenTest, VisitVariableDecl) {
     ionshared::Ptr<IonIrLoweringPass> ionIrLoweringPass = test::bootstrap::ionIrLoweringPass();
 
-    ionshared::Ptr<VariableDecl> variableDecl = std::make_shared<VariableDecl>(
+    ionshared::Ptr<VariableDeclStatement> variableDecl = std::make_shared<VariableDeclStatement>(VariableDeclStatementOpts{
         // The parent will be filled in below.
         nullptr,
 
         std::make_shared<BooleanType>(),
         test::constant::foo,
         std::make_shared<BooleanLiteral>(true)
-    );
+    });
 
     ionshared::Ptr<Function> function = test::bootstrap::emptyFunction({
         variableDecl

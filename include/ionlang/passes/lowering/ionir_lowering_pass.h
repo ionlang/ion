@@ -101,7 +101,7 @@ namespace ionlang {
 
         void visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> node) override;
 
-        void visitVariableDecl(ionshared::Ptr<VariableDecl> node) override;
+        void visitVariableDecl(ionshared::Ptr<VariableDeclStatement> node) override;
 
         void visitCallExpr(ionshared::Ptr<CallExpr> node) override;
 

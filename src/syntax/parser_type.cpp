@@ -13,7 +13,7 @@ namespace ionlang {
         // 1st qualifier: const (constant).
         if (this->is(TokenKind::QualifierConst)) {
             this->tokenStream.skip();
-            qualifiers->insert(TypeQualifier::Constant);
+            qualifiers->add(TypeQualifier::Constant);
         }
 
         // 2nd qualifier: mut (mutable reference or pointer).
@@ -23,25 +23,25 @@ namespace ionlang {
             // Mutable reference.
             if (this->is(TokenKind::SymbolAmpersand)) {
                 this->tokenStream.skip();
-                qualifiers->insert(TypeQualifier::Reference);
+                qualifiers->add(TypeQualifier::Reference);
             }
             // Otherwise, it must be a pointer.
             else {
                 IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolStar), Type)
 
-                qualifiers->insert(TypeQualifier::Pointer);
+                qualifiers->add(TypeQualifier::Pointer);
             }
         }
         // 3rd qualifier: reference
         else if (this->is(TokenKind::SymbolAmpersand)) {
             this->tokenStream.skip();
-            qualifiers->insert(TypeQualifier::Reference);
+            qualifiers->add(TypeQualifier::Reference);
         }
 
         // 4th qualifier: pointer.
         if (this->is(TokenKind::SymbolStar)) {
             this->tokenStream.skip();
-            qualifiers->insert(TypeQualifier::Pointer);
+            qualifiers->add(TypeQualifier::Pointer);
         }
 
         // TODO: What about **?

@@ -1,6 +1,11 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
+    Pass::Pass() :
+        ionshared::BasePass<Construct>() {
+        //
+    }
+
     void Pass::visit(ionshared::Ptr<Construct> node) {
         node->accept(*this);
 
@@ -66,7 +71,7 @@ namespace ionlang {
             }
 
             case StatementKind::VariableDeclaration: {
-                this->visitVariableDecl(node->dynamicCast<VariableDecl>());
+                this->visitVariableDecl(node->dynamicCast<VariableDeclStatement>());
 
                 break;
             }
@@ -205,7 +210,7 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitVariableDecl(ionshared::Ptr<VariableDecl> node) {
+    void Pass::visitVariableDecl(ionshared::Ptr<VariableDeclStatement> node) {
         //
     }
 

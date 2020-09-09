@@ -6,7 +6,7 @@
 #include <ionshared/tracking/symbol_table.h>
 #include <ionshared/tracking/scoped.h>
 #include <ionlang/construct/pseudo/child_construct.h>
-#include "ionlang/construct/statement/variable_declaration.h"
+#include "ionlang/construct/statement/variable_decl_statement.h"
 #include "statement.h"
 
 namespace ionlang {
@@ -15,7 +15,7 @@ namespace ionlang {
     class StatementBuilder;
 
     // TODO: Must be verified to contain a single terminal instruction at the end?
-    class Block : public ChildConstruct<>, public ionshared::Scoped<VariableDecl> {
+    class Block : public ChildConstruct<>, public ionshared::Scoped<VariableDeclStatement> {
     private:
         std::vector<ionshared::Ptr<Statement>> statements;
 
@@ -25,8 +25,8 @@ namespace ionlang {
 
             std::vector<ionshared::Ptr<Statement>> statements = {},
 
-            const ionshared::PtrSymbolTable<VariableDecl> &symbolTable =
-                ionshared::util::makePtrSymbolTable<VariableDecl>()
+            const ionshared::PtrSymbolTable<VariableDeclStatement> &symbolTable =
+                ionshared::util::makePtrSymbolTable<VariableDeclStatement>()
         );
 
         void accept(Pass &visitor) override;
@@ -38,7 +38,7 @@ namespace ionlang {
         // TODO: When statements are set, the symbol table must be cleared and re-populated.
         void setStatements(std::vector<ionshared::Ptr<Statement>> statements);
 
-        void insertStatement(const ionshared::Ptr<Statement> &statement);
+        void appendStatement(const ionshared::Ptr<Statement> &statement);
 
         uint32_t relocateStatements(Block &target, uint32_t from = 0);
 

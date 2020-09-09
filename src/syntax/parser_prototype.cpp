@@ -40,7 +40,7 @@ namespace ionlang {
 
             Arg arg = *argResult;
 
-            args->insert(arg.second, arg);
+            args->set(arg.second, arg);
         }
         while (this->is(TokenKind::SymbolComma));
 

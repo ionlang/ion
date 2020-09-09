@@ -27,7 +27,7 @@ namespace ionlang {
     }
 
     bool Type::addQualifier(TypeQualifier qualifier) noexcept {
-        return this->qualifiers->insert(qualifier);
+        return this->qualifiers->add(qualifier);
     }
 
     bool Type::removeQualifier(TypeQualifier qualifier) noexcept {

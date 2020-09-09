@@ -1,6 +1,6 @@
 #include <utility>
 #include <ionlang/const/const.h>
-#include <ionlang/misc/type_factory.h>
+#include <ionlang/type_system/type_factory.h>
 #include "const.h"
 #include "bootstrap.h"
 
@@ -39,7 +39,7 @@ namespace ionlang::test::bootstrap {
             std::make_shared<ionshared::SymbolTable<ionshared::Ptr<ionir::Module>>>();
 
         // TODO: Inserting module, but can be done inline above -- it's just a headache.
-        modules->insert(module->getId(), module);
+        modules->set(module->getId(), module);
 
         ionshared::Ptr<IonIrLoweringPass> ionIrCodegenPass =
             std::make_shared<IonIrLoweringPass>(modules);

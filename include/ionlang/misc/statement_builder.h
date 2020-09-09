@@ -1,6 +1,9 @@
 #pragma once
 
 #include <ionshared/misc/helpers.h>
+#include <ionlang/construct/statement/return_statement.h>
+#include <ionlang/construct/statement/assignment_statement.h>
+#include <ionlang/construct/statement/if_statement.h>
 #include <ionlang/construct/statement.h>
 #include <ionlang/construct/block.h>
 #include <ionlang/construct/type.h>
@@ -8,27 +11,45 @@
 namespace ionlang {
     class StatementBuilder {
     private:
-        ionshared::Ptr<Block> basicBlock;
+        ionshared::Ptr<Block> block;
 
     public:
-        explicit StatementBuilder(ionshared::Ptr<Block> basicBlock);
+        explicit StatementBuilder(ionshared::Ptr<Block> block);
 
-        [[nodiscard]] ionshared::Ptr<Block> getSection() const noexcept;
+        [[nodiscard]] ionshared::Ptr<Block> getBlock() const noexcept;
 
-        void insert(const ionshared::Ptr<Statement> &inst);
+        void appendStatement(const ionshared::Ptr<Statement> &statement);
 
-        template<class TInst, typename... TArgs>
-        ionshared::Ptr<TInst> make(TArgs... args) {
+        template<class TStatement, typename... TArgs>
+        ionshared::Ptr<TStatement> make(TArgs... args) {
             // TODO: Ensure T inherits from Inst or derived.
 
-            ionshared::Ptr<TInst> inst = std::make_shared<TInst>(args...);
+            ionshared::Ptr<TStatement> statement = std::make_shared<TStatement>(args...);
 
-            this->insert(inst);
+            this->appendStatement(statement);
 
-            return inst;
+            return statement;
         }
 
-        // TODO
-//        ionshared::Ptr<ReturnInst> createReturn(ionshared::OptPtr<Value<>> value = std::nullopt);
+        ionshared::Ptr<VariableDeclStatement> createVariableDecl(
+            ionshared::Ptr<Type> type,
+            std::string id,
+            ionshared::Ptr<Construct> value
+        );
+
+        ionshared::Ptr<AssignmentStatement> createAssignment(
+            ionshared::Ptr<VariableDeclStatement> variableDeclStatement,
+            ionshared::Ptr<Construct> value
+        );
+
+        ionshared::Ptr<IfStatement> createIf(
+            ionshared::Ptr<Construct> condition,
+            ionshared::Ptr<Block> consequentBlock,
+            ionshared::OptPtr<Block> alternativeBlock
+        );
+
+        ionshared::Ptr<ReturnStatement> createReturn(
+            ionshared::OptPtr<Construct> value = std::nullopt
+        );
     };
 }

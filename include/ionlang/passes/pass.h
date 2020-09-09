@@ -13,7 +13,7 @@
 #include <ionlang/construct/statement.h>
 #include <ionlang/construct/statement/if_statement.h>
 #include <ionlang/construct/statement/return_statement.h>
-#include <ionlang/construct/statement/variable_declaration.h>
+#include <ionlang/construct/statement/variable_decl_statement.h>
 #include <ionlang/construct/statement/assignment_statement.h>
 #include <ionlang/construct/expression.h>
 #include <ionlang/construct/expression/binary_operation.h>
@@ -33,6 +33,8 @@
 namespace ionlang {
     class Pass : public ionshared::BasePass<Construct> {
     public:
+        Pass();
+
         virtual void visit(ionshared::Ptr<Construct> node);
 
         virtual void visitChildren(ionshared::Ptr<Construct> node);
@@ -81,7 +83,7 @@ namespace ionlang {
 
         virtual void visitFunction(ionshared::Ptr<Function> node);
 
-        virtual void visitVariableDecl(ionshared::Ptr<VariableDecl> node);
+        virtual void visitVariableDecl(ionshared::Ptr<VariableDeclStatement> node);
 
         virtual void visitScopeAnchor(ionshared::Ptr<ionshared::Scoped<Construct>> node);
 
@@ -95,6 +97,4 @@ namespace ionlang {
     };
 
     typedef ionshared::BasePassManager<Pass, Construct> PassManager;
-
-    typedef ionshared::PassManagerItem<Pass> PassManagerItem;
 }

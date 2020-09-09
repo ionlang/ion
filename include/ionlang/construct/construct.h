@@ -51,7 +51,7 @@ namespace ionlang {
             // TODO: Ensure T is child of AstNode.
             Ast children = {};
 
-            for (const auto item : vector) {
+            for (const auto &item : vector) {
                 children.push_back(item);
             }
 

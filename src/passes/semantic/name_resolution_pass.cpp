@@ -2,6 +2,7 @@
 
 namespace ionlang {
     NameResolutionPass::NameResolutionPass(ionshared::Ptr<ionshared::NoticeStack> noticeStack) :
+        Pass(),
         noticeStack(std::move(noticeStack)),
         scope() {
         //
@@ -27,9 +28,6 @@ namespace ionlang {
 
         switch (node->getRefKind()) {
             case RefKind::Variable: {
-                // TODO: Debugging.
-                std::cout << "vISIT REF WITH KIND VARIABLE" << std::endl;
-
                 // TODO: Must use flow graph to find variable declarations from other blocks (remember blocks can be nested).
 
                 if (owner->getConstructKind() != ConstructKind::Block) {
@@ -109,8 +107,6 @@ namespace ionlang {
     }
 
     void NameResolutionPass::visitScopeAnchor(ionshared::Ptr<ionshared::Scoped<Construct>> node) {
-        Pass::visitScopeAnchor(node);
-
         // TODO: ScopeStack should be pushed & popped, but its never popped.
         // TODO: CRITICAL: Throwing SEGFAULT because node is NULL (casting fails).
         //        this->scopeStack.add(node->getSymbolTable());

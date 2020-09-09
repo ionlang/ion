@@ -8,7 +8,7 @@ namespace ionlang {
         AstPtrResult<Statement> statement;
 
         // TODO: Symbol table is not being used. Variable decls should be registered?
-        ionshared::PtrSymbolTable<VariableDecl> symbolTable = parent->getSymbolTable();
+        ionshared::PtrSymbolTable<VariableDeclStatement> symbolTable = parent->getSymbolTable();
 
         TokenKind currentTokenKind = this->tokenStream.get().getKind();
 
@@ -123,10 +123,16 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(util::hasValue(value), AssignmentStatement)
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), AssignmentStatement)
 
-        return std::make_shared<AssignmentStatement>(
+        return std::make_shared<AssignmentStatement>(AssignmentStatementOpts{
             parent,
-            std::make_shared<Ref<VariableDecl>>(*id, parent, RefKind::Variable),
+
+            std::make_shared<Ref<VariableDeclStatement>>(
+                *id,
+                parent,
+                RefKind::Variable
+            ),
+
             util::getResultValue(value)
-        );
+        });
     }
 }

@@ -129,7 +129,7 @@ namespace ionlang {
 
         AstPtrResult<Statement> parseStatement(const ionshared::Ptr<Block> &parent);
 
-        AstPtrResult<VariableDecl> parseVariableDecl(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<VariableDeclStatement> parseVariableDecl(const ionshared::Ptr<Block> &parent);
 
         AstPtrResult<IfStatement> parseIfStatement(const ionshared::Ptr<Block> &parent);
 
