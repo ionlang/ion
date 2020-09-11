@@ -8,6 +8,8 @@
 namespace ionlang {
     class MacroExpansionPass : public Pass {
     public:
+        IONSHARED_PASS_ID;
+
         MacroExpansionPass();
     };
 }

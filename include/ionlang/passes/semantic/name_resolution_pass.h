@@ -17,6 +17,8 @@ namespace ionlang {
         std::list<ionshared::PtrSymbolTable<Construct>> scope;
 
     public:
+        IONSHARED_PASS_ID;
+
         explicit NameResolutionPass(
             ionshared::Ptr<ionshared::NoticeStack> noticeStack =
                 std::make_shared<ionshared::NoticeStack>()
