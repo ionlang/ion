@@ -31,7 +31,10 @@ namespace ionlang {
         {ConstructKind::StructDecl, "StructDeclaration"},
         {ConstructKind::Module, "Module"},
         {ConstructKind::Ref, "Reference"},
-        {ConstructKind::Value, "Value"}
+        {ConstructKind::Value, "Value"},
+        {ConstructKind::Statement, "Statement"},
+        {ConstructKind::ErrorMarker, "ErrorMarker"},
+        {ConstructKind::Attribute, "Attribute"}
     };
 
     std::map<TokenKind, IntegerKind> Const::tokenKindToIntegerKind = {

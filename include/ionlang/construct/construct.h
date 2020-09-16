@@ -2,6 +2,7 @@
 
 #include <ionshared/tracking/symbol_table.h>
 #include <ionshared/construct/base_construct.h>
+#include <ionshared/error_handling/source_location.h>
 
 namespace ionlang {
     enum class ConstructKind {
@@ -45,6 +46,9 @@ namespace ionlang {
     typedef ionshared::Ast<Construct> Ast;
 
     class Construct : public ionshared::BaseConstruct<Construct, ConstructKind> {
+    private:
+        std::optional<ionshared::SourceLocation> sourceLocation;
+
     public:
         template<class T>
         static Ast convertChildren(std::vector<ionshared::Ptr<T>> vector) {
@@ -91,7 +95,7 @@ namespace ionlang {
 
         virtual void accept(Pass &visitor) = 0;
 
-        virtual Ast getChildNodes();
+        [[nodiscard]] virtual Ast getChildNodes();
 
         /**
          * Verify the members and properties of the node, and it's children.
@@ -99,8 +103,14 @@ namespace ionlang {
          * true if all the child nodes are successfully verified. If there
          * are no child nodes, the result will be true by default.
          */
-        virtual bool verify();
+        [[nodiscard]] virtual bool verify();
 
-        std::optional<std::string> getConstructName();
+        [[nodiscard]] std::optional<ionshared::SourceLocation> getSourceLocation() const noexcept;
+
+        [[nodiscard]] bool hasSourceLocation() const noexcept;
+
+        void setSourceLocation(std::optional<ionshared::SourceLocation> sourceLocation) noexcept;
+
+        [[nodiscard]] std::optional<std::string> getConstructName();
     };
 }

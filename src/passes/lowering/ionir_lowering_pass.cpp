@@ -182,6 +182,12 @@ namespace ionlang {
         // Register the newly created function on the buffer module's symbol table.
         moduleBuffer->insertFunction(ionIrFunction);
 
+        /**
+         * Register the node and function on the local symbol table for later lookups,
+         * ex. when visiting a call expression.
+         */
+        this->symbolTable.set(node, ionIrFunction);
+
         // Push the function back onto the stack.
         this->constructStack.push(ionIrFunction);
     }
@@ -673,23 +679,29 @@ namespace ionlang {
 
     void IonIrLoweringPass::visitCallExpr(ionshared::Ptr<CallExpr> node) {
         ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = this->requireBuilder();
-        ionshared::Ptr<ionir::Function> ionIrCallee = this->requireFunction();
+        PtrRef<Function> calleeRef = node->getCalleeRef();
+
+        if (!calleeRef->isResolved()) {
+            throw std::runtime_error("Expected callee reference to be resolved");
+        }
+
+        ionshared::Ptr<Function> callee = *calleeRef->getValue();
+
+        ionshared::OptPtr<ionir::Function> ionIrCalleeResult =
+            this->symbolTable.find<ionir::Function>(callee);
+
+        if (!ionshared::util::hasValue(ionIrCalleeResult)) {
+            throw std::runtime_error("Corresponding emitted IonIR entity could not be found on symbol table");
+        }
 
         /**
          * At this point, we know that the basic block buffer is
          * set because the builder buffer is set.
          */
         ionshared::Ptr<ionir::CallInst> ionIrCallInst = ionIrInstBuilder->createCall(
-            // TODO: Is basicBlockBuffer the correct owner for Ref in this case?
-            std::make_shared<ionir::Ref<ionir::Function>>(
-                ionir::RefKind::Function,
-                ionIrCallee->getPrototype()->getId(),
-                *this->basicBlockBuffer,
-                ionIrCallee
-            )
+            *ionIrCalleeResult
+            // TODO: Process arguments.
         );
-
-        // TODO: Process arguments here.
 
         this->constructStack.push(ionIrCallInst);
     }

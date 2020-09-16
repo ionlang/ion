@@ -28,6 +28,18 @@ namespace ionlang {
         return true;
     }
 
+    std::optional<ionshared::SourceLocation> Construct::getSourceLocation() const noexcept {
+        return this->sourceLocation;
+    }
+
+    bool Construct::hasSourceLocation() const noexcept {
+        return this->sourceLocation.has_value();
+    }
+
+    void Construct::setSourceLocation(std::optional<ionshared::SourceLocation> sourceLocation) noexcept {
+        this->sourceLocation = sourceLocation;
+    }
+
     std::optional<std::string> Construct::getConstructName() {
         return Const::getConstructKindName(this->getConstructKind());
     }

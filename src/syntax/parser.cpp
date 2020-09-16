@@ -1,6 +1,5 @@
 #include <ionlang/lexical/classifier.h>
 #include <ionlang/syntax/parser.h>
-#include <ionlang/misc/util.h>
 #include <ionlang/const/notice.h>
 
 namespace ionlang {
@@ -33,11 +32,66 @@ namespace ionlang {
         return true;
     }
 
-    std::nullopt_t Parser::makeNotice(std::string message, ionshared::NoticeType type) {
+    std::nullopt_t Parser::makeNotice(const std::string &message, ionshared::NoticeType type) {
         // TODO
         throw std::runtime_error(message);
 
         return std::nullopt;
+    }
+
+    ionshared::Range Parser::makeSyntaxRange() const noexcept {
+        // TODO: Hard-coded 1 length.
+        //            return {
+        //                this->syntaxStartMarker,
+        //                static_cast<uint32_t>(this->tokenStream.getIndex()) - this->syntaxStartMarker;
+        //            };
+        return {
+            static_cast<uint32_t>(this->tokenStream.getIndex()),
+            1
+        };
+    }
+
+    void Parser::beginSourceLocationMapping() noexcept {
+        this->sourceLocationMappingStartStack.push(std::make_pair(
+            this->tokenStream.get().getLineNumber(),
+            this->tokenStream.get().getStartPosition()
+        ));
+    }
+
+    ionshared::SourceLocation Parser::makeSourceLocation() {
+        if (this->sourceLocationMappingStartStack.empty()) {
+            throw std::runtime_error("Source mapping starting point stack is empty");
+        }
+
+        std::pair<uint32_t, uint32_t> mappingStart =
+            this->sourceLocationMappingStartStack.top();
+
+        this->sourceLocationMappingStartStack.pop();
+
+        Token currentToken = this->tokenStream.get();
+
+        return ionshared::SourceLocation(
+            ionshared::Span(
+                mappingStart.first,
+                currentToken.getLineNumber() - mappingStart.first
+            ),
+
+            ionshared::Span(
+                mappingStart.second,
+                currentToken.getEndPosition() - mappingStart.second
+            )
+        );
+    }
+
+    void Parser::mapSourceLocation(AstPtrResult<> construct) {
+        this->sourceMap->set(
+            util::getResultValue(std::move(construct)),
+            this->makeSourceLocation()
+        );
+    }
+
+    void Parser::finishSourceLocationMapping(const ionshared::Ptr<Construct> &construct) {
+        construct->setSourceLocation(this->makeSourceLocation());
     }
 
     Parser::Parser(
@@ -48,7 +102,8 @@ namespace ionlang {
         tokenStream(std::move(stream)),
         noticeStack(noticeStack),
         noticeSentinel(std::make_shared<NoticeSentinel>(noticeStack)),
-        filePath(std::move(filePath)) {
+        filePath(std::move(filePath)),
+        sourceLocationMappingStartStack() {
         //
     }
 
@@ -60,7 +115,7 @@ namespace ionlang {
         return this->filePath;
     }
 
-    AstPtrResult<> Parser::parseTopLevel(const ionshared::Ptr<Module> &parent) {
+    AstPtrResult<> Parser::parseTopLevelFork(const ionshared::Ptr<Module> &parent) {
         switch (this->tokenStream.get().getKind()) {
             case TokenKind::KeywordFunction: {
                 return util::getResultValue(this->parseFunction(parent));
@@ -82,6 +137,8 @@ namespace ionlang {
     }
 
     AstPtrResult<Global> Parser::parseGlobal() {
+        this->beginSourceLocationMapping();
+
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordGlobal), Global)
 
         AstPtrResult<Type> typeResult = this->parseType();
@@ -99,7 +156,7 @@ namespace ionlang {
             // Skip the equal symbol before continuing parsing.
             this->tokenStream.skip();
 
-            valueResult = this->parseLiteral();
+            valueResult = this->parseLiteralFork();
 
             // Value must have been parsed at this point.
             if (!util::hasValue(valueResult)) {
@@ -110,14 +167,19 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), Global)
 
-        return std::make_shared<Global>(
+        ionshared::Ptr<Global> global = std::make_shared<Global>(
             util::getResultValue(typeResult),
             *id,
             util::getResultValue(valueResult)
         );
+
+        this->finishSourceLocationMapping(global);
+
+        return global;
     }
 
     AstPtrResult<Block> Parser::parseBlock(const ionshared::Ptr<Construct> &parent) {
+        this->beginSourceLocationMapping();
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL), Block)
 
         ionshared::Ptr<Block> block = std::make_shared<Block>(parent);
@@ -149,7 +211,7 @@ namespace ionlang {
         ionshared::Ptr<Module> module = std::make_shared<Module>(*id, std::make_shared<Context>(globalScope));
 
         while (!this->is(TokenKind::SymbolBraceR)) {
-            AstPtrResult<> topLevelConstructResult = this->parseTopLevel(module);
+            AstPtrResult<> topLevelConstructResult = this->parseTopLevelFork(module);
 
             // TODO: Make notice if it has no value? Or is it enough with the notice under 'parseTopLevel()'?
             if (util::hasValue(topLevelConstructResult)) {
@@ -187,7 +249,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(id.has_value(), VariableDeclStatement)
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual), VariableDeclStatement)
 
-        AstPtrResult<Value<>> valueResult = this->parseLiteral();
+        AstPtrResult<Value<>> valueResult = this->parseLiteralFork();
 
         IONLANG_PARSER_ASSERT(util::hasValue(valueResult), VariableDeclStatement)
 

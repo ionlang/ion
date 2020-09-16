@@ -21,5 +21,7 @@ namespace ionlang {
         static bool isKeyword(TokenKind tokenKind);
 
         static bool isLiteral(TokenKind tokenKind);
+
+        static bool isStatement(TokenKind tokenKind, std::optional<TokenKind> nextTokenKind);
     };
 }

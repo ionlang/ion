@@ -1,7 +1,6 @@
 #include <ionlang/lexical/classifier.h>
 #include <ionlang/misc/util.h>
 #include <ionlang/syntax/parser.h>
-#include <ionlang/const/notice.h>
 
 namespace ionlang {
     AstPtrResult<Statement> Parser::parseStatement(const ionshared::Ptr<Block> &parent) {
@@ -28,9 +27,16 @@ namespace ionlang {
         else if (currentTokenKind == TokenKind::Identifier && this->isNext(TokenKind::SymbolEqual)) {
             statement = util::getResultValue(this->parseAssignmentStatement(parent));
         }
-        // TODO: Use Ast(Ptr)Result<>.
+        // Otherwise, it must be a primary expression.
         else {
-            throw ionshared::util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_TOKEN);
+            AstPtrResult<Expression> primaryExpr = this->parsePrimaryExpr(parent);
+
+            IONLANG_PARSER_ASSERT(util::hasValue(primaryExpr), Statement)
+
+            statement = std::make_shared<ExprWrapperStatement>(ExprWrapperStatementOpts{
+                parent,
+                util::getResultValue(primaryExpr)
+            });
         }
 
         return statement;
@@ -40,7 +46,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIf), IfStatement)
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL), IfStatement)
 
-        AstPtrResult<Value<>> condition = this->parseLiteral();
+        AstPtrResult<Value<>> condition = this->parseLiteralFork();
 
         IONLANG_PARSER_ASSERT(util::hasValue(condition), IfStatement)
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR), IfStatement)
@@ -89,7 +95,7 @@ namespace ionlang {
     AstPtrResult<ReturnStatement> Parser::parseReturnStatement(const ionshared::Ptr<Block> &parent) {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordReturn), ReturnStatement)
 
-        AstPtrResult<> valueResult;
+        AstPtrResult<Expression> valueResult;
 
         // Return statement contains a value. Parse it and save it.
         if (!this->is(TokenKind::SymbolSemiColon)) {
@@ -118,7 +124,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(id.has_value(), AssignmentStatement)
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual), AssignmentStatement)
 
-        AstPtrResult<> value = this->parsePrimaryExpr(parent);
+        AstPtrResult<Expression> value = this->parsePrimaryExpr(parent);
 
         IONLANG_PARSER_ASSERT(util::hasValue(value), AssignmentStatement)
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), AssignmentStatement)

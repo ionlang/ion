@@ -19,7 +19,9 @@ namespace ionlang {
 
         void accept(Pass &visitor) override;
 
-        [[nodiscard]] PtrRef<Function> getCallee() const noexcept;
+
+
+        [[nodiscard]] PtrRef<Function> getCalleeRef() const noexcept;
 
         void setCallee(PtrRef<Function> callee) noexcept;
 

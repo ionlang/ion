@@ -13,8 +13,9 @@ namespace ionlang {
             : lineBuffer[0].getValue();
     }
 
-    CodeBacktrack::CodeBacktrack(std::string input, TokenStream stream)
-        : input(std::move(input)), stream(std::move(stream)) {
+    CodeBacktrack::CodeBacktrack(std::string input, TokenStream stream) :
+        input(std::move(input)),
+        stream(std::move(stream)) {
         //
     }
 
@@ -106,7 +107,8 @@ namespace ionlang {
     }
 
     std::optional<CodeBlock> CodeBacktrack::createCodeBlockNear(const ionshared::SourceLocation &sourceLocation, uint32_t grace) {
-        return this->createCodeBlockNear(sourceLocation.getLineNumber(), grace);
+        // TODO: Use start AND end line positions.
+        return this->createCodeBlockNear(sourceLocation.getLines().getStartPosition(), grace);
     }
 
     std::optional<CodeBlock> CodeBacktrack::createCodeBlockNear(const ionshared::Notice &notice, uint32_t grace) {

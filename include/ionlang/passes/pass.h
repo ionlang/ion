@@ -15,9 +15,11 @@
 #include <ionlang/construct/statement/return_statement.h>
 #include <ionlang/construct/statement/variable_decl_statement.h>
 #include <ionlang/construct/statement/assignment_statement.h>
+#include <ionlang/construct/statement/expr_wrapper_statement.h>
 #include <ionlang/construct/expression.h>
 #include <ionlang/construct/expression/binary_operation.h>
 #include <ionlang/construct/expression/call_expr.h>
+#include <ionlang/construct/expression/variable_ref_expr.h>
 #include <ionlang/construct/value.h>
 #include <ionlang/construct/value/boolean_literal.h>
 #include <ionlang/construct/value/char_literal.h>
@@ -55,6 +57,8 @@ namespace ionlang {
 
         virtual void visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> node);
 
+        virtual void visitExprWrapperStatement(ionshared::Ptr<ExprWrapperStatement> node);
+
         virtual void visitExpression(ionshared::Ptr<Expression> node);
 
         virtual void visitUnaryOperation(ionshared::Ptr<UnaryOperation> node);
@@ -62,6 +66,8 @@ namespace ionlang {
         virtual void visitBinaryOperation(ionshared::Ptr<BinaryOperation> node);
 
         virtual void visitCallExpr(ionshared::Ptr<CallExpr> node);
+
+        virtual void visitVariableRefExpr(ionshared::Ptr<VariableRefExpr> node);
 
         virtual void visitValue(ionshared::Ptr<Value<>> node);
 

@@ -15,7 +15,7 @@ namespace ionlang {
         visitor.visitCallExpr(this->dynamicCast<CallExpr>());
     }
 
-    PtrRef<Function> CallExpr::getCallee() const noexcept {
+    PtrRef<Function> CallExpr::getCalleeRef() const noexcept {
         return this->callee;
     }
 

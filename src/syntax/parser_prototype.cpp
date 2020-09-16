@@ -48,13 +48,19 @@ namespace ionlang {
     }
 
     AstPtrResult<Attribute> Parser::parseAttribute(const ionshared::Ptr<Construct> &parent) {
+        this->beginSourceLocationMapping();
+
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolAt), Attribute)
 
         std::optional<std::string> id = this->parseId();
 
         IONLANG_PARSER_ASSERT(id.has_value(), Attribute)
 
-        return std::make_shared<Attribute>(parent, *id);
+        ionshared::Ptr<Attribute> attribute = std::make_shared<Attribute>(parent, *id);
+
+        this->finishSourceLocationMapping(attribute);
+
+        return attribute;
     }
 
     AstResult<Attributes> Parser::parseAttributes(const ionshared::Ptr<Construct> &parent) {
@@ -75,6 +81,8 @@ namespace ionlang {
     }
 
     AstPtrResult<Prototype> Parser::parsePrototype(const ionshared::Ptr<Module> &parent) {
+        this->beginSourceLocationMapping();
+
         std::optional<std::string> id = this->parseId();
 
         IONLANG_PARSER_ASSERT(id.has_value(), Prototype)
@@ -99,10 +107,17 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(util::hasValue(returnType), Prototype)
 
-        return std::make_shared<Prototype>(*id, args, util::getResultValue(returnType), parent);
+        ionshared::Ptr<Prototype> prototype =
+            std::make_shared<Prototype>(*id, args, util::getResultValue(returnType), parent);
+
+        this->finishSourceLocationMapping(prototype);
+
+        return prototype;
     }
 
     AstPtrResult<Extern> Parser::parseExtern(const ionshared::Ptr<Module> &parent) {
+        this->beginSourceLocationMapping();
+
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordExtern), Extern)
 
         AstPtrResult<Prototype> prototype = this->parsePrototype(parent);
@@ -110,10 +125,17 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(util::hasValue(prototype), Extern)
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), Extern)
 
-        return std::make_shared<Extern>(parent, util::getResultValue(prototype));
+        ionshared::Ptr<Extern> externConstruct =
+            std::make_shared<Extern>(parent, util::getResultValue(prototype));
+
+        this->finishSourceLocationMapping(externConstruct);
+
+        return externConstruct;
     }
 
     AstPtrResult<Function> Parser::parseFunction(const ionshared::Ptr<Module> &parent) {
+        this->beginSourceLocationMapping();
+
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordFunction), Function)
 
         AstPtrResult<Prototype> prototypeResult = this->parsePrototype(parent);
@@ -138,6 +160,8 @@ namespace ionlang {
 
         // Fill in the nullptr body.
         function->setBody(util::getResultValue(bodyResult));
+
+        this->finishSourceLocationMapping(function);
 
         return function;
     }

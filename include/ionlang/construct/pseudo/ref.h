@@ -4,7 +4,7 @@
 #include <utility>
 #include <ionshared/misc/util.h>
 #include <ionshared/misc/named.h>
-#include <ionlang/construct/construct.h>
+#include <ionlang/construct/expression.h>
 
 namespace ionlang {
     // TODO: What if 'pass.h' is never included?

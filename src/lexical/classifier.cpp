@@ -45,4 +45,16 @@ namespace ionlang {
             || tokenKind == TokenKind::LiteralCharacter
             || tokenKind == TokenKind::LiteralString;
     }
+
+    bool Classifier::isStatement(TokenKind tokenKind, std::optional<TokenKind> nextTokenKind) {
+        return Classifier::isBuiltInType(tokenKind)
+            || (
+                nextTokenKind.has_value()
+                    && tokenKind == TokenKind::Identifier
+                    && nextTokenKind.value() == TokenKind::SymbolEqual
+            )
+
+            || tokenKind == TokenKind::KeywordIf
+            || tokenKind == TokenKind::KeywordReturn;
+    }
 }

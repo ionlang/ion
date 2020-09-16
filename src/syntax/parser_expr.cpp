@@ -2,7 +2,7 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    AstPtrResult<> Parser::parsePrimaryExpr(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<Expression> Parser::parsePrimaryExpr(const ionshared::Ptr<Block> &parent) {
         if (this->is(TokenKind::SymbolParenthesesL)) {
             return this->parseParenthesesExpr(parent);
         }
@@ -13,33 +13,36 @@ namespace ionlang {
         // TODO: Support unary and binary operation parsing.
 
         // Otherwise, it must be a literal value.
-        AstPtrResult<Value<>> literal = this->parseLiteral();
+        AstPtrResult<Value<>> literal = this->parseLiteralFork();
 
         if (!util::hasValue(literal)) {
             // TODO: Use proper exception.
             throw std::runtime_error("Literal has no value");
         }
 
-        return util::castAstPtrResult<Value<>, Construct>(literal, true);
+        return util::castAstPtrResult<Value<>, Expression>(literal, false);
     }
 
-    AstPtrResult<> Parser::parseParenthesesExpr(const ionshared::Ptr<Block> &parent) {
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL), Construct)
+    AstPtrResult<Expression> Parser::parseParenthesesExpr(const ionshared::Ptr<Block> &parent) {
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL), Expression)
 
-        AstPtrResult<> expr = this->parsePrimaryExpr(parent);
+        AstPtrResult<Expression> expr = this->parsePrimaryExpr(parent);
 
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR), Construct)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR), Expression)
 
         return expr;
     }
 
-    AstPtrResult<> Parser::parseIdExpr(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<Expression> Parser::parseIdExpr(const ionshared::Ptr<Block> &parent) {
         if (this->isNext(TokenKind::SymbolParenthesesL)) {
             return util::getResultValue(this->parseCallExpr(parent));
         }
 
         // TODO: Is this the correct parent for the ref?
-        return util::getResultValue(this->parseRef(parent));
+        PtrRef<VariableDeclStatement> variableDeclRef =
+            util::getResultValue(this->parseRef<VariableDeclStatement>(parent));
+
+        return std::make_shared<VariableRefExpr>(variableDeclRef);
     }
 
     AstPtrResult<BinaryOperation> Parser::parseBinaryOperation(const ionshared::Ptr<Block> &parent) {
@@ -51,7 +54,7 @@ namespace ionlang {
 
             this->tokenStream.skip();
 
-            AstPtrResult<> rightSideResult = this->parsePrimaryExpr(parent);
+            AstPtrResult<Expression> rightSideResult = this->parsePrimaryExpr(parent);
 
             IONLANG_PARSER_ASSERT(util::hasValue(rightSideResult), BinaryOperation)
 

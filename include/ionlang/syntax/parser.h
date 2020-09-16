@@ -1,14 +1,17 @@
 #pragma once
 
-#define IONLANG_PARSER_ASSERT(condition, T) if (!condition) { return AstPtrResult<T>(std::make_shared<ErrorMarker>(this->makeSyntaxRange())); }
-
 #include <optional>
 #include <string>
+#include <utility>
 #include <ionshared/misc/result.h>
+#include <ionshared/error_handling/source_map.h>
 #include <ionir/const/const_name.h>
 #include <ionlang/error_handling/notice_sentinel.h>
 #include <ionlang/lexical/token.h>
 #include <ionlang/passes/pass.h>
+#include <ionlang/misc/util.h>
+
+#define IONLANG_PARSER_ASSERT(condition, T) if (!condition) { return AstPtrResult<T>(std::make_shared<ErrorMarker>(this->makeSyntaxRange())); }
 
 namespace ionlang {
     // TODO
@@ -23,7 +26,16 @@ namespace ionlang {
 
         ionshared::Ptr<NoticeSentinel> noticeSentinel;
 
+        ionshared::Ptr<ionshared::SourceMap<ionshared::Ptr<Construct>>> sourceMap;
+
         std::string filePath;
+
+        /**
+         * A stack of source location mapping beginnings, containing a
+         * pair with the first item denoting the line number and the second
+         * the column.
+         */
+        std::stack<std::pair<uint32_t, uint32_t>> sourceLocationMappingStartStack;
 
         // TODO
 //        Classifier classifier;
@@ -37,20 +49,34 @@ namespace ionlang {
         bool skipOver(TokenKind tokenKind);
 
         std::nullopt_t makeNotice(
-            std::string message,
+            const std::string &message,
             ionshared::NoticeType type = ionshared::NoticeType::Error
         );
 
-        [[nodiscard]] ionshared::Range makeSyntaxRange() const noexcept {
-            // TODO: Hard-coded 1 length.
-//            return {
-//                this->syntaxStartMarker,
-//                static_cast<uint32_t>(this->tokenStream.getIndex()) - this->syntaxStartMarker;
-//            };
-            return {
-                static_cast<uint32_t>(this->tokenStream.getIndex()),
-                1
-            };
+        [[nodiscard]] ionshared::Range makeSyntaxRange() const noexcept;
+
+        void beginSourceLocationMapping() noexcept;
+
+        ionshared::SourceLocation makeSourceLocation();
+
+        void mapSourceLocation(AstPtrResult<> construct);
+
+        void finishSourceLocationMapping(const ionshared::Ptr<Construct> &construct);
+
+        template<typename T = Construct>
+        AstPtrResult<T> sourceMapCallback(const std::function<AstPtrResult<>()> &callback) {
+            this->beginSourceLocationMapping();
+
+            AstPtrResult<> result = callback();
+
+            if (util::hasValue(result)) {
+                this->finishSourceLocationMapping(util::getResultValue(result));
+            }
+            else {
+                this->sourceLocationMappingStartStack.pop();
+            }
+
+            return result;
         }
 
     public:
@@ -68,7 +94,7 @@ namespace ionlang {
 
         [[nodiscard]] std::string getFilePath() const;
 
-        AstPtrResult<Construct> parseTopLevel(const ionshared::Ptr<Module> &parent);
+        AstPtrResult<> parseTopLevelFork(const ionshared::Ptr<Module> &parent);
 
         /**
          * Parses a integer literal in the form of long (or integer 64).
@@ -111,13 +137,13 @@ namespace ionlang {
 
         AstPtrResult<Global> parseGlobal();
 
-        AstPtrResult<Value<>> parseLiteral();
+        AstPtrResult<Value<>> parseLiteralFork();
 
-        AstPtrResult<> parsePrimaryExpr(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<Expression> parsePrimaryExpr(const ionshared::Ptr<Block> &parent);
 
-        AstPtrResult<> parseParenthesesExpr(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<Expression> parseParenthesesExpr(const ionshared::Ptr<Block> &parent);
 
-        AstPtrResult<> parseIdExpr(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<Expression> parseIdExpr(const ionshared::Ptr<Block> &parent);
 
         AstPtrResult<BinaryOperation> parseBinaryOperation(const ionshared::Ptr<Block> &parent);
 

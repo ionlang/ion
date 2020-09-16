@@ -6,7 +6,7 @@
 #include <ionlang/misc/util.h>
 
 namespace ionlang {
-    AstPtrResult<Value<>> Parser::parseLiteral() {
+    AstPtrResult<Value<>> Parser::parseLiteralFork() {
         /**
          * Always use static pointer cast when downcasting to Value<>,
          * otherwise the cast result will be nullptr.
@@ -46,6 +46,8 @@ namespace ionlang {
     }
 
     AstPtrResult<IntegerLiteral> Parser::parseIntegerLiteral() {
+        this->beginSourceLocationMapping();
+
         IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralInteger), IntegerLiteral)
 
         /**
@@ -76,6 +78,9 @@ namespace ionlang {
             throw std::runtime_error("Could not convert string to value, integer may be invalid or too large");
         }
 
+        // Skip the value token.
+        this->tokenStream.skip();
+
         // Calculate the value's bit-length and it's corresponding integer kind.
         uint32_t valueBitLength = ionshared::util::calculateBitLength(value);
 
@@ -94,40 +99,50 @@ namespace ionlang {
             valueIntegerKind = IntegerKind::Int32;
         }
 
-        // Create a long integer type for the value.
-        ionshared::Ptr<IntegerType> type =
+        ionshared::Ptr<IntegerType> integerType =
             std::make_shared<IntegerType>(*valueIntegerKind);
 
-        // Create the integer instance.
-        ionshared::Ptr<IntegerLiteral> integer =
-            std::make_shared<IntegerLiteral>(type, value);
+        ionshared::Ptr<IntegerLiteral> integerLiteral =
+            std::make_shared<IntegerLiteral>(integerType, value);
 
-        // Skip current token.
-        this->tokenStream.skip();
+        this->finishSourceLocationMapping(integerLiteral);
 
-        // Finally, return the result.
-        return integer;
+        return integerLiteral;
     }
 
     AstPtrResult<BooleanLiteral> Parser::parseBooleanLiteral() {
+        this->beginSourceLocationMapping();
+
         IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralBoolean), BooleanLiteral)
 
         std::string value = this->tokenStream.get().getValue();
 
         this->tokenStream.skip();
 
+        bool boolValue;
+
         if (value == ConstName::booleanTrue) {
-            return std::make_shared<BooleanLiteral>(true);
+            boolValue = true;
         }
         else if (value == ConstName::booleanFalse) {
-            return std::make_shared<BooleanLiteral>(false);
+            boolValue = false;
+        }
+        else {
+            // TODO: Use internal errors.
+            throw std::runtime_error("Unexpected token value");
         }
 
-        // TODO: Use internal errors.
-        throw std::runtime_error("Unexpected token value");
+        ionshared::Ptr<BooleanLiteral> booleanLiteral =
+            std::make_shared<BooleanLiteral>(boolValue);
+
+        this->finishSourceLocationMapping(booleanLiteral);
+
+        return booleanLiteral;
     }
 
     AstPtrResult<CharLiteral> Parser::parseCharLiteral() {
+        this->beginSourceLocationMapping();
+
         IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralCharacter), CharLiteral)
 
         // Extract the value from the character token.
@@ -143,10 +158,17 @@ namespace ionlang {
         }
 
         // Create the character construct with the first and only character of the captured value.
-        return std::make_shared<CharLiteral>(stringValue[0]);
+        ionshared::Ptr<CharLiteral> charLiteral =
+            std::make_shared<CharLiteral>(stringValue[0]);
+
+        this->finishSourceLocationMapping(charLiteral);
+
+        return charLiteral;
     }
 
     AstPtrResult<StringLiteral> Parser::parseStringLiteral() {
+        this->beginSourceLocationMapping();
+
         IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralString), StringLiteral)
 
         // Extract the value from the string token.
@@ -155,6 +177,11 @@ namespace ionlang {
         // Skip over string token.
         this->tokenStream.skip();
 
-        return std::make_shared<StringLiteral>(value);
+        ionshared::Ptr<StringLiteral> stringLiteral =
+            std::make_shared<StringLiteral>(value);
+
+        this->finishSourceLocationMapping(stringLiteral);
+
+        return stringLiteral;
     }
 }

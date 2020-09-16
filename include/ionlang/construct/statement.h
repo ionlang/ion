@@ -19,7 +19,9 @@ namespace ionlang {
 
         Assignment,
 
-        Call
+        Call,
+
+        ExprWrapper
     };
 
     class Statement : public ChildConstruct<Block> {

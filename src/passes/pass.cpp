@@ -82,6 +82,12 @@ namespace ionlang {
                 break;
             }
 
+            case StatementKind::ExprWrapper: {
+                this->visitExpression(node->dynamicCast<ExprWrapperStatement>()->getExpression());
+
+                break;
+            }
+
             // TODO: Add for all statements. Critical!
 
             default: {
@@ -99,6 +105,10 @@ namespace ionlang {
     }
 
     void Pass::visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> node) {
+        //
+    }
+
+    void Pass::visitExprWrapperStatement(ionshared::Ptr<ExprWrapperStatement> node) {
         //
     }
 
@@ -142,6 +152,10 @@ namespace ionlang {
         //
     }
 
+    void Pass::visitVariableRefExpr(ionshared::Ptr<VariableRefExpr> node) {
+        //
+    }
+
     void Pass::visitValue(ionshared::Ptr<Value<>> node) {
         switch (node->getValueKind()) {
             case ValueKind::Character: {
@@ -164,6 +178,12 @@ namespace ionlang {
 
             case ValueKind::Boolean: {
                 this->visitBooleanValue(node->dynamicCast<BooleanLiteral>());
+
+                break;
+            }
+
+            case ValueKind::Expression: {
+                this->visitExpression(node->dynamicCast<Expression>());
 
                 break;
             }
