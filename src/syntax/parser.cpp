@@ -84,10 +84,11 @@ namespace ionlang {
     }
 
     void Parser::mapSourceLocation(AstPtrResult<> construct) {
-        this->sourceMap->set(
-            util::getResultValue(std::move(construct)),
-            this->makeSourceLocation()
-        );
+        // TODO: Causing error regarding std::pair.
+//        this->sourceMap->set(
+//            util::getResultValue(std::move(construct)),
+//            this->makeSourceLocation()
+//        );
     }
 
     void Parser::finishSourceLocationMapping(const ionshared::Ptr<Construct> &construct) {
