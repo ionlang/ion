@@ -31,7 +31,7 @@ namespace ionlang {
         else {
             AstPtrResult<Expression> primaryExpr = this->parsePrimaryExpr(parent);
 
-            IONLANG_PARSER_ASSERT(util::hasValue(primaryExpr), Statement)
+            IONLANG_PARSER_ASSERT(util::hasValue(primaryExpr))
 
             statement = std::make_shared<ExprWrapperStatement>(ExprWrapperStatementOpts{
                 parent,
@@ -43,18 +43,18 @@ namespace ionlang {
     }
 
     AstPtrResult<IfStatement> Parser::parseIfStatement(const ionshared::Ptr<Block> &parent) {
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIf), IfStatement)
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL), IfStatement)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIf))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
         AstPtrResult<Value<>> condition = this->parseLiteralFork();
 
-        IONLANG_PARSER_ASSERT(util::hasValue(condition), IfStatement)
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR), IfStatement)
+        IONLANG_PARSER_ASSERT(util::hasValue(condition))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
 
         // The block's parent will be filled below.
         AstPtrResult<Block> consequentBlockResult = this->parseBlock(nullptr);
 
-        IONLANG_PARSER_ASSERT(util::hasValue(consequentBlockResult), IfStatement)
+        IONLANG_PARSER_ASSERT(util::hasValue(consequentBlockResult))
 
         ionshared::Ptr<Block> consequentBlock = util::getResultValue(consequentBlockResult);
 
@@ -62,7 +62,7 @@ namespace ionlang {
         AstPtrResult<Block> alternativeBlockResult;
 
         if (this->is(TokenKind::KeywordElse)) {
-            IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordElse), IfStatement)
+            IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordElse))
 
             // The block's parent will be filled below.
             alternativeBlockResult = this->parseBlock(nullptr);
@@ -93,7 +93,7 @@ namespace ionlang {
     }
 
     AstPtrResult<ReturnStatement> Parser::parseReturnStatement(const ionshared::Ptr<Block> &parent) {
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordReturn), ReturnStatement)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordReturn))
 
         AstPtrResult<Expression> valueResult;
 
@@ -101,10 +101,10 @@ namespace ionlang {
         if (!this->is(TokenKind::SymbolSemiColon)) {
             valueResult = this->parsePrimaryExpr(parent);
 
-            IONLANG_PARSER_ASSERT(util::hasValue(valueResult), ReturnStatement)
+            IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
         }
 
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), ReturnStatement)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
         ionshared::OptPtr<Construct> finalValue = std::nullopt;
 
@@ -121,13 +121,13 @@ namespace ionlang {
     AstPtrResult<AssignmentStatement> Parser::parseAssignmentStatement(const ionshared::Ptr<Block> &parent) {
         std::optional<std::string> id = this->parseId();
 
-        IONLANG_PARSER_ASSERT(id.has_value(), AssignmentStatement)
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual), AssignmentStatement)
+        IONLANG_PARSER_ASSERT(id.has_value())
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual))
 
         AstPtrResult<Expression> value = this->parsePrimaryExpr(parent);
 
-        IONLANG_PARSER_ASSERT(util::hasValue(value), AssignmentStatement)
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon), AssignmentStatement)
+        IONLANG_PARSER_ASSERT(util::hasValue(value))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
         return std::make_shared<AssignmentStatement>(AssignmentStatementOpts{
             parent,

@@ -2,8 +2,8 @@
 #include <ionlang/const/const.h>
 #include <ionlang/const/const_name.h>
 #include <ionlang/const/notice.h>
+#include <ionlang/error_handling/notice.h>
 #include <ionlang/syntax/parser.h>
-#include <ionlang/misc/util.h>
 
 namespace ionlang {
     AstPtrResult<Value<>> Parser::parseLiteralFork() {
@@ -15,7 +15,7 @@ namespace ionlang {
             case TokenKind::LiteralInteger: {
                 AstPtrResult<IntegerLiteral> integerLiteralResult = this->parseIntegerLiteral();
 
-                IONLANG_PARSER_ASSERT(util::hasValue(integerLiteralResult), Value<>)
+                IONLANG_PARSER_ASSERT(util::hasValue(integerLiteralResult))
 
                 return util::getResultValue(integerLiteralResult)->staticCast<Value<>>();
             }
@@ -23,7 +23,7 @@ namespace ionlang {
             case TokenKind::LiteralCharacter: {
                 AstPtrResult<CharLiteral> charLiteralResult = this->parseCharLiteral();
 
-                IONLANG_PARSER_ASSERT(util::hasValue(charLiteralResult), Value<>)
+                IONLANG_PARSER_ASSERT(util::hasValue(charLiteralResult))
 
                 return util::getResultValue(charLiteralResult)->staticCast<Value<>>();
             }
@@ -31,7 +31,7 @@ namespace ionlang {
             case TokenKind::LiteralBoolean: {
                 AstPtrResult<BooleanLiteral> booleanLiteralResult = this->parseBooleanLiteral();
 
-                IONLANG_PARSER_ASSERT(util::hasValue(booleanLiteralResult), Value<>)
+                IONLANG_PARSER_ASSERT(util::hasValue(booleanLiteralResult))
 
                 return util::getResultValue(booleanLiteralResult)->staticCast<Value<>>();
             }
@@ -39,8 +39,10 @@ namespace ionlang {
             // TODO: Missing literals.
 
             default: {
-                // TODO: Return std::nullopt instead.
-                throw ionshared::util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_TOKEN);
+                this->diagnosticBuilder
+                    ->bootstrap(notice::internalUnexpectedToken);
+
+                return this->makeErrorMarker();
             }
         }
     }
@@ -48,7 +50,7 @@ namespace ionlang {
     AstPtrResult<IntegerLiteral> Parser::parseIntegerLiteral() {
         this->beginSourceLocationMapping();
 
-        IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralInteger), IntegerLiteral)
+        IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralInteger))
 
         /**
          * Abstract the token's value to be used in the
@@ -74,8 +76,12 @@ namespace ionlang {
         }
         catch (std::exception &exception) {
             // Value conversion failed.
-            // TODO: Use proper exception.
-            throw std::runtime_error("Could not convert string to value, integer may be invalid or too large");
+            this->diagnosticBuilder->bootstrap(
+                notice::syntaxConversionFailed,
+                this->makeSourceLocation()
+            );
+
+            return this->makeErrorMarker();
         }
 
         // Skip the value token.
@@ -88,8 +94,10 @@ namespace ionlang {
             util::calculateIntegerKindFromBitLength(valueBitLength);
 
         if (!valueIntegerKind.has_value()) {
-            // TODO: Use proper exception.
-            throw std::runtime_error("Integer value's type kind could not be determined");
+            this->diagnosticBuilder
+                ->bootstrap(notice::syntaxIntegerValueTypeUnknown);
+
+            return this->makeErrorMarker();
         }
         /**
          * Default literal integers to have a bit-length of 32 bits,
@@ -113,7 +121,7 @@ namespace ionlang {
     AstPtrResult<BooleanLiteral> Parser::parseBooleanLiteral() {
         this->beginSourceLocationMapping();
 
-        IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralBoolean), BooleanLiteral)
+        IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralBoolean))
 
         std::string value = this->tokenStream.get().getValue();
 
@@ -128,8 +136,10 @@ namespace ionlang {
             boolValue = false;
         }
         else {
-            // TODO: Use internal errors.
-            throw std::runtime_error("Unexpected token value");
+            this->diagnosticBuilder
+                ->bootstrap(notice::internalUnexpectedToken);
+
+            return this->makeErrorMarker();
         }
 
         ionshared::Ptr<BooleanLiteral> booleanLiteral =
@@ -143,7 +153,7 @@ namespace ionlang {
     AstPtrResult<CharLiteral> Parser::parseCharLiteral() {
         this->beginSourceLocationMapping();
 
-        IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralCharacter), CharLiteral)
+        IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralCharacter))
 
         // Extract the value from the character token.
         std::string stringValue = this->tokenStream.get().getValue();
@@ -153,8 +163,12 @@ namespace ionlang {
 
         // Ensure extracted value only contains a single character.
         if (stringValue.length() > 1) {
-            // TODO: Use proper exception.
-            throw std::runtime_error("Character value length must be at most 1 character");
+            this->diagnosticBuilder->bootstrap(
+                notice::syntaxCharLengthInvalid,
+                this->makeSourceLocation()
+            );
+
+            return this->makeErrorMarker();
         }
 
         // Create the character construct with the first and only character of the captured value.
@@ -169,7 +183,7 @@ namespace ionlang {
     AstPtrResult<StringLiteral> Parser::parseStringLiteral() {
         this->beginSourceLocationMapping();
 
-        IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralString), StringLiteral)
+        IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralString))
 
         // Extract the value from the string token.
         std::string value = this->tokenStream.get().getValue();

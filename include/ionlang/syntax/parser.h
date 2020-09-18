@@ -7,11 +7,12 @@
 #include <ionshared/error_handling/source_map.h>
 #include <ionir/const/const_name.h>
 #include <ionlang/error_handling/notice_sentinel.h>
+#include <ionlang/error_handling/notice.h>
 #include <ionlang/lexical/token.h>
 #include <ionlang/passes/pass.h>
 #include <ionlang/misc/util.h>
 
-#define IONLANG_PARSER_ASSERT(condition, T) if (!condition) { return AstPtrResult<T>(std::make_shared<ErrorMarker>(this->makeSyntaxRange())); }
+#define IONLANG_PARSER_ASSERT(condition) if (!condition) { return this->makeErrorMarker(); }
 
 namespace ionlang {
     // TODO
@@ -22,13 +23,9 @@ namespace ionlang {
     private:
         TokenStream tokenStream;
 
-        ionshared::Ptr<ionshared::NoticeStack> noticeStack;
-
-        ionshared::Ptr<NoticeSentinel> noticeSentinel;
+        ionshared::Ptr<ionshared::DiagnosticBuilder> diagnosticBuilder;
 
         ionshared::Ptr<ionshared::SourceMap<ionshared::Ptr<Construct>>> sourceMap;
-
-        std::string filePath;
 
         /**
          * A stack of source location mapping beginnings, containing a
@@ -48,18 +45,15 @@ namespace ionlang {
 
         bool skipOver(TokenKind tokenKind);
 
-        std::nullopt_t makeNotice(
-            const std::string &message,
-            ionshared::NoticeType type = ionshared::NoticeType::Error
-        );
-
-        [[nodiscard]] ionshared::Range makeSyntaxRange() const noexcept;
-
         void beginSourceLocationMapping() noexcept;
 
         ionshared::SourceLocation makeSourceLocation();
 
-        void mapSourceLocation(AstPtrResult<> construct);
+        ionshared::SourceLocation finishSourceLocation();
+
+        ionshared::Ptr<ErrorMarker> makeErrorMarker();
+
+        void mapSourceLocation(const AstPtrResult<> &construct);
 
         void finishSourceLocationMapping(const ionshared::Ptr<Construct> &construct);
 
@@ -84,15 +78,11 @@ namespace ionlang {
         explicit Parser(
             TokenStream stream,
 
-            const ionshared::Ptr<ionshared::NoticeStack> &noticeStack =
-                std::make_shared<ionshared::Stack<ionshared::Notice>>(),
-
-            std::string filePath = "anonymous"/*ConstName::anonymous*/
+            ionshared::Ptr<ionshared::DiagnosticBuilder> diagnosticBuilder =
+                ionshared::Ptr<ionshared::DiagnosticBuilder>()
         );
 
-        [[nodiscard]] ionshared::Ptr<NoticeSentinel> getNoticeSentinel() const;
-
-        [[nodiscard]] std::string getFilePath() const;
+        [[nodiscard]] ionshared::Ptr<ionshared::DiagnosticBuilder> getDiagnosticBuilder() const;
 
         AstPtrResult<> parseTopLevelFork(const ionshared::Ptr<Module> &parent);
 
@@ -114,11 +104,13 @@ namespace ionlang {
         AstPtrResult<VoidType> parseVoidType();
 
         AstPtrResult<BooleanType> parseBooleanType(
-            const ionshared::Ptr<TypeQualifiers> &qualifiers = std::make_shared<TypeQualifiers>()
+            const ionshared::Ptr<TypeQualifiers> &qualifiers =
+                std::make_shared<TypeQualifiers>()
         );
 
         AstPtrResult<IntegerType> parseIntegerType(
-            const ionshared::Ptr<TypeQualifiers> &qualifiers = std::make_shared<TypeQualifiers>()
+            const ionshared::Ptr<TypeQualifiers> &qualifiers =
+                std::make_shared<TypeQualifiers>()
         );
 
         std::optional<Arg> parseArg();
@@ -171,7 +163,7 @@ namespace ionlang {
         AstPtrResult<Ref<T>> parseRef(ionshared::Ptr<Construct> owner) {
             std::optional<std::string> id = this->parseId();
 
-            IONLANG_PARSER_ASSERT(id.has_value(), Ref<T>)
+            IONLANG_PARSER_ASSERT(id.has_value())
 
             return std::make_shared<Ref<T>>(*id, owner, RefKind::Variable);
         }

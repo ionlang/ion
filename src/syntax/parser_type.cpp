@@ -27,7 +27,7 @@ namespace ionlang {
             }
             // Otherwise, it must be a pointer.
             else {
-                IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolStar), Type)
+                IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolStar))
 
                 qualifiers->add(TypeQualifier::Pointer);
             }
@@ -56,7 +56,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT((
             Classifier::isBuiltInType(tokenKind)
                 || tokenKind == TokenKind::Identifier
-        ), Type)
+        ))
 
         AstPtrResult<Type> type;
 
@@ -79,7 +79,11 @@ namespace ionlang {
          * user-defined type assumption.
          */
         if (!util::hasValue(type)) {
-            type = std::make_shared<Type>(tokenValue, util::resolveTypeKind(tokenValue));
+            type = std::make_shared<Type>(
+                tokenValue,
+                util::resolveTypeKind(tokenValue)
+            );
+
             this->tokenStream.skip();
         }
 
@@ -92,13 +96,13 @@ namespace ionlang {
          * Void type does not accept references nor pointer
          * specifiers, so just simply skip over its token.
          */
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::TypeVoid), VoidType)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::TypeVoid))
 
         return std::make_shared<VoidType>();
     }
 
     AstPtrResult<BooleanType> Parser::parseBooleanType(const ionshared::Ptr<TypeQualifiers> &qualifiers) {
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::TypeBool), BooleanType)
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::TypeBool))
 
         return std::make_shared<BooleanType>(qualifiers);
     }
@@ -113,7 +117,8 @@ namespace ionlang {
 
         // TODO: Missing support for is signed or not?
 
-        std::optional<IntegerKind> integerKind = Const::getIntegerKind(currentTokenKind);
+        std::optional<IntegerKind> integerKind =
+            Const::getIntegerKind(currentTokenKind);
 
         if (!integerKind.has_value()) {
             // TODO: Use proper exception/error.
@@ -123,6 +128,10 @@ namespace ionlang {
         // Skip over the type token.
         this->tokenStream.skip();
 
-        return std::make_shared<IntegerType>(*integerKind, false, qualifiers);
+        return std::make_shared<IntegerType>(
+            *integerKind,
+            false,
+            qualifiers
+        );
     }
 }
