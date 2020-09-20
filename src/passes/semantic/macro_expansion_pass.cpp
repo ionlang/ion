@@ -1,8 +1,10 @@
 #include <ionlang/passes/semantic/macro_expansion_pass.h>
 
 namespace ionlang {
-    MacroExpansionPass::MacroExpansionPass() :
-        Pass() {
+    MacroExpansionPass::MacroExpansionPass(
+        ionshared::Ptr<ionshared::PassContext> context
+    ) :
+        Pass(std::move(context)) {
         //
     }
 }

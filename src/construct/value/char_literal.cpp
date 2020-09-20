@@ -9,7 +9,7 @@ namespace ionlang {
     }
 
     void CharLiteral::accept(Pass &visitor) {
-        visitor.visitCharValue(this->dynamicCast<CharLiteral>());
+        visitor.visitCharLiteral(this->dynamicCast<CharLiteral>());
     }
 
     char CharLiteral::getValue() const noexcept {

@@ -12,16 +12,13 @@ namespace ionlang {
      */
     class NameResolutionPass : public Pass {
     private:
-        ionshared::Ptr<ionshared::NoticeStack> noticeStack;
-
         std::list<ionshared::PtrSymbolTable<Construct>> scope;
 
     public:
         IONSHARED_PASS_ID;
 
         explicit NameResolutionPass(
-            ionshared::Ptr<ionshared::NoticeStack> noticeStack =
-                std::make_shared<ionshared::NoticeStack>()
+            ionshared::Ptr<ionshared::PassContext> context
         );
 
         void visitModule(ionshared::Ptr<Module> node) override;
@@ -29,8 +26,6 @@ namespace ionlang {
         void visitScopeAnchor(ionshared::Ptr<ionshared::Scoped<Construct>> node) override;
 
         void visitRef(PtrRef<> node) override;
-
-        [[nodiscard]] ionshared::Ptr<ionshared::NoticeStack> getNoticeStack() const;
 
         [[nodiscard]] const std::list<ionshared::PtrSymbolTable<Construct>> &getScope() const;
     };

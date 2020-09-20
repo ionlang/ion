@@ -9,7 +9,7 @@ namespace ionlang {
     }
 
     void StringLiteral::accept(Pass &visitor) {
-        visitor.visitStringValue(this->dynamicCast<StringLiteral>());
+        visitor.visitStringLiteral(this->dynamicCast<StringLiteral>());
     }
 
     std::string StringLiteral::getValue() const {

@@ -111,12 +111,10 @@ namespace ionlang {
         return this->createCodeBlockNear(sourceLocation.getLines().getStartPosition(), grace);
     }
 
-    std::optional<CodeBlock> CodeBacktrack::createCodeBlockNear(const ionshared::Notice &notice, uint32_t grace) {
-        std::optional<ionshared::SourceLocation> location = notice.getLocation();
-
-        if (!location.has_value()) {
+    std::optional<CodeBlock> CodeBacktrack::createCodeBlockNear(const ionshared::Diagnostic &diagnostic, uint32_t grace) {
+        if (!diagnostic.location.has_value()) {
             return std::nullopt;
         }
-        return this->createCodeBlockNear(*location, grace);
+        return this->createCodeBlockNear(*diagnostic.location, grace);
     }
 }

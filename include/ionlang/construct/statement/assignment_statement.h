@@ -27,13 +27,13 @@ namespace ionlang {
 
         void accept(Pass &visitor) override;
 
-        Ast getChildNodes() override;
+        [[nodiscard]] Ast getChildNodes() override;
 
         [[nodiscard]] PtrRef<VariableDeclStatement> getVariableDeclStatement() const noexcept;
 
         void setVariableDeclStatement(PtrRef<VariableDeclStatement> variableDeclStatement) noexcept;
 
-        ionshared::Ptr<Construct> getValue() const noexcept;
+        [[nodiscard]] ionshared::Ptr<Construct> getValue() const noexcept;
 
         void setValue(ionshared::Ptr<Construct> value) noexcept;
     };

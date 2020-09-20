@@ -10,6 +10,8 @@ namespace ionlang {
     public:
         IONSHARED_PASS_ID;
 
-        MacroExpansionPass();
+        explicit MacroExpansionPass(
+            ionshared::Ptr<ionshared::PassContext> context
+        );
     };
 }

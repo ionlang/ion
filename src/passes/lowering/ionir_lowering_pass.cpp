@@ -52,10 +52,14 @@ namespace ionlang {
         this->basicBlockBuffer = basicBlock;
     }
 
-    void IonIrLoweringPass::lockBuilder(const std::function<void()> &callback) {
+    void IonIrLoweringPass::lockBuffers(const std::function<void()> &callback) {
+        auto ionIrModuleBuffer = this->requireModule();
+        auto ionIrFunctionBuffer = this->requireFunction();
         ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlockBuffer = this->requireBasicBlock();
 
         callback();
+        this->moduleBuffer = ionIrModuleBuffer;
+        this->functionBuffer = ionIrFunctionBuffer;
         this->setBuilder(ionIrBasicBlockBuffer);
     }
 
@@ -63,8 +67,11 @@ namespace ionlang {
         return this->nameCounter++;
     }
 
-    IonIrLoweringPass::IonIrLoweringPass(ionshared::PtrSymbolTable<ionir::Module> modules) :
-        Pass(),
+    IonIrLoweringPass::IonIrLoweringPass(
+        ionshared::Ptr<ionshared::PassContext> context,
+        ionshared::PtrSymbolTable<ionir::Module> modules
+    ) :
+        Pass(std::move(context)),
         modules(std::move(modules)),
         constructStack(),
         typeStack(),
@@ -132,11 +139,23 @@ namespace ionlang {
              * Discard visited top-level constructs (such as functions and
              * global variables) as they have no use elsewhere.
              */
-            this->constructStack.pop();
+            this->constructStack.tryPop();
         }
     }
 
     void IonIrLoweringPass::visitFunction(ionshared::Ptr<Function> node) {
+        /**
+         * Function was already emitted, do not continue. This check
+         * is present because visiting a call expression referencing a
+         * function that will be processed in the future, no symbol has
+         * been emitted on the local symbol table. So that function (this
+         * node) is either emitted here or when emitting the call expression,
+         * in other words, whenever first encountered or needed.
+         */
+        if (this->symbolTable.contains(node)) {
+            return;
+        }
+
         ionshared::Ptr<ionir::Module> moduleBuffer = this->requireModule();
 
         // TODO: Awaiting verification implementation.
@@ -332,7 +351,7 @@ namespace ionlang {
         }
     }
 
-    void IonIrLoweringPass::visitIntegerValue(ionshared::Ptr<IntegerLiteral> node) {
+    void IonIrLoweringPass::visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> node) {
         ionshared::Ptr<Type> nodeType = node->getType();
 
         if (nodeType->getTypeKind() != TypeKind::Integer) {
@@ -351,21 +370,21 @@ namespace ionlang {
         this->constructStack.push(ionIrIntegerLiteral->staticCast<ionir::Value<>>());
     }
 
-    void IonIrLoweringPass::visitCharValue(ionshared::Ptr<CharLiteral> node) {
+    void IonIrLoweringPass::visitCharLiteral(ionshared::Ptr<CharLiteral> node) {
         ionshared::Ptr<ionir::CharLiteral> ionIrCharLiteral =
             std::make_shared<ionir::CharLiteral>(node->getValue());
 
         this->constructStack.push(ionIrCharLiteral->dynamicCast<ionir::Value<>>());
     }
 
-    void IonIrLoweringPass::visitStringValue(ionshared::Ptr<StringLiteral> node) {
+    void IonIrLoweringPass::visitStringLiteral(ionshared::Ptr<StringLiteral> node) {
         ionshared::Ptr<ionir::StringLiteral> ionIrStringLiteral =
             std::make_shared<ionir::StringLiteral>(node->getValue());
 
         this->constructStack.push(ionIrStringLiteral->dynamicCast<ionir::Value<>>());
     }
 
-    void IonIrLoweringPass::visitBooleanValue(ionshared::Ptr<BooleanLiteral> node) {
+    void IonIrLoweringPass::visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> node) {
         ionshared::Ptr<ionir::BooleanLiteral> ionIrBooleanLiteral =
             std::make_shared<ionir::BooleanLiteral>(node->getValue());
 
@@ -682,10 +701,23 @@ namespace ionlang {
         PtrRef<Function> calleeRef = node->getCalleeRef();
 
         if (!calleeRef->isResolved()) {
-            throw std::runtime_error("Expected callee reference to be resolved");
+            throw std::runtime_error("Expected callee function reference to be resolved");
         }
 
         ionshared::Ptr<Function> callee = *calleeRef->getValue();
+
+        /**
+         * Visit the callee function earlier if it hasn't been
+         * visited/emitted at this point.
+         */
+        if (!this->symbolTable.contains(callee)) {
+            this->lockBuffers([&, this] {
+                this->visitFunction(callee);
+            });
+
+            // TODO: The function is being discarded here, but what if that function needs to be present in the stack because of the invoking method requires to pop it?
+            this->constructStack.tryPop();
+        }
 
         ionshared::OptPtr<ionir::Function> ionIrCalleeResult =
             this->symbolTable.find<ionir::Function>(callee);

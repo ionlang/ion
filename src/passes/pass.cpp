@@ -1,26 +1,22 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    Pass::Pass() :
-        ionshared::BasePass<Construct>() {
+    Pass::Pass(ionshared::Ptr<ionshared::PassContext> context) :
+        ionshared::BasePass<Construct>(std::move(context)) {
         //
     }
 
     void Pass::visit(ionshared::Ptr<Construct> node) {
-        node->accept(*this);
-
         // TODO: Hotfix for circular dep.
         if (node->getConstructKind() == ConstructKind::Ref) {
             this->visitRef(node->staticCast<Ref<>>());
-
-            // No need to visit children for this node.
-            return;
         }
         else if (node->getConstructKind() == ConstructKind::Value) {
             this->visitValue(node->staticCast<Value<>>());
-
-            // No need to visit children for this node.
-            return;
+        }
+        // TODO: This should be at the top alone with visitChildren() once fixed.
+        else {
+            node->accept(*this);
         }
 
         this->visitChildren(node);
@@ -31,11 +27,10 @@ namespace ionlang {
         Ast children = node->getChildNodes();
 
         /**
-         * After visiting the node, attempt to
-         * visit all its children as well.
+         * After visiting the node, attempt to visit all its children
+         * as well.
          */
         for (const auto &child : children) {
-            // TODO: CRITICAL: What if 'child' (AstNode) is not boxed under Construct?
             this->visit(child);
         }
     }
@@ -159,25 +154,25 @@ namespace ionlang {
     void Pass::visitValue(ionshared::Ptr<Value<>> node) {
         switch (node->getValueKind()) {
             case ValueKind::Character: {
-                this->visitCharValue(node->dynamicCast<CharLiteral>());
+                this->visitCharLiteral(node->dynamicCast<CharLiteral>());
 
                 break;
             }
 
             case ValueKind::Integer: {
-                this->visitIntegerValue(node->dynamicCast<IntegerLiteral>());
+                this->visitIntegerLiteral(node->dynamicCast<IntegerLiteral>());
 
                 break;
             }
 
             case ValueKind::String: {
-                this->visitStringValue(node->dynamicCast<StringLiteral>());
+                this->visitStringLiteral(node->dynamicCast<StringLiteral>());
 
                 break;
             }
 
             case ValueKind::Boolean: {
-                this->visitBooleanValue(node->dynamicCast<BooleanLiteral>());
+                this->visitBooleanLiteral(node->dynamicCast<BooleanLiteral>());
 
                 break;
             }
@@ -194,19 +189,19 @@ namespace ionlang {
         }
     }
 
-    void Pass::visitBooleanValue(ionshared::Ptr<BooleanLiteral> node) {
+    void Pass::visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> node) {
         //
     }
 
-    void Pass::visitCharValue(ionshared::Ptr<CharLiteral> node) {
+    void Pass::visitCharLiteral(ionshared::Ptr<CharLiteral> node) {
         //
     }
 
-    void Pass::visitIntegerValue(ionshared::Ptr<IntegerLiteral> node) {
+    void Pass::visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> node) {
         //
     }
 
-    void Pass::visitStringValue(ionshared::Ptr<StringLiteral> node) {
+    void Pass::visitStringLiteral(ionshared::Ptr<StringLiteral> node) {
         //
     }
 

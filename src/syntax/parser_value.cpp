@@ -2,7 +2,7 @@
 #include <ionlang/const/const.h>
 #include <ionlang/const/const_name.h>
 #include <ionlang/const/notice.h>
-#include <ionlang/error_handling/notice.h>
+#include <ionlang/error_handling/diagnostic.h>
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
@@ -40,7 +40,7 @@ namespace ionlang {
 
             default: {
                 this->diagnosticBuilder
-                    ->bootstrap(notice::internalUnexpectedToken);
+                    ->bootstrap(diagnostic::internalUnexpectedToken);
 
                 return this->makeErrorMarker();
             }
@@ -77,7 +77,7 @@ namespace ionlang {
         catch (std::exception &exception) {
             // Value conversion failed.
             this->diagnosticBuilder->bootstrap(
-                notice::syntaxConversionFailed,
+                diagnostic::syntaxConversionFailed,
                 this->makeSourceLocation()
             );
 
@@ -95,7 +95,7 @@ namespace ionlang {
 
         if (!valueIntegerKind.has_value()) {
             this->diagnosticBuilder
-                ->bootstrap(notice::syntaxIntegerValueTypeUnknown);
+                ->bootstrap(diagnostic::syntaxIntegerValueTypeUnknown);
 
             return this->makeErrorMarker();
         }
@@ -137,7 +137,7 @@ namespace ionlang {
         }
         else {
             this->diagnosticBuilder
-                ->bootstrap(notice::internalUnexpectedToken);
+                ->bootstrap(diagnostic::internalUnexpectedToken);
 
             return this->makeErrorMarker();
         }
@@ -164,7 +164,7 @@ namespace ionlang {
         // Ensure extracted value only contains a single character.
         if (stringValue.length() > 1) {
             this->diagnosticBuilder->bootstrap(
-                notice::syntaxCharLengthInvalid,
+                diagnostic::syntaxCharLengthInvalid,
                 this->makeSourceLocation()
             );
 

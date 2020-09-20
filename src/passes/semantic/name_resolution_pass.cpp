@@ -1,9 +1,10 @@
 #include <ionlang/passes/semantic/name_resolution_pass.h>
 
 namespace ionlang {
-    NameResolutionPass::NameResolutionPass(ionshared::Ptr<ionshared::NoticeStack> noticeStack) :
-        Pass(),
-        noticeStack(std::move(noticeStack)),
+    NameResolutionPass::NameResolutionPass(
+        ionshared::Ptr<ionshared::PassContext> context
+    ) :
+        Pass(std::move(context)),
         scope() {
         //
     }
@@ -43,6 +44,34 @@ namespace ionlang {
                 }
 
                 node->resolve(*valueLookupResult);
+
+                break;
+            }
+
+            case RefKind::Function: {
+                if (owner->getConstructKind() != ConstructKind::Block) {
+                    // TODO: Better error.
+                    throw std::runtime_error("Cannot resolve function reference when owner is not a block");
+                }
+
+                ionshared::OptPtr<Function> parentFunction =
+                    owner->dynamicCast<Block>()->findParentFunction();
+
+                if (!ionshared::util::hasValue(parentFunction)) {
+                    // TODO: Use diagnostics.
+                    throw std::runtime_error("Could not find parent function of block");
+                }
+
+                auto rootModuleSymbolTable =
+                    parentFunction->get()->getParent()->getContext()->getGlobalScope();
+
+                auto lookupResult = rootModuleSymbolTable->lookup(id);
+
+                if (!ionshared::util::hasValue(lookupResult)) {
+                    throwUndefinedRef();
+                }
+
+                node->resolve(*lookupResult);
 
                 break;
             }
@@ -110,10 +139,6 @@ namespace ionlang {
         // TODO: ScopeStack should be pushed & popped, but its never popped.
         // TODO: CRITICAL: Throwing SEGFAULT because node is NULL (casting fails).
         //        this->scopeStack.add(node->getSymbolTable());
-    }
-
-    ionshared::Ptr<ionshared::NoticeStack> NameResolutionPass::getNoticeStack() const {
-        return this->noticeStack;
     }
 
     const std::list<ionshared::PtrSymbolTable<Construct>> &NameResolutionPass::getScope() const {

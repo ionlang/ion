@@ -6,7 +6,7 @@ namespace ionlang {
         // TODO: Expression requires 'type' but since the callee is a PtrRef, it's type is not necessarily resolved yet. What to do?
         Expression(ExpressionKind::Call, nullptr),
 
-        callee(std::move(callee)),
+        calleeRef(std::move(callee)),
         args(std::move(args)) {
         //
     }
@@ -15,12 +15,18 @@ namespace ionlang {
         visitor.visitCallExpr(this->dynamicCast<CallExpr>());
     }
 
-    PtrRef<Function> CallExpr::getCalleeRef() const noexcept {
-        return this->callee;
+    Ast CallExpr::getChildNodes() {
+        return {
+            this->calleeRef
+        };
     }
 
-    void CallExpr::setCallee(PtrRef<Function> callee) noexcept {
-        this->callee = std::move(callee);
+    PtrRef<Function> CallExpr::getCalleeRef() const noexcept {
+        return this->calleeRef;
+    }
+
+    void CallExpr::setCalleeRef(PtrRef<Function> calleeRef) noexcept {
+        this->calleeRef = std::move(calleeRef);
     }
 
     CallArgs CallExpr::getArgs() const noexcept {

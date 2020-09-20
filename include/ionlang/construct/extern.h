@@ -16,7 +16,7 @@ namespace ionlang {
 
         void accept(Pass &visitor) override;
 
-        Ast getChildNodes() override;
+        [[nodiscard]] Ast getChildNodes() override;
 
         [[nodiscard]] ionshared::Ptr<Prototype> getPrototype() const noexcept;
 

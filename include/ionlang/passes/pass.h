@@ -35,7 +35,7 @@
 namespace ionlang {
     class Pass : public ionshared::BasePass<Construct> {
     public:
-        Pass();
+        explicit Pass(ionshared::Ptr<ionshared::PassContext> context);
 
         virtual void visit(ionshared::Ptr<Construct> node);
 
@@ -71,13 +71,13 @@ namespace ionlang {
 
         virtual void visitValue(ionshared::Ptr<Value<>> node);
 
-        virtual void visitIntegerValue(ionshared::Ptr<IntegerLiteral> node);
+        virtual void visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> node);
 
-        virtual void visitCharValue(ionshared::Ptr<CharLiteral> node);
+        virtual void visitCharLiteral(ionshared::Ptr<CharLiteral> node);
 
-        virtual void visitStringValue(ionshared::Ptr<StringLiteral> node);
+        virtual void visitStringLiteral(ionshared::Ptr<StringLiteral> node);
 
-        virtual void visitBooleanValue(ionshared::Ptr<BooleanLiteral> node);
+        virtual void visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> node);
 
         virtual void visitType(ionshared::Ptr<Type> node);
 

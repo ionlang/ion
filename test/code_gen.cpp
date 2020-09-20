@@ -24,7 +24,9 @@ TEST(CodeGenTest, VisitExtern) {
 
     // Now, make the ionir::LlvmCodegenPass.
     ionshared::Ptr<ionir::LlvmCodegenPass> ionIrLlvmCodegenPass =
-        std::make_shared<ionir::LlvmCodegenPass>();
+        std::make_shared<ionir::LlvmCodegenPass>(
+            std::make_shared<ionshared::PassContext>()
+        );
 
     // Visit the resulting IonIR module buffer from our own codegen pass.
     ionIrLlvmCodegenPass->visitModule(*ionIrModuleBuffer);
@@ -64,7 +66,9 @@ TEST(CodeGenTest, VisitIfStatement) {
 
     // Now, make the ionir::LlvmCodegenPass.
     ionshared::Ptr<ionir::LlvmCodegenPass> ionIrLlvmCodegenPass =
-        std::make_shared<ionir::LlvmCodegenPass>();
+        std::make_shared<ionir::LlvmCodegenPass>(
+            std::make_shared<ionshared::PassContext>()
+        );
 
     // Visit the resulting IonIR module buffer from our own codegen pass.
     ionIrLlvmCodegenPass->visitModule(*ionIrModuleBuffer);
@@ -104,7 +108,9 @@ TEST(CodeGenTest, VisitVariableDecl) {
 
     // Now, make the ionir::LlvmCodegenPass.
     ionshared::Ptr<ionir::LlvmCodegenPass> ionIrLlvmCodegenPass =
-        std::make_shared<ionir::LlvmCodegenPass>();
+        std::make_shared<ionir::LlvmCodegenPass>(
+            std::make_shared<ionshared::PassContext>()
+        );
 
     // Visit the resulting IonIR module buffer from our own codegen pass.
     ionIrLlvmCodegenPass->visitModule(*ionIrModuleBuffer);

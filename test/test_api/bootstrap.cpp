@@ -42,7 +42,10 @@ namespace ionlang::test::bootstrap {
         modules->set(module->getId(), module);
 
         ionshared::Ptr<IonIrLoweringPass> ionIrCodegenPass =
-            std::make_shared<IonIrLoweringPass>(modules);
+            std::make_shared<IonIrLoweringPass>(
+                std::make_shared<ionshared::PassContext>(),
+                modules
+            );
 
         if (!ionIrCodegenPass->setModuleBuffer(module->getId())) {
             throw std::runtime_error("Could not set active module buffer during bootstrap process");

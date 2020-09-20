@@ -18,7 +18,7 @@ namespace ionlang {
                 // Warn about leading, lonely comma.
                 if (args->isEmpty()) {
                     this->diagnosticBuilder
-                        ->bootstrap(notice::syntaxLeadingCommaInArgs);
+                        ->bootstrap(diagnostic::syntaxLeadingCommaInArgs);
                 }
 
                 // Skip over comma token.

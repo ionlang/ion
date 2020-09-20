@@ -10,20 +10,20 @@ namespace ionlang {
 
     class CallExpr : public Expression {
     private:
-        PtrRef<Function> callee;
+        PtrRef<Function> calleeRef;
 
         CallArgs args;
 
     public:
-        explicit CallExpr(PtrRef<Function> callee, CallArgs args);
+        CallExpr(PtrRef<Function> callee, CallArgs args);
 
         void accept(Pass &visitor) override;
 
-
+        [[nodiscard]] Ast getChildNodes() override;
 
         [[nodiscard]] PtrRef<Function> getCalleeRef() const noexcept;
 
-        void setCallee(PtrRef<Function> callee) noexcept;
+        void setCalleeRef(PtrRef<Function> calleeRef) noexcept;
 
         [[nodiscard]] CallArgs getArgs() const noexcept;
 

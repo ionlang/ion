@@ -8,6 +8,7 @@
 #include <ionlang/construct/pseudo/child_construct.h>
 #include "ionlang/construct/statement/variable_decl_statement.h"
 #include "statement.h"
+#include "function.h"
 
 namespace ionlang {
     class Pass;
@@ -31,7 +32,7 @@ namespace ionlang {
 
         void accept(Pass &visitor) override;
 
-        Ast getChildNodes() override;
+        [[nodiscard]] Ast getChildNodes() override;
 
         [[nodiscard]] std::vector<ionshared::Ptr<Statement>> &getStatements() noexcept;
 
@@ -71,5 +72,7 @@ namespace ionlang {
         [[nodiscard]] ionshared::OptPtr<Statement> findLastStatement() noexcept;
 
         [[nodiscard]] bool isFunctionBody() const;
+
+        [[nodiscard]] ionshared::OptPtr<Function> findParentFunction();
     };
 }

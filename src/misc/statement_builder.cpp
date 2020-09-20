@@ -11,7 +11,7 @@ namespace ionlang {
     }
 
     void StatementBuilder::appendStatement(const ionshared::Ptr<Statement> &statement) {
-        this->block->getStatements().push_back(statement);
+        this->block->appendStatement(statement);
     }
 
     ionshared::Ptr<VariableDeclStatement> StatementBuilder::createVariableDecl(ionshared::Ptr<Type> type, std::string id, ionshared::Ptr<Construct> value) {

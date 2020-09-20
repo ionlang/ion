@@ -15,7 +15,8 @@ namespace ionlang {
     }
 
     void Block::accept(Pass &visitor) {
-        visitor.visitScopeAnchor(this->dynamicCast<ionshared::Scoped<Construct>>());
+        // TODO: Cast fails.
+//        visitor.visitScopeAnchor(this->dynamicCast<ionshared::Scoped<Construct>>());
         visitor.visitBlock(this->dynamicCast<Block>());
     }
 
@@ -139,5 +140,32 @@ namespace ionlang {
          * a function construct.
          */
         return parent->getConstructKind() == ConstructKind::Function;
+    }
+
+    ionshared::OptPtr<Function> Block::findParentFunction() {
+        ionshared::OptPtr<Function> parentFunction = std::nullopt;
+        std::queue<ionshared::Ptr<ChildConstruct<Block>>> childrenOfBlockQueue = {};
+
+        childrenOfBlockQueue.push(this->staticCast<ChildConstruct<Block>>());
+
+        while (!childrenOfBlockQueue.empty()) {
+            ionshared::Ptr<ChildConstruct<Block>> childOfBlock =
+                childrenOfBlockQueue.front();
+
+            childrenOfBlockQueue.pop();
+
+            ionshared::Ptr<Construct> parent = childOfBlock->getParent();
+
+            if (parent->getConstructKind() == ConstructKind::Function) {
+                parentFunction = parent->dynamicCast<Function>();
+
+                break;
+            }
+            else if (dynamic_cast<ChildConstruct<Block> *>(parent.get())) {
+                childrenOfBlockQueue.push(parent->dynamicCast<ChildConstruct<Block>>());
+            }
+        }
+
+        return parentFunction;
     }
 }

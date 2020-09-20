@@ -43,25 +43,27 @@ namespace ionlang {
          */
         void setBuilder(ionshared::Ptr<ionir::BasicBlock> basicBlock);
 
-        void lockBuilder(const std::function<void()> &callback);
+        void lockBuffers(const std::function<void()> &callback);
 
         [[nodiscard]] uint32_t getNameCounter() noexcept;
 
     public:
         explicit IonIrLoweringPass(
+            ionshared::Ptr<ionshared::PassContext> context,
+
             ionshared::PtrSymbolTable<ionir::Module> modules =
                 std::make_shared<ionshared::SymbolTable<ionshared::Ptr<ionir::Module>>>()
         );
 
         ~IonIrLoweringPass();
 
-        ionshared::Ptr<ionshared::SymbolTable<ionshared::Ptr<ionir::Module>>> getModules() const;
+        [[nodiscard]] ionshared::Ptr<ionshared::SymbolTable<ionshared::Ptr<ionir::Module>>> getModules() const;
 
-        ionshared::Stack<ionshared::Ptr<ionir::Construct>> getConstructStack() const noexcept;
+        [[nodiscard]] ionshared::Stack<ionshared::Ptr<ionir::Construct>> getConstructStack() const noexcept;
 
-        ionshared::Stack<ionshared::Ptr<ionir::Type>> getTypeStack() const noexcept;
+        [[nodiscard]] ionshared::Stack<ionshared::Ptr<ionir::Type>> getTypeStack() const noexcept;
 
-        ionshared::OptPtr<ionir::Module> getModuleBuffer() const;
+        [[nodiscard]] ionshared::OptPtr<ionir::Module> getModuleBuffer() const;
 
         bool setModuleBuffer(const std::string &id);
 
@@ -77,13 +79,13 @@ namespace ionlang {
 
         void visitBlock(ionshared::Ptr<Block> node) override;
 
-        void visitIntegerValue(ionshared::Ptr<IntegerLiteral> node) override;
+        void visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> node) override;
 
-        void visitCharValue(ionshared::Ptr<CharLiteral> node) override;
+        void visitCharLiteral(ionshared::Ptr<CharLiteral> node) override;
 
-        void visitStringValue(ionshared::Ptr<StringLiteral> node) override;
+        void visitStringLiteral(ionshared::Ptr<StringLiteral> node) override;
 
-        void visitBooleanValue(ionshared::Ptr<BooleanLiteral> node) override;
+        void visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> node) override;
 
         void visitGlobal(ionshared::Ptr<Global> node) override;
 

@@ -6,8 +6,7 @@
 #include <ionshared/misc/result.h>
 #include <ionshared/error_handling/source_map.h>
 #include <ionir/const/const_name.h>
-#include <ionlang/error_handling/notice_sentinel.h>
-#include <ionlang/error_handling/notice.h>
+#include <ionlang/error_handling/diagnostic.h>
 #include <ionlang/lexical/token.h>
 #include <ionlang/passes/pass.h>
 #include <ionlang/misc/util.h>
@@ -165,6 +164,7 @@ namespace ionlang {
 
             IONLANG_PARSER_ASSERT(id.has_value())
 
+            // TODO: Parsing variable ref. only! Not taking in what kind in params!
             return std::make_shared<Ref<T>>(*id, owner, RefKind::Variable);
         }
     };

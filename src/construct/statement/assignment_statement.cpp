@@ -10,7 +10,7 @@ namespace ionlang {
     }
 
     void AssignmentStatement::accept(Pass &visitor) {
-        visitor.visitVariableDecl(this->dynamicCast<VariableDeclStatement>());
+        visitor.visitAssignmentStatement(this->dynamicCast<AssignmentStatement>());
     }
 
     Ast AssignmentStatement::getChildNodes() {

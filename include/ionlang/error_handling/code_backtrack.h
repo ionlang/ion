@@ -55,7 +55,7 @@ namespace ionlang {
         );
 
         std::optional<CodeBlock> createCodeBlockNear(
-            const ionshared::Notice &notice,
+            const ionshared::Diagnostic &diagnostic,
             uint32_t grace = IONLANG_CODE_BACKTRACK_DEFAULT_GRACE
         );
     };
