@@ -8,22 +8,23 @@
 namespace ionlang {
     class IonIrLoweringPass : public Pass {
     private:
+        struct Buffers {
+            ionshared::OptPtr<ionir::Module> module = std::nullopt;
+
+            ionshared::OptPtr<ionir::Function> function = std::nullopt;
+
+            ionshared::OptPtr<ionir::BasicBlock> basicBlock = std::nullopt;
+
+            ionshared::OptPtr<ionir::InstBuilder> builder = std::nullopt;
+        };
+
         ionshared::PtrSymbolTable<ionir::Module> modules;
 
         ionshared::Stack<ionshared::Ptr<ionir::Construct>> constructStack;
 
         ionshared::Stack<ionshared::Ptr<ionir::Type>> typeStack;
 
-        /**
-         * The currently active IonIR module.
-         */
-        ionshared::OptPtr<ionir::Module> moduleBuffer;
-
-        ionshared::OptPtr<ionir::Function> functionBuffer;
-
-        ionshared::OptPtr<ionir::BasicBlock> basicBlockBuffer;
-
-        ionshared::OptPtr<ionir::InstBuilder> builderBuffer;
+        Buffers buffers;
 
         IonIrEmittedEntities symbolTable;
 

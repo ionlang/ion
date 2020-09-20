@@ -14,53 +14,49 @@
 
 namespace ionlang {
     ionshared::Ptr<ionir::Module> IonIrLoweringPass::requireModule() {
-        if (!ionshared::util::hasValue(this->moduleBuffer)) {
+        if (!ionshared::util::hasValue(this->buffers.module)) {
             throw std::runtime_error("Expected the module buffer to be set, but was nullptr");
         }
 
-        return *this->moduleBuffer;
+        return *this->buffers.module;
     }
 
     ionshared::Ptr<ionir::Function> IonIrLoweringPass::requireFunction() {
-        if (!ionshared::util::hasValue(this->functionBuffer)) {
+        if (!ionshared::util::hasValue(this->buffers.function)) {
             throw std::runtime_error("Expected the function buffer to be set, but was nullptr");
         }
 
-        return *this->functionBuffer;
+        return *this->buffers.function;
     }
 
     ionshared::Ptr<ionir::BasicBlock> IonIrLoweringPass::requireBasicBlock() {
-        if (!ionshared::util::hasValue(this->basicBlockBuffer)) {
+        if (!ionshared::util::hasValue(this->buffers.basicBlock)) {
             throw std::runtime_error("Expected the basic block buffer to be set, but was nullptr");
         }
 
-        return *this->basicBlockBuffer;
+        return *this->buffers.basicBlock;
     }
 
     ionshared::Ptr<ionir::InstBuilder> IonIrLoweringPass::requireBuilder() {
         // Builder must be instantiated.
-        if (!this->builderBuffer.has_value()) {
+        if (!this->buffers.builder.has_value()) {
             // Otherwise, throw a runtime error.
             throw std::runtime_error("Expected builder to be instantiated");
         }
 
-        return *builderBuffer;
+        return *buffers.builder;
     }
 
     void IonIrLoweringPass::setBuilder(ionshared::Ptr<ionir::BasicBlock> basicBlock) {
-        this->builderBuffer = basicBlock->createBuilder();
-        this->basicBlockBuffer = basicBlock;
+        this->buffers.builder = basicBlock->createBuilder();
+        this->buffers.basicBlock = basicBlock;
     }
 
     void IonIrLoweringPass::lockBuffers(const std::function<void()> &callback) {
-        auto ionIrModuleBuffer = this->requireModule();
-        auto ionIrFunctionBuffer = this->requireFunction();
-        ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlockBuffer = this->requireBasicBlock();
+        Buffers buffersBackup = this->buffers;
 
         callback();
-        this->moduleBuffer = ionIrModuleBuffer;
-        this->functionBuffer = ionIrFunctionBuffer;
-        this->setBuilder(ionIrBasicBlockBuffer);
+        this->buffers = buffersBackup;
     }
 
     uint32_t IonIrLoweringPass::getNameCounter() noexcept {
@@ -75,10 +71,7 @@ namespace ionlang {
         modules(std::move(modules)),
         constructStack(),
         typeStack(),
-        moduleBuffer(std::nullopt),
-        functionBuffer(std::nullopt),
-        basicBlockBuffer(std::nullopt),
-        builderBuffer(std::nullopt),
+        buffers(),
         symbolTable(),
         nameCounter(0) {
         //
@@ -100,12 +93,12 @@ namespace ionlang {
     }
 
     ionshared::OptPtr<ionir::Module> IonIrLoweringPass::getModuleBuffer() const {
-        return this->moduleBuffer;
+        return this->buffers.module;
     }
 
     bool IonIrLoweringPass::setModuleBuffer(const std::string &id) {
         if (this->modules->contains(id)) {
-            this->moduleBuffer = this->modules->lookup(id);
+            this->buffers.module = this->modules->lookup(id);
 
             return true;
         }
@@ -123,10 +116,10 @@ namespace ionlang {
     }
 
     void IonIrLoweringPass::visitModule(ionshared::Ptr<Module> node) {
-        this->moduleBuffer = std::make_shared<ionir::Module>(node->getId());
+        this->buffers.module = std::make_shared<ionir::Module>(node->getId());
 
         // Set the module on the modules symbol table.
-        this->modules->set(node->getId(), *this->moduleBuffer);
+        this->modules->set(node->getId(), *this->buffers.module);
 
         // Proceed to visit all the module's children (top-level constructs).
         std::map<std::string, ionshared::Ptr<Construct>> moduleSymbolTable =
@@ -190,13 +183,13 @@ namespace ionlang {
             std::make_shared<ionir::Function>(ionIrPrototype, nullptr);
 
         // Set the function buffer. This is required when visiting the function body.
-        this->functionBuffer = ionIrFunction;
+        this->buffers.function = ionIrFunction;
 
         this->visitBlock(node->getBody());
 
         // TODO: Redundant Repetitive assignment?
         // Set the function buffer.
-        this->functionBuffer = ionIrFunction;
+        this->buffers.function = ionIrFunction;
 
         // Register the newly created function on the buffer module's symbol table.
         moduleBuffer->insertFunction(ionIrFunction);
@@ -270,7 +263,7 @@ namespace ionlang {
             node->getId(),
             ionIrArguments,
             ionIrReturnType,
-            *this->moduleBuffer
+            *this->buffers.module
         );
 
         this->constructStack.push(ionIrPrototype);
@@ -669,7 +662,7 @@ namespace ionlang {
     void IonIrLoweringPass::visitVariableDecl(ionshared::Ptr<VariableDeclStatement> node) {
         this->requireBuilder();
 
-        ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = *this->builderBuffer;
+        ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = *this->buffers.builder;
 
         // First, visit the type and create a IonIR alloca inst,  and push it onto the stack.
         this->visitType(node->getType());
