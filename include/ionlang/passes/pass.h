@@ -16,6 +16,7 @@
 #include <ionlang/construct/statement/variable_decl_statement.h>
 #include <ionlang/construct/statement/assignment_statement.h>
 #include <ionlang/construct/statement/expr_wrapper_statement.h>
+#include <ionlang/construct/statement/block_wrapper_statement.h>
 #include <ionlang/construct/expression.h>
 #include <ionlang/construct/expression/binary_operation.h>
 #include <ionlang/construct/expression/call_expr.h>
@@ -31,10 +32,10 @@
 #include <ionlang/construct/function.h>
 #include <ionlang/construct/global.h>
 #include <ionlang/construct/attribute.h>
+#include <ionlang/construct/struct.h>
 
 namespace ionlang {
-    class Pass : public ionshared::BasePass<Construct> {
-    public:
+    struct Pass : ionshared::BasePass<Construct> {
         explicit Pass(ionshared::Ptr<ionshared::PassContext> context);
 
         virtual void visit(ionshared::Ptr<Construct> node);
@@ -58,6 +59,8 @@ namespace ionlang {
         virtual void visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> node);
 
         virtual void visitExprWrapperStatement(ionshared::Ptr<ExprWrapperStatement> node);
+
+        virtual void visitBlockWrapperStatement(ionshared::Ptr<BlockWrapperStatement> node);
 
         virtual void visitExpression(ionshared::Ptr<Expression> node);
 
@@ -100,6 +103,8 @@ namespace ionlang {
         virtual void visitErrorMarker(ionshared::Ptr<ErrorMarker> node);
 
         virtual void visitAttribute(ionshared::Ptr<Attribute> node);
+
+        virtual void visitStruct(ionshared::Ptr<Struct> node);
     };
 
     typedef ionshared::BasePassManager<Pass, Construct> PassManager;

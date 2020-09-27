@@ -14,12 +14,17 @@ namespace ionlang {
     public:
         IonIrEmittedEntities();
 
-        void set(const ionshared::Ptr<Construct> &key, const ionshared::Ptr<ionir::Construct> &value);
+        void set(
+            const ionshared::Ptr<Construct> &key,
+            const ionshared::Ptr<ionir::Construct> &value
+        );
 
         [[nodiscard]] bool contains(ionshared::Ptr<Construct> key) const;
 
         template<typename T = ionir::Construct>
-        [[nodiscard]] std::optional<ionshared::Ptr<T>> find(const ionshared::Ptr<Construct> &construct) {
+        [[nodiscard]] std::optional<ionshared::Ptr<T>> find(
+            const ionshared::Ptr<Construct> &construct
+        ) {
             if (this->contains(construct)) {
                 ionshared::Ptr<T> castResult = this->entities.lookup(construct)->get()->dynamicCast<T>();
 

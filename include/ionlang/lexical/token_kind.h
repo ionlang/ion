@@ -38,8 +38,6 @@ namespace ionlang {
 
         SymbolSemiColon,
 
-        SymbolStar,
-
         SymbolBraceL,
 
         SymbolBraceR,
@@ -50,7 +48,7 @@ namespace ionlang {
 
         SymbolAt,
 
-        SymbolVariableArgs,
+        SymbolEllipsis,
 
         KeywordFunction,
 
@@ -67,6 +65,8 @@ namespace ionlang {
         KeywordReturn,
 
         KeywordUnsafe,
+
+        KeywordStruct,
 
         TypeVoid,
 

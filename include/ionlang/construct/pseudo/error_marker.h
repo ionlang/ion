@@ -6,8 +6,7 @@ namespace ionlang {
     // TODO: What if 'pass.h' is never included?
     class Pass;
 
-    class ErrorMarker : public Construct {
-    public:
+    struct ErrorMarker : Construct {
         ErrorMarker();
 
         void accept(Pass &visitor) override;

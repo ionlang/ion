@@ -1,4 +1,6 @@
 #include <utility>
+#include <ionir/construct/module.h>
+#include <ionir/construct/identifier.h>
 #include <ionlang/const/const.h>
 #include <ionlang/type_system/type_factory.h>
 #include "const.h"
@@ -29,7 +31,9 @@ namespace ionlang::test::bootstrap {
     }
 
     ionshared::Ptr<ionir::Module> ionIrModule(const std::string &identifier) {
-        return std::make_shared<ionir::Module>(identifier);
+        return std::make_shared<ionir::Module>(
+            std::make_shared<ionir::Identifier>(identifier)
+        );
     }
 
     ionshared::Ptr<IonIrLoweringPass> ionIrLoweringPass() {
@@ -39,7 +43,7 @@ namespace ionlang::test::bootstrap {
             std::make_shared<ionshared::SymbolTable<ionshared::Ptr<ionir::Module>>>();
 
         // TODO: Inserting module, but can be done inline above -- it's just a headache.
-        modules->set(module->getId(), module);
+        modules->set(**module->identifier, module);
 
         ionshared::Ptr<IonIrLoweringPass> ionIrCodegenPass =
             std::make_shared<IonIrLoweringPass>(
@@ -47,7 +51,7 @@ namespace ionlang::test::bootstrap {
                 modules
             );
 
-        if (!ionIrCodegenPass->setModuleBuffer(module->getId())) {
+        if (!ionIrCodegenPass->setModuleBuffer(**module->identifier)) {
             throw std::runtime_error("Could not set active module buffer during bootstrap process");
         }
 
@@ -74,10 +78,10 @@ namespace ionlang::test::bootstrap {
             std::make_shared<Function>(nullptr, prototype, body);
 
         // Fill in the body's parent.
-        body->setParent(function);
+        body->parent = function;
 
         // Fill in the prototype's parent.
-        prototype->setParent(function);
+        prototype->parent = function;
 
         return function;
     }

@@ -7,19 +7,16 @@
 namespace ionlang {
     class Pass;
 
-    class Extern : public ChildConstruct<Module> {
-    private:
+    struct Extern : ConstructWithParent<Module> {
         ionshared::Ptr<Prototype> prototype;
 
-    public:
-        Extern(ionshared::Ptr<Module> parent, ionshared::Ptr<Prototype> prototype);
+        Extern(
+            ionshared::Ptr<Module> parent,
+            ionshared::Ptr<Prototype> prototype
+        );
 
         void accept(Pass &visitor) override;
 
         [[nodiscard]] Ast getChildNodes() override;
-
-        [[nodiscard]] ionshared::Ptr<Prototype> getPrototype() const noexcept;
-
-        void setPrototype(ionshared::Ptr<Prototype> prototype) noexcept;
     };
 }

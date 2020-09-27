@@ -9,8 +9,8 @@ namespace ionlang {
         ionshared::Ptr<Type> returnType,
         ionshared::Ptr<Construct> parent
     ) :
-        ChildConstruct<>(std::move(parent), ConstructKind::Prototype),
-        Named(std::move(id)),
+        ConstructWithParent<>(std::move(parent), ConstructKind::Prototype),
+        Named{std::move(id)},
         args(std::move(args)),
         returnType(std::move(returnType)) {
         //
@@ -20,45 +20,32 @@ namespace ionlang {
         visitor.visitPrototype(this->dynamicCast<Prototype>());
     }
 
-    ionshared::Ptr<Args> Prototype::getArguments() const noexcept {
-        return this->args;
-    }
-
-    void Prototype::setArgs(ionshared::Ptr<Args> args) noexcept {
-        this->args = std::move(args);
-    }
-
-    ionshared::Ptr<Type> Prototype::getReturnType() const noexcept {
-        return this->returnType;
-    }
-
-    void Prototype::setReturnType(ionshared::Ptr<Type> returnType) noexcept {
-        this->returnType = std::move(returnType);
-    }
-
     std::optional<std::string> Prototype::getMangledId() {
-        ionshared::Ptr<Construct> localParent = this->getParent();
-        ConstructKind parentConstructKind = localParent->getConstructKind();
+        ionshared::Ptr<Construct> localParent = this->getUnboxedParent();
+        ConstructKind parentConstructKind = localParent->constructKind;
 
         if (parentConstructKind != ConstructKind::Extern && parentConstructKind != ConstructKind::Function) {
             return std::nullopt;
         }
 
-        ionshared::Ptr<ChildConstruct<Module>> localParentAsChild =
-            localParent->dynamicCast<ChildConstruct<Module>>();
+        ionshared::Ptr<ConstructWithParent<Module>> localParentAsChild =
+            localParent->dynamicCast<ConstructWithParent<Module>>();
 
         // TODO: Need to make sure that mangled id is compatible with LLVM IR ids.
         std::stringstream mangledId;
 
-        mangledId << localParentAsChild->getParent()->getId() << IONLANG_MANGLE_SEPARATOR
-            << this->returnType->getId() << IONLANG_MANGLE_SEPARATOR
-            << this->getId();
+        mangledId << localParentAsChild->getUnboxedParent()->name
+            << IONLANG_MANGLE_SEPARATOR
+            << this->returnType->name
+            << IONLANG_MANGLE_SEPARATOR
+            << this->name;
 
-        auto argsMap = this->args->getItems()->unwrap();
+        auto argsMap = this->args->items->unwrap();
 
         for (const auto &[id, arg] : argsMap) {
             mangledId << IONLANG_MANGLE_SEPARATOR
-                << arg.first->getId() << IONLANG_MANGLE_SEPARATOR
+                << arg.first->name
+                << IONLANG_MANGLE_SEPARATOR
                 << arg.second;
         }
 

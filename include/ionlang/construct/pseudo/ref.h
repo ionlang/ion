@@ -13,15 +13,17 @@ namespace ionlang {
     enum class RefKind {
         Variable,
 
+        /**
+         * A reference to a function or extern.
+         */
         Function
     };
 
     template<typename T = Construct>
-    class Ref : public Construct, public ionshared::Named {
-    private:
+    struct Ref : public Construct, public ionshared::Named {
         ionshared::Ptr<Construct> owner;
 
-        RefKind kind;
+        const RefKind refKind;
 
         ionshared::OptPtr<T> value;
 
@@ -33,9 +35,9 @@ namespace ionlang {
             ionshared::OptPtr<T> value = std::nullopt
         ) :
             Construct(ConstructKind::Ref),
-            Named(id),
+            Named{id},
             owner(std::move(scope)),
-            kind(kind),
+            refKind(kind),
             value(value) {
             //
         }
@@ -45,24 +47,16 @@ namespace ionlang {
             // visitor.visitRef(this->dynamicCast<Ref<T>>());
         }
 
+        ionshared::Ptr<T> operator*() {
+            if (!this->isResolved()) {
+                throw std::runtime_error("Value is not resolved but being accessed");
+            }
+
+            return *this->value;
+        }
+
         Ref<T> &operator=(ionshared::Ptr<T> value) {
             this->resolve(value);
-        }
-
-        [[nodiscard]] ionshared::Ptr<Construct> getOwner() const noexcept {
-            return this->owner;
-        }
-
-        void setOwner(ionshared::Ptr<Construct> owner) noexcept {
-            this->owner = std::move(owner);
-        }
-
-        [[nodiscard]] RefKind getRefKind() const noexcept {
-            return this->kind;
-        }
-
-        [[nodiscard]] ionshared::OptPtr<T> getValue() const noexcept {
-            return this->value;
         }
 
         template<typename TValue>
@@ -71,10 +65,6 @@ namespace ionlang {
             return this->isResolved()
                 ? std::dynamic_pointer_cast<TValue>(this->getValue()->get())
                 : std::nullopt;
-        }
-
-        void resolve(ionshared::OptPtr<T> value) noexcept {
-            this->value = value;
         }
 
         void removeValue() noexcept {

@@ -54,8 +54,8 @@ TEST(CodeGenTest, VisitIfStatement) {
     });
 
     // Set the block and if statement's parents.
-    consequentBlock->setParent(ifStatement);
-    ifStatement->setParent(function->getBody());
+    consequentBlock->parent = ifStatement;
+    ifStatement->parent = function->body;
 
     // Visit the function.
     ionIrLoweringPass->visitFunction(function);
@@ -97,7 +97,7 @@ TEST(CodeGenTest, VisitVariableDecl) {
     });
 
     // Set the variable declaration parent.
-    variableDecl->setParent(function->getBody());
+    variableDecl->parent = function->body;
 
     // Visit the function.
     ionIrLoweringPass->visitFunction(function);

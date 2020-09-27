@@ -5,28 +5,25 @@
 
 namespace ionlang {
     template<typename T>
+        // TODO: Require T : Construct;
     struct ChildConstructOpts {
         ionshared::Ptr<T> parent;
     };
 
     template<class T = Construct>
-    class ChildConstruct : public Construct {
-    private:
-        ionshared::Ptr<T> parent;
-
-    public:
-        ChildConstruct(ionshared::Ptr<T> parent, ConstructKind kind) :
-            Construct(kind),
-            parent(parent) {
+        // TODO: Require T : Construct.
+    struct ConstructWithParent : Construct {
+        ConstructWithParent(ionshared::Ptr<T> parent, ConstructKind kind) :
+            Construct(kind, std::nullopt, parent) {
             //
         }
 
-        [[nodiscard]] ionshared::Ptr<T> getParent() const noexcept {
-            return this->parent;
-        }
+        [[nodiscard]] ionshared::Ptr<T> getUnboxedParent() {
+            if (!ionshared::util::hasValue(this->parent)) {
+                throw std::runtime_error("Parent is nullptr");
+            }
 
-        void setParent(ionshared::Ptr<T> parent) noexcept {
-            this->parent = parent;
+            return this->parent->get()->template dynamicCast<T>();
         }
     };
 }

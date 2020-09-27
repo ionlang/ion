@@ -8,10 +8,10 @@ namespace ionlang {
 
     void Pass::visit(ionshared::Ptr<Construct> node) {
         // TODO: Hotfix for circular dep.
-        if (node->getConstructKind() == ConstructKind::Ref) {
+        if (node->constructKind == ConstructKind::Ref) {
             this->visitRef(node->staticCast<Ref<>>());
         }
-        else if (node->getConstructKind() == ConstructKind::Value) {
+        else if (node->constructKind == ConstructKind::Value) {
             this->visitValue(node->staticCast<Value<>>());
         }
         // TODO: This should be at the top alone with visitChildren() once fixed.
@@ -52,7 +52,7 @@ namespace ionlang {
     }
 
     void Pass::visitStatement(ionshared::Ptr<Statement> node) {
-        switch (node->getStatementKind()) {
+        switch (node->statementKind) {
             case StatementKind::If: {
                 this->visitIfStatement(node->dynamicCast<IfStatement>());
 
@@ -107,8 +107,12 @@ namespace ionlang {
         //
     }
 
+    void Pass::visitBlockWrapperStatement(ionshared::Ptr<BlockWrapperStatement> node) {
+        //
+    }
+
     void Pass::visitExpression(ionshared::Ptr<Expression> node) {
-        switch (node->getExpressionKind()) {
+        switch (node->expressionKind) {
             case ExpressionKind::UnaryOperation: {
                 this->visitUnaryOperation(node->dynamicCast<UnaryOperation>());
 
@@ -246,6 +250,10 @@ namespace ionlang {
     }
 
     void Pass::visitAttribute(ionshared::Ptr<Attribute> node) {
+        //
+    }
+
+    void Pass::visitStruct(ionshared::Ptr<Struct> node) {
         //
     }
 }

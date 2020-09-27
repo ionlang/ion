@@ -7,8 +7,7 @@
 namespace ionlang {
     class Pass;
 
-    class Attribute : public ChildConstruct<>, public ionshared::Named {
-    public:
+    struct Attribute : ConstructWithParent<>, ionshared::Named {
         Attribute(ionshared::Ptr<Construct> parent, std::string id);
 
         void accept(Pass &visitor) override;

@@ -5,8 +5,12 @@
 #include <ionlang/lexical/lexer.h>
 
 namespace ionlang {
-    Lexer::Lexer(const std::string &input)
-        : input(input), length(input.length()), index(IONLANG_LEXER_INDEX_DEFAULT), simpleIds(TokenConst::getSortedSimpleIds()), complexIds(TokenConst::getComplexIds()) {
+    Lexer::Lexer(const std::string &input) :
+        input(input),
+        length(input.length()),
+        index(IONLANG_LEXER_INDEX_DEFAULT),
+        simpleIds(TokenConst::getSortedSimpleIds()),
+        complexIds(TokenConst::getComplexIds()) {
         // Input string must contain at least one character.
         if (!this->length || this->length < 1) {
             throw std::invalid_argument("Input must be a string with one or more character(s)");
@@ -50,7 +54,7 @@ namespace ionlang {
         return this->setIndex(this->index + amount);
     }
 
-    MatchResult Lexer::matchExpression(MatchOpts opts) {
+    Lexer::MatchResult Lexer::matchExpression(const MatchOpts &opts) {
         MatchResult result = {
             false
         };
@@ -66,7 +70,7 @@ namespace ionlang {
                 throw std::runtime_error("Successful regex match may not contain a captured value");
             }
 
-            int index = opts.expectCapturedValue
+            uint32_t index = opts.expectCapturedValue
                 ? IONLANG_MATCH_INDEX_CAPTURED
                 : IONLANG_MATCH_INDEX_MATCHED;
 
@@ -103,7 +107,7 @@ namespace ionlang {
             }
 
             // Modify the input token (since it was passed by reference).
-            opts.token = Token(opts.tokenKind, value, opts.token.getStartPosition());
+            opts.token = Token(opts.tokenKind, value, opts.token.startPosition);
 
             // Skip the matched value's length (never the captured one).
             this->skip(result.matchedValue->length());
@@ -158,7 +162,7 @@ namespace ionlang {
         Token token = Token(TokenKind::Unknown, this->getCharAsString(), this->index);
 
         // Abstract the Token's value for easier access.
-        std::string tokenValue = token.getValue();
+        std::string tokenValue = token.value;
 
         // Begin by testing against all simple until a possible match is found.
         for (const auto &pair : this->simpleIds) {
@@ -197,7 +201,7 @@ namespace ionlang {
                     //this.SetPosition(this.Position - token.Value.Length - pair.Key.Length);
 
                     // Skim the last character off.
-                    token = Token(token.getKind(), pair.first, token.getStartPosition());
+                    token = Token(token.kind, pair.first, token.startPosition);
 
                     // Return the token, no need to skip its value.
                     return token;
@@ -235,9 +239,7 @@ namespace ionlang {
         // Reset index to avoid carrying over previous information.
         this->begin();
 
-        // TODO: Should be a list, then converted to a vector?
         std::vector<Token> tokens = {};
-
         std::optional<Token> token;
 
         while (this->hasNext()) {
@@ -248,7 +250,7 @@ namespace ionlang {
                 break;
             }
             // Display a warning if the token's type is unknown.
-            else if (token->getKind() == TokenKind::Unknown) {
+            else if (token->kind == TokenKind::Unknown) {
                 // TODO: Issue warning instead of plain std::cout.
                 std::cout << "Warning: Unknown token encountered" << std::endl;
             }

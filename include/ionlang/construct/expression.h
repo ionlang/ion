@@ -14,15 +14,11 @@ namespace ionlang {
         BinaryOperation
     };
 
-    class Expression : public Value<> {
-    private:
-        ExpressionKind kind;
+    struct Expression : public Value<> {
+        const ExpressionKind expressionKind;
 
-    public:
-        explicit Expression(ExpressionKind kind, ionshared::Ptr<Type> type);
+        Expression(ExpressionKind kind, ionshared::Ptr<Type> type);
 
         void accept(Pass &visitor) override;
-
-        ExpressionKind getExpressionKind() const noexcept;
     };
 }

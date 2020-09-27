@@ -28,7 +28,7 @@ namespace ionlang {
             this->block,
 
             std::make_shared<Ref<VariableDeclStatement>>(
-                variableDeclStatement->getId(),
+                variableDeclStatement->name,
                 this->block,
                 RefKind::Variable,
                 variableDeclStatement
@@ -47,7 +47,7 @@ namespace ionlang {
         });
     }
 
-    ionshared::Ptr<ReturnStatement> StatementBuilder::createReturn(ionshared::OptPtr<Construct> value) {
+    ionshared::Ptr<ReturnStatement> StatementBuilder::createReturn(ionshared::OptPtr<Expression> value) {
         return this->make<ReturnStatement, ReturnStatementOpts>(ReturnStatementOpts{
             this->block,
             std::move(value)

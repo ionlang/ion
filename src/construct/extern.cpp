@@ -2,7 +2,7 @@
 
 namespace ionlang {
     Extern::Extern(ionshared::Ptr<Module> parent, ionshared::Ptr<Prototype> prototype) :
-        ChildConstruct<Module>(std::move(parent), ConstructKind::Extern),
+        ConstructWithParent<Module>(std::move(parent), ConstructKind::Extern),
         prototype(std::move(prototype)) {
         //
     }
@@ -15,13 +15,5 @@ namespace ionlang {
         return {
             this->prototype->nativeCast()
         };
-    }
-
-    ionshared::Ptr<Prototype> Extern::getPrototype() const noexcept {
-        return this->prototype;
-    }
-
-    void Extern::setPrototype(ionshared::Ptr<Prototype> prototype) noexcept {
-        this->prototype = std::move(prototype);
     }
 }

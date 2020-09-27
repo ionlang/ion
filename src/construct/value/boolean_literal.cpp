@@ -10,12 +10,4 @@ namespace ionlang {
     void BooleanLiteral::accept(Pass &visitor) {
         visitor.visitBooleanLiteral(this->dynamicCast<BooleanLiteral>());
     }
-
-    bool BooleanLiteral::getValue() const noexcept {
-        return this->value;
-    }
-
-    void BooleanLiteral::setValue(bool value) noexcept {
-        this->value = value;
-    }
 }

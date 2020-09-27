@@ -29,13 +29,11 @@ namespace ionlang {
 
     typedef ionshared::Set<TypeQualifier> TypeQualifiers;
 
-    class Type : public Construct, public ionshared::Named {
-    private:
-        TypeKind kind;
+    struct Type : public Construct, public ionshared::Named {
+        const TypeKind typeKind;
 
         ionshared::Ptr<TypeQualifiers> qualifiers;
 
-    public:
         explicit Type(
             std::string id,
             TypeKind kind = TypeKind::UserDefined,
@@ -44,11 +42,7 @@ namespace ionlang {
 
         void accept(Pass &visitor) override;
 
-        TypeKind getTypeKind() const noexcept;
-
-        [[nodiscard]] ionshared::Ptr<TypeQualifiers> getQualifiers() const noexcept;
-
-        void setQualifiers(ionshared::Ptr<TypeQualifiers> qualifiers) noexcept;
+        [[nodiscard]] TypeKind getTypeKind() const noexcept;
 
         [[nodiscard]] bool addQualifier(TypeQualifier qualifier) noexcept;
 

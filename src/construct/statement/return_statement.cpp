@@ -21,14 +21,6 @@ namespace ionlang {
         };
     }
 
-    ionshared::OptPtr<Construct> ReturnStatement::getValue() const noexcept {
-        return this->value;
-    }
-
-    void ReturnStatement::setValue(ionshared::OptPtr<Construct> value) noexcept {
-        this->value = std::move(value);
-    }
-
     bool ReturnStatement::hasValue() const noexcept {
         return ionshared::util::hasValue(this->value);
     }

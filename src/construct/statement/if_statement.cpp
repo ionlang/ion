@@ -19,31 +19,7 @@ namespace ionlang {
         };
     }
 
-    ionshared::Ptr<Construct> IfStatement::getCondition() const noexcept {
-        return this->condition;
-    }
-
-    void IfStatement::setCondition(ionshared::Ptr<Construct> condition) noexcept {
-        this->condition = std::move(condition);
-    }
-
-    ionshared::Ptr<Block> IfStatement::getConsequentBlock() const noexcept {
-        return this->consequentBlock;
-    }
-
-    void IfStatement::setConsequentBlock(ionshared::Ptr<Block> block) noexcept {
-        this->consequentBlock = std::move(block);
-    }
-
-    ionshared::OptPtr<Block> IfStatement::getAlternativeBlock() const noexcept {
-        return this->alternativeBlock;
-    }
-
-    void IfStatement::setAlternativeBlock(ionshared::OptPtr<Block> block) noexcept {
-        this->alternativeBlock = std::move(block);
-    }
-
     bool IfStatement::hasAlternativeBlock() const noexcept {
-        return ionshared::util::hasValue(this->getAlternativeBlock());
+        return ionshared::util::hasValue(this->alternativeBlock);
     }
 }

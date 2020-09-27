@@ -21,27 +21,23 @@ namespace ionlang {
 
         Call,
 
-        ExprWrapper
+        ExprWrapper,
+
+        BlockWrapper
     };
 
-    class Statement : public ChildConstruct<Block> {
-    private:
-        StatementKind kind;
+    struct Statement : ConstructWithParent<Block> {
+        const StatementKind statementKind;
 
-        ionshared::OptPtr<Statement> yields;
+        const ionshared::OptPtr<Statement> yields;
 
-    public:
         Statement(
             ionshared::Ptr<Block> parent,
             StatementKind kind,
             ionshared::OptPtr<Statement> yields = std::nullopt
         );
 
-        virtual void accept(Pass &visitor) = 0;
-
-        [[nodiscard]] StatementKind getStatementKind() const noexcept;
-
-        [[nodiscard]] ionshared::OptPtr<Statement> getYields() const noexcept;
+        void accept(Pass &visitor) override = 0;
 
         [[nodiscard]] bool isTerminal() const noexcept;
 

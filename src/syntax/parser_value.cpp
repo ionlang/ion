@@ -1,17 +1,17 @@
 #include <ionshared/misc/util.h>
 #include <ionlang/const/const.h>
 #include <ionlang/const/const_name.h>
-#include <ionlang/const/notice.h>
-#include <ionlang/error_handling/diagnostic.h>
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
     AstPtrResult<Value<>> Parser::parseLiteralFork() {
+        this->beginSourceLocationMapping();
+
         /**
          * Always use static pointer cast when downcasting to Value<>,
          * otherwise the cast result will be nullptr.
          */
-        switch (this->tokenStream.get().getKind()) {
+        switch (this->tokenStream.get().kind) {
             case TokenKind::LiteralInteger: {
                 AstPtrResult<IntegerLiteral> integerLiteralResult = this->parseIntegerLiteral();
 
@@ -28,6 +28,14 @@ namespace ionlang {
                 return util::getResultValue(charLiteralResult)->staticCast<Value<>>();
             }
 
+            case TokenKind::LiteralString: {
+                AstPtrResult<StringLiteral> stringLiteralResult = this->parseStringLiteral();
+
+                IONLANG_PARSER_ASSERT(util::hasValue(stringLiteralResult))
+
+                return util::getResultValue(stringLiteralResult)->staticCast<Value<>>();
+            }
+
             case TokenKind::LiteralBoolean: {
                 AstPtrResult<BooleanLiteral> booleanLiteralResult = this->parseBooleanLiteral();
 
@@ -40,7 +48,9 @@ namespace ionlang {
 
             default: {
                 this->diagnosticBuilder
-                    ->bootstrap(diagnostic::internalUnexpectedToken);
+                    ->bootstrap(diagnostic::internalUnexpectedToken)
+                    ->setLocation(this->makeSourceLocation())
+                    ->finish();
 
                 return this->makeErrorMarker();
             }
@@ -56,7 +66,7 @@ namespace ionlang {
          * Abstract the token's value to be used in the
          * string to long integer conversion.
          */
-        std::string tokenValue = this->tokenStream.get().getValue();
+        std::string tokenValue = this->tokenStream.get().value;
 
         // TODO: May stol() throw an error? If so, wrap in try-catch block for safety.
         /**
@@ -76,10 +86,10 @@ namespace ionlang {
         }
         catch (std::exception &exception) {
             // Value conversion failed.
-            this->diagnosticBuilder->bootstrap(
-                diagnostic::syntaxConversionFailed,
-                this->makeSourceLocation()
-            );
+            this->diagnosticBuilder
+                ->bootstrap(diagnostic::syntaxConversionFailed)
+                ->setLocation(this->makeSourceLocation())
+                ->finish();
 
             return this->makeErrorMarker();
         }
@@ -95,7 +105,9 @@ namespace ionlang {
 
         if (!valueIntegerKind.has_value()) {
             this->diagnosticBuilder
-                ->bootstrap(diagnostic::syntaxIntegerValueTypeUnknown);
+                ->bootstrap(diagnostic::syntaxIntegerValueTypeUnknown)
+                ->setLocation(this->makeSourceLocation())
+                ->finish();
 
             return this->makeErrorMarker();
         }
@@ -123,7 +135,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralBoolean))
 
-        std::string value = this->tokenStream.get().getValue();
+        std::string value = this->tokenStream.get().value;
 
         this->tokenStream.skip();
 
@@ -137,7 +149,9 @@ namespace ionlang {
         }
         else {
             this->diagnosticBuilder
-                ->bootstrap(diagnostic::internalUnexpectedToken);
+                ->bootstrap(diagnostic::internalUnexpectedToken)
+                ->setLocation(this->makeSourceLocation())
+                ->finish();
 
             return this->makeErrorMarker();
         }
@@ -156,17 +170,17 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralCharacter))
 
         // Extract the value from the character token.
-        std::string stringValue = this->tokenStream.get().getValue();
+        std::string stringValue = this->tokenStream.get().value;
 
         // Skip over character token.
         this->tokenStream.skip();
 
         // Ensure extracted value only contains a single character.
         if (stringValue.length() > 1) {
-            this->diagnosticBuilder->bootstrap(
-                diagnostic::syntaxCharLengthInvalid,
-                this->makeSourceLocation()
-            );
+            this->diagnosticBuilder
+                ->bootstrap(diagnostic::syntaxCharLengthInvalid)
+                ->setLocation(this->makeSourceLocation())
+                ->finish();
 
             return this->makeErrorMarker();
         }
@@ -186,7 +200,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralString))
 
         // Extract the value from the string token.
-        std::string value = this->tokenStream.get().getValue();
+        std::string value = this->tokenStream.get().value;
 
         // Skip over string token.
         this->tokenStream.skip();

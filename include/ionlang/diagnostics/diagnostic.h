@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ionshared/error_handling/diagnostic_builder.h>
+#include <ionshared/diagnostics/diagnostic_builder.h>
 
 #define IONLANG_NOTICE_DEFINE(name, type, message, example) \
     const static inline ionshared::Diagnostic name =\
@@ -47,6 +47,20 @@ namespace ionlang::diagnostic {
         syntaxLeadingCommaInArgs,
         ionshared::DiagnosticType::Warning,
         "Leading comma in argument list",
+        std::nullopt
+    );
+
+    IONLANG_NOTICE_DEFINE(
+        syntaxExpectedToken,
+        ionshared::DiagnosticType::Error,
+        "Expected token '%s' but got '%s'",
+        std::nullopt
+    );
+
+    IONLANG_NOTICE_DEFINE(
+        structFieldRedefinition,
+        ionshared::DiagnosticType::Error,
+        "Field '%s' in struct '%s' was already previously defined",
         std::nullopt
     );
 }

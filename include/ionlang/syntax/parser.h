@@ -4,10 +4,10 @@
 #include <string>
 #include <utility>
 #include <ionshared/misc/result.h>
-#include <ionshared/error_handling/source_map.h>
+#include <ionshared/diagnostics/source_map.h>
 #include <ionir/const/const_name.h>
-#include <ionlang/error_handling/diagnostic.h>
 #include <ionlang/lexical/token.h>
+#include <ionlang/diagnostics/diagnostic.h>
 #include <ionlang/passes/pass.h>
 #include <ionlang/misc/util.h>
 
@@ -126,7 +126,9 @@ namespace ionlang {
 
         AstPtrResult<Function> parseFunction(const ionshared::Ptr<Module> &parent);
 
-        AstPtrResult<Global> parseGlobal();
+        AstPtrResult<Global> parseGlobal(const ionshared::Ptr<Module> &parent);
+
+        AstPtrResult<Struct> parseStruct(const ionshared::Ptr<Module> &parent);
 
         AstPtrResult<Value<>> parseLiteralFork();
 
@@ -160,6 +162,8 @@ namespace ionlang {
 
         template<typename T = Construct>
         AstPtrResult<Ref<T>> parseRef(ionshared::Ptr<Construct> owner) {
+            this->beginSourceLocationMapping();
+
             std::optional<std::string> id = this->parseId();
 
             IONLANG_PARSER_ASSERT(id.has_value())

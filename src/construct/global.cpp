@@ -1,8 +1,16 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    Global::Global(ionshared::Ptr<Type> type, std::string id, ionshared::OptPtr<Value<>> value)
-        : Construct(ConstructKind::Global), type(std::move(type)), Named(std::move(id)), value(std::move(value)) {
+    Global::Global(
+        ionshared::Ptr<Module> parent,
+        ionshared::Ptr<Type> type,
+        std::string name,
+        ionshared::OptPtr<Value<>> value
+    ) :
+        ConstructWithParent<Module>(std::move(parent), ConstructKind::Global),
+        ionshared::Named{std::move(name)},
+        type(std::move(type)),
+        value(std::move(value)) {
         //
     }
 
@@ -22,21 +30,5 @@ namespace ionlang {
         }
 
         return children;
-    }
-
-    ionshared::Ptr<Type> Global::getType() const noexcept {
-        return this->type;
-    }
-
-    void Global::setType(ionshared::Ptr<Type> type) noexcept {
-        this->type = std::move(type);
-    }
-
-    ionshared::OptPtr<Value<>> Global::getValue() const noexcept {
-        return this->value;
-    }
-
-    void Global::setValue(ionshared::OptPtr<Value<>> value) noexcept {
-        this->value = std::move(value);
     }
 }

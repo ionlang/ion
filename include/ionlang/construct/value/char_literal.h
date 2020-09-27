@@ -5,17 +5,11 @@
 namespace ionlang {
     class Pass;
 
-    class CharLiteral : public Value<> {
-    private:
+    struct CharLiteral : Value<> {
         char value;
 
-    public:
         explicit CharLiteral(char value);
 
         void accept(Pass &visitor) override;
-
-        [[nodiscard]] char getValue() const noexcept;
-
-        void setValue(char value) noexcept;
     };
 }

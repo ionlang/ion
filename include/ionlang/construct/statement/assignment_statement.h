@@ -16,25 +16,15 @@ namespace ionlang {
         ionshared::Ptr<Construct> value;
     };
 
-    class AssignmentStatement : public Statement {
-    private:
+    struct AssignmentStatement : Statement {
         PtrRef<VariableDeclStatement> variableDeclStatementRef;
 
         ionshared::Ptr<Construct> value;
 
-    public:
         explicit AssignmentStatement(const AssignmentStatementOpts &opts);
 
         void accept(Pass &visitor) override;
 
         [[nodiscard]] Ast getChildNodes() override;
-
-        [[nodiscard]] PtrRef<VariableDeclStatement> getVariableDeclStatement() const noexcept;
-
-        void setVariableDeclStatement(PtrRef<VariableDeclStatement> variableDeclStatement) noexcept;
-
-        [[nodiscard]] ionshared::Ptr<Construct> getValue() const noexcept;
-
-        void setValue(ionshared::Ptr<Construct> value) noexcept;
     };
 }

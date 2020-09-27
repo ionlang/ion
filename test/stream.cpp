@@ -9,9 +9,9 @@ TEST(StreamTest, HandleGet) {
 
     // TODO: Add actual data so there isn't chance for some sort of corrupted token. (Overall, improve this test.)
 
-    EXPECT_EQ(currentToken.getValue(), "");
-    EXPECT_EQ(currentToken.getKind(), TokenKind::Unknown);
-    EXPECT_EQ(currentToken.getStartPosition(), 0);
+    EXPECT_EQ(currentToken.value, "");
+    EXPECT_EQ(currentToken.kind, TokenKind::Unknown);
+    EXPECT_EQ(currentToken.startPosition, 0);
     EXPECT_EQ(currentToken.getEndPosition(), 0);
 }
 

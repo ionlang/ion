@@ -16,23 +16,13 @@ namespace ionlang {
         ionshared::Ptr<Construct> value;
     };
 
-    class VariableDeclStatement : public Statement, public ionshared::Named {
-    private:
+    struct VariableDeclStatement : Statement, ionshared::Named {
         ionshared::Ptr<Type> type;
 
         ionshared::Ptr<Construct> value;
 
-    public:
         explicit VariableDeclStatement(const VariableDeclStatementOpts &opts);
 
         void accept(Pass &visitor) override;
-
-        [[nodiscard]] ionshared::Ptr<Type> getType() const noexcept;
-
-        void setType(ionshared::Ptr<Type> type) noexcept;
-
-        [[nodiscard]] ionshared::Ptr<Construct> getValue() const noexcept;
-
-        void setValue(ionshared::Ptr<Construct> value) noexcept;
     };
 }

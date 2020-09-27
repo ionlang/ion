@@ -2,7 +2,7 @@
 
 #include <ionshared/tracking/symbol_table.h>
 #include <ionshared/construct/base_construct.h>
-#include <ionshared/error_handling/source_location.h>
+#include <ionshared/diagnostics/source_location.h>
 
 namespace ionlang {
     enum class ConstructKind {
@@ -36,7 +36,9 @@ namespace ionlang {
 
         ErrorMarker,
 
-        Attribute
+        Attribute,
+
+        Struct
     };
 
     class Construct;
@@ -45,11 +47,7 @@ namespace ionlang {
 
     typedef ionshared::Ast<Construct> Ast;
 
-    class Construct : public ionshared::BaseConstruct<Construct, ConstructKind> {
-    private:
-        std::optional<ionshared::SourceLocation> sourceLocation;
-
-    public:
+    struct Construct : ionshared::BaseConstruct<Construct, ConstructKind> {
         template<class T>
         static Ast convertChildren(std::vector<ionshared::Ptr<T>> vector) {
             // TODO: Ensure T is child of AstNode.
@@ -89,9 +87,12 @@ namespace ionlang {
             return children;
         }
 
-        explicit Construct(ConstructKind kind);
+        std::optional<ionshared::SourceLocation> sourceLocation;
 
-        void accept(ionshared::BasePass<Construct> visitor) override;
+        explicit Construct(ConstructKind kind,
+            std::optional<ionshared::SourceLocation> sourceLocation = std::nullopt,
+            ionshared::OptPtr<Construct> parent = std::nullopt
+        );
 
         virtual void accept(Pass &visitor) = 0;
 
@@ -105,12 +106,6 @@ namespace ionlang {
          */
         [[nodiscard]] virtual bool verify();
 
-        [[nodiscard]] std::optional<ionshared::SourceLocation> getSourceLocation() const noexcept;
-
-        [[nodiscard]] bool hasSourceLocation() const noexcept;
-
-        void setSourceLocation(std::optional<ionshared::SourceLocation> sourceLocation) noexcept;
-
-        [[nodiscard]] std::optional<std::string> getConstructName();
+        [[nodiscard]] std::optional<std::string> findConstructName();
     };
 }

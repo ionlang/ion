@@ -18,13 +18,13 @@ namespace ionlang {
     };
 
     template<typename T = Type>
-    class Value : public Construct {
-    private:
-        ValueKind kind;
+    struct Value : public Construct {
+        const ValueKind kind;
 
-        ionshared::Ptr<T> type;
+        const ionshared::Ptr<T> type;
 
-    public:
+        Value() = delete;
+
         Value(ValueKind kind, ionshared::Ptr<T> type) :
             Construct(ConstructKind::Value),
             kind(kind),

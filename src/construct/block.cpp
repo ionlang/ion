@@ -8,7 +8,7 @@ namespace ionlang {
         std::vector<ionshared::Ptr<Statement>> statements,
         const ionshared::PtrSymbolTable<VariableDeclStatement> &symbolTable
     ) :
-        ChildConstruct<Construct>(std::move(parent), ConstructKind::Block),
+        ConstructWithParent<Construct>(std::move(parent), ConstructKind::Block),
         ionshared::Scoped<VariableDeclStatement>(symbolTable),
         statements(std::move(statements)) {
         //
@@ -24,14 +24,6 @@ namespace ionlang {
         return Construct::convertChildren(this->statements);
     }
 
-    std::vector<ionshared::Ptr<Statement>> &Block::getStatements() noexcept {
-        return this->statements;
-    }
-
-    void Block::setStatements(std::vector<ionshared::Ptr<Statement>> statements) {
-        this->statements = std::move(statements);
-    }
-
     void Block::appendStatement(const ionshared::Ptr<Statement> &statement) {
         this->statements.push_back(statement);
 
@@ -39,56 +31,92 @@ namespace ionlang {
          * Variable declaration statements should be registered on
          * the local symbol table.
          */
-        if (statement->getStatementKind() == StatementKind::VariableDeclaration) {
+        if (statement->statementKind == StatementKind::VariableDeclaration) {
             ionshared::Ptr<VariableDeclStatement> variableDecl =
                 statement->dynamicCast<VariableDeclStatement>();
 
-            this->getSymbolTable()->set(variableDecl->getId(), variableDecl);
-        }
-    }
-
-    uint32_t Block::relocateStatements(Block &target, uint32_t from) {
-        uint32_t count = 0;
-
-        for (uint32_t i = from; i < this->statements.size(); i++) {
-            target.getStatements().push_back(this->statements[i]);
-            this->statements.erase(this->statements.begin() + i - 1);
-            count++;
+            this->symbolTable->set(variableDecl->name, variableDecl);
         }
 
-        return count;
+        // TODO: What about other named statements? Currently there might be none -- but in the future this might be an edge case, it's really daunting to write checks for each named construct (also recall there's Identifier, so we can't just std::dynamic_pointer_cast<ionshared::Named>).
     }
 
-    ionshared::Ptr<Block> Block::split(uint32_t atOrder) {
-        // TODO: If insts are empty, atOrder parameter is ignored (useless). Address that.
+    bool Block::relocateStatement(size_t orderIndex, ionshared::Ptr<Block> target) {
+        /**
+         * The size of the local statements vector is less than
+         * the provided index.
+         */
+        if (!ionshared::util::indexExistsInVector(orderIndex, this->statements)) {
+            return false;
+        }
+        // Prevent the target from being this same instance.
+        else if (target.get() == this) {
+            return false;
+        }
 
-        if (!this->statements.empty() && (atOrder < 0 || atOrder > this->statements.size() - 1)) {
+        // TODO: Relocate symbol table entries, but making a map Statement -> Vector<Symbol Table Key>. Remember statement is already registered on the local symbol table on the appendStatement() call.
+
+        /**
+         * NOTE: The statement is registered on foreign block's symbol
+         * table during this call.
+         */
+        target->appendStatement(this->statements[orderIndex]);
+
+        this->statements.erase(this->statements.begin() + orderIndex);
+
+        return true;
+    }
+
+    size_t Block::relocateStatements(
+        const ionshared::Ptr<Block> &target,
+        size_t from,
+        std::optional<size_t> to
+    ) {
+        bool areStatementsEmpty = this->statements.empty();
+
+        if (to.has_value()) {
+            if (*to > from) {
+                throw std::out_of_range("To cannot be after from");
+            }
+            else if (!areStatementsEmpty && *to > this->statements.size() - 1) {
+                throw std::out_of_range("Provided order is outsize of bounds");
+            }
+        }
+
+        if (!areStatementsEmpty && from > this->statements.size() - 1) {
             throw std::out_of_range("Provided order is outsize of bounds");
         }
 
-        std::vector<ionshared::Ptr<Statement>> statements = {};
+        size_t statementsRelocated = 0;
 
-        if (!this->statements.empty()) {
-            auto from = this->statements.begin() + atOrder;
-            auto to = this->statements.end();
+        auto toIterator = to.has_value()
+            ? this->statements.begin() + *to
+            : this->statements.end();
 
-            statements = std::vector<ionshared::Ptr<Statement>>(from, to);
-
-            // Erase the instructions from the local basic block.
-            this->statements.erase(from, to);
+        for (auto i = this->statements.begin() + from; i != toIterator; i++) {
+            if (this->relocateStatement(i - this->statements.begin(), target)) {
+                statementsRelocated++;
+            }
         }
 
-        ionshared::Ptr<Block> newBlock = std::make_shared<Block>(Block{
-            this->getParent(),
-            statements
+        return statementsRelocated;
+    }
 
-            // TODO: The symbol table needs to be relocated as well!
+    ionshared::Ptr<Block> Block::slice(size_t from, std::optional<size_t> to) {
+        ionshared::Ptr<Block> newBlock = std::make_shared<Block>(Block{
+            this->getUnboxedParent()
         });
+
+        /**
+         * NOTE: Index boundary checks are performed when relocation
+         * occurs, therefore there is no need to re-write them here.
+         */
+        this->relocateStatements(newBlock, from, to);
 
         return newBlock;
     }
 
-    std::optional<uint32_t> Block::locate(ionshared::Ptr<Statement> construct) const {
+    std::optional<size_t> Block::locate(ionshared::Ptr<Statement> construct) const {
         return ionshared::util::locateInVector<ionshared::Ptr<Statement>>(
             this->statements,
             std::move(construct)
@@ -127,8 +155,8 @@ namespace ionlang {
         return std::nullopt;
     }
 
-    bool Block::isFunctionBody() const {
-        ionshared::Ptr<Construct> parent = this->getParent();
+    bool Block::isFunctionBody() {
+        ionshared::Ptr<Construct> parent = this->getUnboxedParent();
 
         // TODO: Better way to know if this is a function body.
         if (parent == nullptr) {
@@ -139,30 +167,30 @@ namespace ionlang {
          * A block is considered a function body if it's parent is
          * a function construct.
          */
-        return parent->getConstructKind() == ConstructKind::Function;
+        return parent->constructKind == ConstructKind::Function;
     }
 
     ionshared::OptPtr<Function> Block::findParentFunction() {
         ionshared::OptPtr<Function> parentFunction = std::nullopt;
-        std::queue<ionshared::Ptr<ChildConstruct<Block>>> childrenOfBlockQueue = {};
+        std::queue<ionshared::Ptr<ConstructWithParent<Block>>> childrenOfBlockQueue = {};
 
-        childrenOfBlockQueue.push(this->staticCast<ChildConstruct<Block>>());
+        childrenOfBlockQueue.push(this->staticCast<ConstructWithParent<Block>>());
 
         while (!childrenOfBlockQueue.empty()) {
-            ionshared::Ptr<ChildConstruct<Block>> childOfBlock =
+            ionshared::Ptr<ConstructWithParent<Block>> childOfBlock =
                 childrenOfBlockQueue.front();
 
             childrenOfBlockQueue.pop();
 
-            ionshared::Ptr<Construct> parent = childOfBlock->getParent();
+            ionshared::Ptr<Construct> parent = *childOfBlock->parent;
 
-            if (parent->getConstructKind() == ConstructKind::Function) {
+            if (parent->constructKind == ConstructKind::Function) {
                 parentFunction = parent->dynamicCast<Function>();
 
                 break;
             }
-            else if (dynamic_cast<ChildConstruct<Block> *>(parent.get())) {
-                childrenOfBlockQueue.push(parent->dynamicCast<ChildConstruct<Block>>());
+            else if (dynamic_cast<ConstructWithParent<Block> *>(parent.get())) {
+                childrenOfBlockQueue.push(parent->dynamicCast<ConstructWithParent<Block>>());
             }
         }
 

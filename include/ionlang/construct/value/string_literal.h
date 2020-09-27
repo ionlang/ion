@@ -6,17 +6,11 @@
 namespace ionlang {
     class Pass;
 
-    class StringLiteral : public Value<> {
-    private:
+    struct StringLiteral : Value<> {
         std::string value;
 
-    public:
         explicit StringLiteral(std::string value);
 
         void accept(Pass &visitor) override;
-
-        std::string getValue() const;
-
-        void setValue(std::string value);
     };
 }

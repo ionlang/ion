@@ -4,12 +4,12 @@
 
 namespace ionlang {
     AstPtrResult<Args> Parser::parseArgs() {
+        this->beginSourceLocationMapping();
+
         ionshared::Ptr<ionshared::SymbolTable<Arg>> args =
             std::make_shared<ionshared::SymbolTable<Arg>>();
 
         bool isVariable = false;
-
-        // TODO: Support for variable arguments (currently the flag is useless).
 
         do {
             // Skip comma token if applicable.
@@ -18,13 +18,15 @@ namespace ionlang {
                 // Warn about leading, lonely comma.
                 if (args->isEmpty()) {
                     this->diagnosticBuilder
-                        ->bootstrap(diagnostic::syntaxLeadingCommaInArgs);
+                        ->bootstrap(diagnostic::syntaxLeadingCommaInArgs)
+                        ->setLocation(this->makeSourceLocation())
+                        ->finish();
                 }
 
                 // Skip over comma token.
                 this->tokenStream.skip();
             }
-            else if (this->is(TokenKind::SymbolVariableArgs)) {
+            else if (this->is(TokenKind::SymbolEllipsis)) {
                 isVariable = true;
                 this->tokenStream.skip();
 
@@ -62,6 +64,8 @@ namespace ionlang {
     }
 
     AstResult<Attributes> Parser::parseAttributes(const ionshared::Ptr<Construct> &parent) {
+        this->beginSourceLocationMapping();
+
         std::vector<ionshared::Ptr<Attribute>> attributes = {};
 
         while (this->is(TokenKind::SymbolAt)) {
@@ -154,7 +158,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(util::hasValue(bodyResult))
 
         // Fill in the nullptr body.
-        function->setBody(util::getResultValue(bodyResult));
+        function->body = util::getResultValue(bodyResult);
 
         this->finishSourceLocationMapping(function);
 

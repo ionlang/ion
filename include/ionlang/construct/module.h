@@ -12,11 +12,9 @@ namespace ionlang {
 
     typedef ionshared::Context<Construct> Context;
 
-    class Module : public Construct, public ionshared::Named {
-    private:
+    struct Module : Construct, ionshared::Named {
         ionshared::Ptr<Context> context;
 
-    public:
         explicit Module(
             std::string id,
             ionshared::Ptr<Context> context = std::make_shared<Context>()
@@ -24,10 +22,6 @@ namespace ionlang {
 
         void accept(Pass &visitor) override;
 
-        Ast getChildNodes() override;
-
-        [[nodiscard]] ionshared::Ptr<Context> getContext() const noexcept;
-
-        void setContext(ionshared::Ptr<Context> context) noexcept;
+        [[nodiscard]] Ast getChildNodes() override;
     };
 }

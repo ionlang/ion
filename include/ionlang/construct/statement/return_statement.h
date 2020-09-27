@@ -2,28 +2,23 @@
 
 #include <ionlang/construct/statement.h>
 #include <ionlang/construct/value.h>
+#include <ionlang/construct/expression.h>
 
 namespace ionlang {
     class Pass;
 
     struct ReturnStatementOpts : StatementOpts {
-        ionshared::OptPtr<Construct> value = std::nullopt;
+        ionshared::OptPtr<Expression> value = std::nullopt;
     };
 
-    class ReturnStatement : public Statement {
-    private:
-        ionshared::OptPtr<Construct> value;
+    struct ReturnStatement : Statement {
+        ionshared::OptPtr<Expression> value;
 
-    public:
         explicit ReturnStatement(const ReturnStatementOpts &opts);
 
         void accept(Pass &visitor) override;
 
-        Ast getChildNodes() override;
-
-        ionshared::OptPtr<Construct> getValue() const noexcept;
-
-        void setValue(ionshared::OptPtr<Construct> value) noexcept;
+        [[nodiscard]] Ast getChildNodes() override;
 
         bool hasValue() const noexcept;
     };

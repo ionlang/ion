@@ -1,8 +1,9 @@
-#include <ionlang/misc/util.h>
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
     AstPtrResult<Expression> Parser::parsePrimaryExpr(const ionshared::Ptr<Block> &parent) {
+        this->beginSourceLocationMapping();
+
         if (this->is(TokenKind::SymbolParenthesesL)) {
             return this->parseParenthesesExpr(parent);
         }
@@ -21,6 +22,8 @@ namespace ionlang {
     }
 
     AstPtrResult<Expression> Parser::parseParenthesesExpr(const ionshared::Ptr<Block> &parent) {
+        this->beginSourceLocationMapping();
+
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
         AstPtrResult<Expression> expr = this->parsePrimaryExpr(parent);
@@ -31,6 +34,8 @@ namespace ionlang {
     }
 
     AstPtrResult<Expression> Parser::parseIdExpr(const ionshared::Ptr<Block> &parent) {
+        this->beginSourceLocationMapping();
+
         if (this->isNext(TokenKind::SymbolParenthesesL)) {
             return util::getResultValue(this->parseCallExpr(parent));
         }
@@ -45,7 +50,7 @@ namespace ionlang {
     AstPtrResult<BinaryOperation> Parser::parseBinaryOperation(const ionshared::Ptr<Block> &parent) {
         while (true) {
             std::optional<Operator> operation =
-                util::findOperator(this->tokenStream.get().getKind());
+                util::findOperator(this->tokenStream.get().kind);
 
             IONLANG_PARSER_ASSERT(operation.has_value())
 
@@ -84,29 +89,36 @@ namespace ionlang {
     }
 
     AstPtrResult<CallExpr> Parser::parseCallExpr(const ionshared::Ptr<Block> &parent) {
+        this->beginSourceLocationMapping();
+
         std::optional<std::string> calleeId = this->parseId();
 
         IONLANG_PARSER_ASSERT(calleeId.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
-        // Call contains no arguments.
-        if (this->is(TokenKind::SymbolParenthesesR)) {
-            // TODO
-        }
-        else {
-            // TODO: Implement.
-            throw std::runtime_error("Not implemented; Currently not supported call with arguments");
+        CallArgs callArgs = CallArgs();
+
+        while (!this->is(TokenKind::SymbolParenthesesR)) {
+            AstPtrResult<Expression> primaryExpr = this->parsePrimaryExpr(parent);
+
+            IONLANG_PARSER_ASSERT(util::hasValue(primaryExpr))
+
+            callArgs.push_back(util::getResultValue(primaryExpr));
+
+            if (this->is(TokenKind::SymbolComma) && this->isNext(TokenKind::SymbolParenthesesR)) {
+                // TODO: Use DiagnosticBuilder.
+                throw std::runtime_error("No lonely leading comma");
+            }
+            else if (!this->is(TokenKind::SymbolParenthesesR)) {
+                IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolComma))
+            }
         }
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
         return std::make_shared<CallExpr>(
-            // TODO: Is this the correct parent for the Ref<Function>?
-            std::make_shared<Ref<Function>>(*calleeId, parent, RefKind::Function),
-
-            // TODO: Parse call args.
-            CallArgs()
+            std::make_shared<Ref<>>(*calleeId, parent, RefKind::Function),
+            callArgs
         );
     }
 }

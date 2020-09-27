@@ -10,29 +10,20 @@
 namespace ionlang {
     class Pass;
 
-    class Global : public Construct, public ionshared::Named {
-    private:
+    struct Global : ConstructWithParent<Module>, ionshared::Named {
         ionshared::Ptr<Type> type;
 
         ionshared::OptPtr<Value<>> value;
 
-    public:
         Global(
+            ionshared::Ptr<Module> parent,
             ionshared::Ptr<Type> type,
-            std::string id,
+            std::string name,
             ionshared::OptPtr<Value<>> value = std::nullopt
         );
 
         void accept(Pass &visitor) override;
 
-        Ast getChildNodes() override;
-
-        [[nodiscard]] ionshared::Ptr<Type> getType() const noexcept;
-
-        void setType(ionshared::Ptr<Type> type) noexcept;
-
-        [[nodiscard]] ionshared::OptPtr<Value<>> getValue() const noexcept;
-
-        void setValue(ionshared::OptPtr<Value<>> value) noexcept;
+        [[nodiscard]] Ast getChildNodes() override;
     };
 }

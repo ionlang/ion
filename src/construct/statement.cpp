@@ -6,27 +6,19 @@ namespace ionlang {
         StatementKind kind,
         ionshared::OptPtr<Statement> yields
     ) :
-        ChildConstruct(std::move(parent), ConstructKind::Statement),
-        kind(kind),
+        ConstructWithParent(std::move(parent), ConstructKind::Statement),
+        statementKind(kind),
         yields(std::move(yields)) {
         //
     }
 
-    StatementKind Statement::getStatementKind() const noexcept {
-        return this->kind;
-    }
-
-    ionshared::OptPtr<Statement> Statement::getYields() const noexcept {
-        return this->yields;
-    }
-
     bool Statement::isTerminal() const noexcept {
-        return this->kind == StatementKind::Return;
+        return this->statementKind == StatementKind::Return;
     }
 
     uint32_t Statement::getOrder() {
         std::optional<uint32_t> order =
-            this->getParent()->locate(this->dynamicCast<Statement>());
+            this->getUnboxedParent()->locate(this->dynamicCast<Statement>());
 
         if (!order.has_value()) {
             throw std::runtime_error("Could not locate instruction in parent");

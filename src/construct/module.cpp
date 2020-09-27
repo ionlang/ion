@@ -3,7 +3,7 @@
 namespace ionlang {
     Module::Module(std::string id, ionshared::Ptr<Context> context) :
         Construct(ConstructKind::Module),
-        ionshared::Named(std::move(id)),
+        ionshared::Named{std::move(id)},
         context(std::move(context)) {
         //
     }
@@ -17,13 +17,5 @@ namespace ionlang {
             // TODO: What about normal scopes? Merge that with global scope. Or actually, module just uses global context, right?
             this->context->getGlobalScope()
         );
-    }
-
-    ionshared::Ptr<Context> Module::getContext() const noexcept {
-        return this->context;
-    }
-
-    void Module::setContext(ionshared::Ptr<Context> context) noexcept {
-        this->context = std::move(context);
     }
 }

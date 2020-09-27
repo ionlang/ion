@@ -5,6 +5,8 @@
 namespace ionlang {
     class ConstName {
     public:
+        static const std::string unknown;
+
         static const std::string anonymous;
 
         static const std::string main;

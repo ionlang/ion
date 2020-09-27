@@ -1,4 +1,3 @@
-#include <ionlang/misc/util.h>
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
@@ -7,7 +6,7 @@ namespace ionlang {
             return std::nullopt;
         }
 
-        std::string id = this->tokenStream.get().getValue();
+        std::string id = this->tokenStream.get().value;
 
         this->tokenStream.skip();
 
@@ -25,7 +24,7 @@ namespace ionlang {
 
         std::optional<std::string> id = this->parseId();
 
-        // TODO: Function returns std::optional<>.
+        // TODO: Function returns std::optional<>.-
         //        IONIR_PARSER_ASSERT(id.hasValue(), Arg)
         if (!id.has_value()) {
             return std::nullopt;

@@ -4,8 +4,7 @@
 #include <ionlang/const/token_const.h>
 
 namespace ionlang {
-    class Classifier {
-    public:
+    struct Classifier {
         static bool isSymbol(TokenKind tokenKind);
 
         static bool isNumeric(TokenKind tokenKind);

@@ -49,7 +49,7 @@ namespace ionlang {
         );
 
         ionshared::Ptr<ReturnStatement> createReturn(
-            ionshared::OptPtr<Construct> value = std::nullopt
+            ionshared::OptPtr<Expression> value = std::nullopt
         );
     };
 }

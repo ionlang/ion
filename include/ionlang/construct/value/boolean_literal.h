@@ -5,17 +5,11 @@
 namespace ionlang {
     class Pass;
 
-    class BooleanLiteral : public Value<> {
-    private:
+    struct BooleanLiteral : Value<> {
         bool value;
 
-    public:
         explicit BooleanLiteral(bool value);
 
         void accept(Pass &visitor) override;
-
-        [[nodiscard]] bool getValue() const noexcept;
-
-        void setValue(bool value) noexcept;
     };
 }

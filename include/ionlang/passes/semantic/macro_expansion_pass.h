@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ionshared/error_handling/notice.h>
+#include <ionshared/diagnostics/diagnostic.h>
 #include <ionshared/tracking/symbol_table.h>
 #include <ionlang/misc/helpers.h>
 #include <ionlang/passes/pass.h>

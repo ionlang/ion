@@ -11,14 +11,12 @@ namespace ionlang {
     /**
      * Prototype's parent is either a function or extern construct.
      */
-    class Prototype : public ChildConstruct<>, public ionshared::Named {
-    private:
+    struct Prototype : ConstructWithParent<>, ionshared::Named {
         ionshared::Ptr<Args> args;
 
         ionshared::Ptr<Type> returnType;
 
-    public:
-        explicit Prototype(
+        Prototype(
             std::string id,
             ionshared::Ptr<Args> args,
             ionshared::Ptr<Type> returnType,
@@ -29,13 +27,7 @@ namespace ionlang {
 
         void accept(Pass &visitor) override;
 
-        [[nodiscard]] ionshared::Ptr<Args> getArguments() const noexcept;
-
-        void setArgs(ionshared::Ptr<Args> args) noexcept;
-
-        [[nodiscard]] ionshared::Ptr<Type> getReturnType() const noexcept;
-
-        void setReturnType(ionshared::Ptr<Type> returnType) noexcept;
+        // TODO: Get child constructs?
 
         // TODO: Move this method to IonIR, since it has no use here.
         /**

@@ -19,7 +19,7 @@ TEST(NameResolutionPassTest, Run) {
 
     // Locate the function and retrieve it's entry block.
     ionshared::OptPtr<Function> function = ast[0]->dynamicCast<Function>();
-    ionshared::Ptr<Block> functionBody = function->get()->getBody();
+    ionshared::Ptr<Block> functionBody = function->get()->body;
 
     // Create an statement builder instance and the branch instruction's condition.
     ionshared::Ptr<StatementBuilder> statementBuilder = std::make_shared<StatementBuilder>(functionBody);
@@ -47,7 +47,7 @@ TEST(NameResolutionPassTest, Run) {
 
     // TODO: Add more tests.
 
-    EXPECT_TRUE(assignmentStatement->getVariableDeclStatement()->isResolved());
+    EXPECT_TRUE(assignmentStatement->variableDeclStatementRef->isResolved());
 //    EXPECT_EQ(assignmentStatement->getValue(), functionBody);
 }
 

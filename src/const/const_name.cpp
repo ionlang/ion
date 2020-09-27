@@ -1,6 +1,8 @@
 #include <ionlang/const/const_name.h>
 
 namespace ionlang {
+    const std::string ConstName::unknown = "Unknown";
+
     const std::string ConstName::anonymous = "anonymous";
 
     const std::string ConstName::main = "main";

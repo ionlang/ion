@@ -6,9 +6,9 @@ using namespace ionlang;
 TEST(TokenTest, CorrectProperties) {
     Token token = Token(TokenKind::Identifier, std::string("hello_world"), 123);
 
-    EXPECT_EQ(token.getValue(), "hello_world");
-    EXPECT_EQ(token.getKind(), TokenKind::Identifier);
-    EXPECT_EQ(token.getStartPosition(), 123);
+    EXPECT_EQ(token.value, "hello_world");
+    EXPECT_EQ(token.kind, TokenKind::Identifier);
+    EXPECT_EQ(token.startPosition, 123);
 
     // End position must be 123 + len("hello_world") (11) = 134.
     EXPECT_EQ(token.getEndPosition(), 134);

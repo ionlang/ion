@@ -2,8 +2,8 @@
 
 namespace ionlang {
     Attribute::Attribute(ionshared::Ptr<Construct> parent, std::string id) :
-        ChildConstruct<>(std::move(parent), ConstructKind::Attribute),
-        ionshared::Named(std::move(id)) {
+        ConstructWithParent<>(std::move(parent), ConstructKind::Attribute),
+        ionshared::Named{std::move(id)} {
         //
     }
 

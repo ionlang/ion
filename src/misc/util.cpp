@@ -2,6 +2,7 @@
 #include <ionlang/const/const_name.h>
 #include <ionlang/construct/function.h>
 #include <ionlang/construct/extern.h>
+#include <ionlang/construct/struct.h>
 
 namespace ionlang::util {
     std::string resolveIntegerKindName(IntegerKind kind) {
@@ -74,24 +75,28 @@ namespace ionlang::util {
     }
 
     std::optional<std::string> findConstructId(const ionshared::Ptr<Construct> &construct) {
-        ConstructKind constructKind = construct->getConstructKind();
+        ConstructKind constructKind = construct->constructKind;
 
         /**
          * If the construct derives from ionshared::Named, simply cast it
          * and get it's id. Certain constructs do derive from it.
          */
         if (constructKind == ConstructKind::Prototype || constructKind == ConstructKind::Global) {
-            return construct->dynamicCast<ionshared::Named>()->getId();
+            return construct->dynamicCast<ionshared::Named>()->name;
         }
 
         // Otherwise, handle other specific cases.
         switch (constructKind) {
             case ConstructKind::Function: {
-                return construct->dynamicCast<Function>()->getPrototype()->getId();
+                return construct->dynamicCast<Function>()->prototype->name;
             }
 
             case ConstructKind::Extern: {
-                return construct->dynamicCast<Extern>()->getPrototype()->getId();
+                return construct->dynamicCast<Extern>()->prototype->name;
+            }
+
+            case ConstructKind::Struct: {
+                return construct->dynamicCast<Struct>()->name;
             }
 
             case ConstructKind::Statement: {
@@ -109,7 +114,7 @@ namespace ionlang::util {
     std::optional<std::string> findStatementId(const ionshared::Ptr<Statement> &statement) noexcept {
         // TODO: Implement. Check for derivations from ionshared::Named first, then specific cases (similar to util::findConstructId()).
         // TODO: VariableDecl can easily be implemented as derived.
-        switch (statement->getStatementKind()) {
+        switch (statement->statementKind) {
             default: {
                 return std::nullopt;
             }

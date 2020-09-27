@@ -6,6 +6,8 @@
 #include <ionir/construct/function.h>
 #include <ionir/construct/global.h>
 #include <ionir/construct/extern.h>
+#include <ionir/construct/identifier.h>
+#include <ionir/construct/struct.h>
 #include <ionir/misc/inst_builder.h>
 #include <ionir/const/const.h>
 #include <ionlang/passes/lowering/ionir_lowering_pass.h>
@@ -13,6 +15,56 @@
 #include <ionlang/const/const.h>
 
 namespace ionlang {
+    ionshared::Ptr<ionir::Type> IonIrLoweringPass::processTypeQualifiers(
+        ionshared::Ptr<ionir::Type> type,
+        const ionshared::Ptr<TypeQualifiers> &qualifiers
+    ) {
+        ionshared::Ptr<ionir::TypeQualifiers> ionIrTypeQualifiers =
+            std::make_shared<ionir::TypeQualifiers>();
+
+        auto typeQualifiersSet = qualifiers->unwrap();
+
+        for (const auto &typeQualifier : typeQualifiersSet) {
+            ionir::TypeQualifier ionIrTypeQualifier;
+
+            switch (typeQualifier) {
+                case TypeQualifier::Pointer: {
+                    ionIrTypeQualifier = ionir::TypeQualifier::Pointer;
+
+                    break;
+                }
+
+                case TypeQualifier::Reference: {
+                    ionIrTypeQualifier = ionir::TypeQualifier::Reference;
+
+                    break;
+                }
+
+                case TypeQualifier::Constant: {
+                    ionIrTypeQualifier = ionir::TypeQualifier::Constant;
+
+                    break;
+                }
+
+                case TypeQualifier::Mutable: {
+                    ionIrTypeQualifier = ionir::TypeQualifier::Mutable;
+
+                    break;
+                }
+
+                default: {
+                    throw std::runtime_error("Unknown type qualifier");
+                }
+            }
+
+            ionIrTypeQualifiers->add(ionIrTypeQualifier);
+        }
+
+        type->qualifiers = ionIrTypeQualifiers;
+
+        return type;
+    }
+
     ionshared::Ptr<ionir::Module> IonIrLoweringPass::requireModule() {
         if (!ionshared::util::hasValue(this->buffers.module)) {
             throw std::runtime_error("Expected the module buffer to be set, but was nullptr");
@@ -116,14 +168,16 @@ namespace ionlang {
     }
 
     void IonIrLoweringPass::visitModule(ionshared::Ptr<Module> node) {
-        this->buffers.module = std::make_shared<ionir::Module>(node->getId());
+        this->buffers.module = std::make_shared<ionir::Module>(
+            std::make_shared<ionir::Identifier>(node->name)
+        );
 
         // Set the module on the modules symbol table.
-        this->modules->set(node->getId(), *this->buffers.module);
+        this->modules->set(node->name, *this->buffers.module);
 
         // Proceed to visit all the module's children (top-level constructs).
         std::map<std::string, ionshared::Ptr<Construct>> moduleSymbolTable =
-            node->getContext()->getGlobalScope()->unwrap();
+            node->context->getGlobalScope()->unwrap();
 
         for (const auto &[id, topLevelConstruct] : moduleSymbolTable) {
             this->visit(topLevelConstruct);
@@ -137,14 +191,6 @@ namespace ionlang {
     }
 
     void IonIrLoweringPass::visitFunction(ionshared::Ptr<Function> node) {
-        /**
-         * Function was already emitted, do not continue. This check
-         * is present because visiting a call expression referencing a
-         * function that will be processed in the future, no symbol has
-         * been emitted on the local symbol table. So that function (this
-         * node) is either emitted here or when emitting the call expression,
-         * in other words, whenever first encountered or needed.
-         */
         if (this->symbolTable.contains(node)) {
             return;
         }
@@ -159,16 +205,16 @@ namespace ionlang {
 //            );
 //        }
 
-        std::string ionIrFunctionId = node->getPrototype()->getId();
+        std::string ionIrFunctionId = node->prototype->name;
 
-        if (moduleBuffer->getContext()->getGlobalScope()->contains(ionIrFunctionId)) {
+        if (moduleBuffer->context->getGlobalScope()->contains(ionIrFunctionId)) {
             throw ionshared::util::quickError(
                 IONLANG_NOTICE_FUNCTION_ALREADY_DEFINED,
                 ionIrFunctionId
             );
         }
 
-        this->visitPrototype(node->getPrototype());
+        this->visitPrototype(node->prototype);
 
         ionshared::Ptr<ionir::Prototype> ionIrPrototype =
             this->constructStack.pop()->dynamicCast<ionir::Prototype>();
@@ -185,7 +231,7 @@ namespace ionlang {
         // Set the function buffer. This is required when visiting the function body.
         this->buffers.function = ionIrFunction;
 
-        this->visitBlock(node->getBody());
+        this->visitBlock(node->body);
 
         // TODO: Redundant Repetitive assignment?
         // Set the function buffer.
@@ -205,19 +251,23 @@ namespace ionlang {
     }
 
     void IonIrLoweringPass::visitExtern(ionshared::Ptr<Extern> node) {
-        ionshared::Ptr<ionir::Module> moduleBuffer = this->requireModule();
+        if (this->symbolTable.contains(node)) {
+            return;
+        }
+
+        ionshared::Ptr<ionir::Module> ionirModuleBuffer = this->requireModule();
 
         ionshared::PtrSymbolTable<ionir::Construct> moduleBufferSymbolTable =
-            moduleBuffer->getContext()->getGlobalScope();
+            ionirModuleBuffer->context->getGlobalScope();
 
-        ionshared::Ptr<Prototype> prototype = node->getPrototype();
+        ionshared::Ptr<Prototype> prototype = node->prototype;
 
         // TODO: Use verify instead.
         if (prototype == nullptr) {
             throw std::runtime_error("Unexpected external definition's prototype to be null");
         }
 
-        if (moduleBufferSymbolTable->contains(prototype->getId())) {
+        if (moduleBufferSymbolTable->contains(prototype->name)) {
             throw std::runtime_error("Entity with same id already exists on module");
         }
 
@@ -227,27 +277,28 @@ namespace ionlang {
             this->constructStack.pop()->dynamicCast<ionir::Prototype>();
 
         ionshared::Ptr<ionir::Extern> ionIrExtern =
-            std::make_shared<ionir::Extern>(ionIrPrototype);
+            std::make_shared<ionir::Extern>(ionirModuleBuffer, ionIrPrototype);
 
         /**
          * Register the IonIR extern on the module buffer's symbol table.
          * This will allow the IonIR codegen pass to visit the extern.
          */
-        moduleBufferSymbolTable->set(prototype->getId(), ionIrExtern);
+        moduleBufferSymbolTable->set(prototype->name, ionIrExtern);
 
+        this->symbolTable.set(node, ionIrExtern);
         this->constructStack.push(ionIrExtern);
     }
 
     void IonIrLoweringPass::visitPrototype(ionshared::Ptr<Prototype> node) {
         this->requireModule();
-        this->visitType(node->getReturnType());
+        this->visitType(node->returnType);
 
         ionshared::Ptr<ionir::Type> ionIrReturnType = this->typeStack.pop();
         ionshared::Ptr<ionir::Args> ionIrArguments = std::make_shared<ionir::Args>();
-        ionshared::Ptr<Args> arguments = node->getArguments();
-        auto nativeArguments = arguments->getItems()->unwrap();
+        ionshared::Ptr<Args> arguments = node->args;
+        auto nativeArguments = arguments->items->unwrap();
 
-        ionIrArguments->setIsVariable(arguments->getIsVariable());
+        ionIrArguments->setIsVariable(arguments->isVariable);
 
         // TODO: Should Args be a construct, and be visited?
         for (const auto &[id, argument] : nativeArguments) {
@@ -260,7 +311,7 @@ namespace ionlang {
         }
 
         ionshared::Ptr<ionir::Prototype> ionIrPrototype = std::make_shared<ionir::Prototype>(
-            node->getId(),
+            node->name,
             ionIrArguments,
             ionIrReturnType,
             *this->buffers.module
@@ -282,7 +333,7 @@ namespace ionlang {
             ionIrFunctionBody = std::make_shared<ionir::FunctionBody>(ionIrFunctionBuffer);
 
             // Apply the newly created function body to the function.
-            ionIrFunctionBuffer->setBody(*ionIrFunctionBody);
+            ionIrFunctionBuffer->body = *ionIrFunctionBody;
 
             /**
              * Only make the basic block the entry block if no previous block
@@ -297,7 +348,7 @@ namespace ionlang {
         // TODO: Create the block somehow. It requires 'BasicBlockKind', 'registers' and 'insts'.
         ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlock =
             std::make_shared<ionir::BasicBlock>(ionir::BasicBlockOpts{
-                ionIrFunctionBuffer->getBody(),
+                ionIrFunctionBuffer->body,
                 ionIrBasicBlockKind,
                 ionIrBasicBlockId
             });
@@ -310,7 +361,7 @@ namespace ionlang {
          */
         this->setBuilder(ionIrBasicBlock);
 
-        std::vector<ionshared::Ptr<Statement>> statements = node->getStatements();
+        std::vector<ionshared::Ptr<Statement>> statements = node->statements;
 
         for (const auto &statement : statements) {
             // Visit the statement.
@@ -357,7 +408,7 @@ namespace ionlang {
             this->typeStack.pop()->dynamicCast<ionir::IntegerType>();
 
         ionshared::Ptr<ionir::IntegerLiteral> ionIrIntegerLiteral =
-            std::make_shared<ionir::IntegerLiteral>(ionIrIntegerType, node->getValue());
+            std::make_shared<ionir::IntegerLiteral>(ionIrIntegerType, node->value);
 
         // Use static pointer cast when downcasting to ionir::Value<>.
         this->constructStack.push(ionIrIntegerLiteral->staticCast<ionir::Value<>>());
@@ -365,21 +416,21 @@ namespace ionlang {
 
     void IonIrLoweringPass::visitCharLiteral(ionshared::Ptr<CharLiteral> node) {
         ionshared::Ptr<ionir::CharLiteral> ionIrCharLiteral =
-            std::make_shared<ionir::CharLiteral>(node->getValue());
+            std::make_shared<ionir::CharLiteral>(node->value);
 
         this->constructStack.push(ionIrCharLiteral->dynamicCast<ionir::Value<>>());
     }
 
     void IonIrLoweringPass::visitStringLiteral(ionshared::Ptr<StringLiteral> node) {
         ionshared::Ptr<ionir::StringLiteral> ionIrStringLiteral =
-            std::make_shared<ionir::StringLiteral>(node->getValue());
+            std::make_shared<ionir::StringLiteral>(node->value);
 
         this->constructStack.push(ionIrStringLiteral->dynamicCast<ionir::Value<>>());
     }
 
     void IonIrLoweringPass::visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> node) {
         ionshared::Ptr<ionir::BooleanLiteral> ionIrBooleanLiteral =
-            std::make_shared<ionir::BooleanLiteral>(node->getValue());
+            std::make_shared<ionir::BooleanLiteral>(node->value);
 
         this->constructStack.push(ionIrBooleanLiteral->dynamicCast<ionir::Value<>>());
     }
@@ -388,10 +439,10 @@ namespace ionlang {
         // Module buffer will be used, therefore it must be set.
         ionshared::Ptr<ionir::Module> ionIrModuleBuffer = this->requireModule();
 
-        this->visitType(node->getType());
+        this->visitType(node->type);
 
         ionshared::Ptr<ionir::Type> type = this->typeStack.pop();
-        ionshared::OptPtr<Value<>> nodeValue = node->getValue();
+        ionshared::OptPtr<Value<>> nodeValue = node->value;
         ionshared::OptPtr<ionir::Value<>> value = std::nullopt;
 
         // Assign value if applicable.
@@ -408,15 +459,17 @@ namespace ionlang {
         }
 
         ionshared::Ptr<ionir::Global> ionIrGlobalVariable =
-            std::make_shared<ionir::Global>(type, node->getId(), value);
+            std::make_shared<ionir::Global>(type, node->name, value);
+
+        // TODO: Check if exists first?
 
         /**
          * Register the global variable on the buffered module's symbol table.
          * This will allow it to be visited and emitted to LLVM IR during the
          * IonIR codegen phase.
          */
-        ionIrModuleBuffer->getContext()->getGlobalScope()->set(
-            ionIrGlobalVariable->getId(),
+        ionIrModuleBuffer->context->getGlobalScope()->set(
+            ionIrGlobalVariable->name,
             ionIrGlobalVariable
         );
 
@@ -471,7 +524,7 @@ namespace ionlang {
          * Create the corresponding IonIR integer type based off the
          * node's integer kind.
          */
-        switch (node->getIntegerKind()) {
+        switch (node->integerKind) {
             case IntegerKind::Int8: {
                 ionIrIntegerKind = ionir::IntegerKind::Int8;
 
@@ -507,35 +560,35 @@ namespace ionlang {
             }
         }
 
-        ionshared::Ptr<ionir::IntegerType> ionIrType =
-            std::make_shared<ionir::IntegerType>(ionIrIntegerKind);
-
-        this->typeStack.push(ionIrType);
+        this->typeStack.push(IonIrLoweringPass::processTypeQualifiers(
+            std::make_shared<ionir::IntegerType>(ionIrIntegerKind, node->isSigned),
+            node->qualifiers
+        ));
     }
 
     void IonIrLoweringPass::visitBooleanType(ionshared::Ptr<BooleanType> node) {
-        ionshared::Ptr<ionir::BooleanType> ionIrBooleanType =
-            std::make_shared<ionir::BooleanType>();
-
-        this->typeStack.push(ionIrBooleanType);
+        this->typeStack.push(IonIrLoweringPass::processTypeQualifiers(
+            std::make_shared<ionir::BooleanType>(),
+            node->qualifiers
+        ));
     }
 
     void IonIrLoweringPass::visitVoidType(ionshared::Ptr<VoidType> node) {
-        ionshared::Ptr<ionir::VoidType> ionIrVoidType =
-            std::make_shared<ionir::VoidType>();
-
-        this->typeStack.push(ionIrVoidType);
+        this->typeStack.push(IonIrLoweringPass::processTypeQualifiers(
+            std::make_shared<ionir::VoidType>(),
+            node->qualifiers
+        ));
     }
 
     void IonIrLoweringPass::visitIfStatement(ionshared::Ptr<IfStatement> node) {
         ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlockBuffer = this->requireBasicBlock();
 
-        Pass::visit(node->getCondition());
+        Pass::visit(node->condition);
 
-        ionshared::Ptr<Block> parentBlock = node->getParent();
+        ionshared::Ptr<Block> parentBlock = node->getUnboxedParent();
         ionshared::Ptr<ionir::Construct> ionIrCondition = this->constructStack.pop();
 
-        // TODO: Should verify if ionIrCondition is either Ref<> or Value<> here? Or in typecheck?
+        // TODO: Should verify if ionIrCondition is either Ref<> or Value<> here? Or in type-check?
 
         /**
          * Transfer all previously emitted instructions into a new continuation
@@ -555,9 +608,9 @@ namespace ionlang {
          * Split the block from after this if statement, if there are
          * more statements after this if statement.
          */
-        if (parentBlock->getStatements().size() - 1 >= splitOrder) {
+        if (parentBlock->statements.size() - 1 >= splitOrder) {
             // TODO: Symbol table not being migrated (split does not do this).
-            successorBlock = parentBlock->split(splitOrder);
+            successorBlock = parentBlock->slice(splitOrder);
         }
         /**
          * There are no more upcoming statements after this if statement.
@@ -565,18 +618,18 @@ namespace ionlang {
          */
         else {
             // TODO: Symbol table not being migrated.
-            successorBlock = std::make_shared<Block>(parentBlock->getParent());
+            successorBlock = std::make_shared<Block>(parentBlock->getUnboxedParent());
         }
 
         // TODO: Hotfix to avoid function body (thus overriding bufferFunction's body).
-        successorBlock->setParent(node);
+        successorBlock->parent = node;
 
         this->visitBlock(successorBlock);
 
         ionshared::Ptr<ionir::BasicBlock> ionIrSuccessorBasicBlock =
             this->constructStack.pop()->dynamicCast<ionir::BasicBlock>();
 
-        this->visitBlock(node->getConsequentBlock());
+        this->visitBlock(node->consequentBlock);
 
         ionshared::Ptr<ionir::BasicBlock> ionIrConsequentBasicBlock =
             this->constructStack.pop()->dynamicCast<ionir::BasicBlock>();
@@ -599,7 +652,7 @@ namespace ionlang {
         ionIrConsequentBasicBlock->link(ionIrSuccessorBasicBlock);
 
         if (node->hasAlternativeBlock()) {
-            this->visitBlock(*node->getAlternativeBlock());
+            this->visitBlock(*node->alternativeBlock);
 
             ionshared::Ptr<ionir::BasicBlock> ionIrAlternativeBlock =
                 this->constructStack.pop()->dynamicCast<ionir::BasicBlock>();
@@ -617,7 +670,7 @@ namespace ionlang {
         ionshared::OptPtr<ionir::Value<>> ionIrValue = std::nullopt;
 
         if (node->hasValue()) {
-            Pass::visit(*node->getValue());
+            Pass::visit(*node->value);
 
             // Use a static pointer cast to cast to ionir::Value<>.
             ionIrValue = this->constructStack.pop()->staticCast<ionir::Value<>>();
@@ -637,21 +690,21 @@ namespace ionlang {
     void IonIrLoweringPass::visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> node) {
         ionshared::Ptr<ionir::InstBuilder> ionIrBuilderBuffer = this->requireBuilder();
 
-        if (!node->getVariableDeclStatement()->isResolved()) {
+        if (!node->variableDeclStatementRef->isResolved()) {
             // TODO: Better error.
             throw std::runtime_error("Expected variable declaration reference to be resolved");
         }
-        else if (!this->symbolTable.contains(*node->getVariableDeclStatement()->getValue())) {
+        else if (!this->symbolTable.contains(**node->variableDeclStatementRef)) {
             // TODO: Better error.
             throw std::runtime_error("Could not find corresponding IonIR alloca instruction on the symbol table");
         }
 
-        ionshared::Ptr<VariableDeclStatement> variableDecl = *node->getVariableDeclStatement()->getValue();
+        ionshared::Ptr<VariableDeclStatement> variableDecl = **node->variableDeclStatementRef;
 
         ionshared::Ptr<ionir::AllocaInst> ionIrAllocaInst =
             *this->symbolTable.find<ionir::AllocaInst>(variableDecl);
 
-        this->visit(node->getValue());
+        this->visit(node->value);
 
         ionIrBuilderBuffer->createStore(
             this->constructStack.pop()->staticCast<ionir::Value<>>(),
@@ -665,18 +718,18 @@ namespace ionlang {
         ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = *this->buffers.builder;
 
         // First, visit the type and create a IonIR alloca inst,  and push it onto the stack.
-        this->visitType(node->getType());
+        this->visitType(node->type);
 
         ionshared::Ptr<ionir::Type> ionIrType = this->typeStack.pop();
 
         ionshared::Ptr<ionir::AllocaInst> ionIrAllocaInst =
-            ionIrInstBuilder->createAlloca(node->getId(), ionIrType);
+            ionIrInstBuilder->createAlloca(node->name, ionIrType);
 
         this->symbolTable.set(node, ionIrAllocaInst);
         this->constructStack.push(ionIrAllocaInst);
 
         // Lastly, then create a IonIR store inst, and push it onto the stack.
-        Pass::visit(node->getValue());
+        Pass::visit(node->value);
 
         // TODO: Value can be an expression as well. Check that ConstructKind == Value, otherwise handle appropriately.
         ionshared::Ptr<ionir::Value<>> ionIrValue =
@@ -690,44 +743,87 @@ namespace ionlang {
     }
 
     void IonIrLoweringPass::visitCallExpr(ionshared::Ptr<CallExpr> node) {
-        ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = this->requireBuilder();
-        PtrRef<Function> calleeRef = node->getCalleeRef();
+        PtrRef<> calleeRef = node->calleeRef;
 
         if (!calleeRef->isResolved()) {
             throw std::runtime_error("Expected callee function reference to be resolved");
         }
 
-        ionshared::Ptr<Function> callee = *calleeRef->getValue();
+        ionshared::Ptr<Construct> callee = *calleeRef->value;
+        ConstructKind calleeConstructKind = callee->constructKind;
+
+        // The callee must be either a function or an extern.
+        if (calleeConstructKind != ConstructKind::Function && calleeConstructKind != ConstructKind::Extern) {
+            // TODO: Use DiagnosticBuilder.
+            throw std::runtime_error("Callee '%s' is neither a function nor an extern");
+        }
 
         /**
-         * Visit the callee function earlier if it hasn't been
-         * visited/emitted at this point.
+         * Visit the callee it earlier if it hasn't been visited/emitted
+         * at this point.
          */
         if (!this->symbolTable.contains(callee)) {
             this->lockBuffers([&, this] {
-                this->visitFunction(callee);
+                this->visit(callee);
             });
 
-            // TODO: The function is being discarded here, but what if that function needs to be present in the stack because of the invoking method requires to pop it?
+            // TODO: The function/extern is being discarded here, but what if that function needs to be present in the stack because of the invoking method requires to pop it?
             this->constructStack.tryPop();
         }
 
-        ionshared::OptPtr<ionir::Function> ionIrCalleeResult =
-            this->symbolTable.find<ionir::Function>(callee);
+        ionshared::OptPtr<ionir::Construct> ionIrCalleeResult =
+            this->symbolTable.find(callee);
 
         if (!ionshared::util::hasValue(ionIrCalleeResult)) {
             throw std::runtime_error("Corresponding emitted IonIR entity could not be found on symbol table");
+        }
+
+        std::vector<ionshared::Ptr<ionir::Construct>> ionIrArgs = {};
+
+        for (const auto &arg : node->args) {
+            arg->accept(*this);
+            ionIrArgs.push_back(this->constructStack.pop());
         }
 
         /**
          * At this point, we know that the basic block buffer is
          * set because the builder buffer is set.
          */
-        ionshared::Ptr<ionir::CallInst> ionIrCallInst = ionIrInstBuilder->createCall(
-            *ionIrCalleeResult
-            // TODO: Process arguments.
+        ionshared::Ptr<ionir::CallInst> ionIrCallInst = this->requireBuilder()->createCall(
+            *ionIrCalleeResult,
+            ionIrArgs
         );
 
         this->constructStack.push(ionIrCallInst);
+    }
+
+    void IonIrLoweringPass::visitStruct(ionshared::Ptr<Struct> node) {
+        ionshared::Ptr<ionir::Module> ionIrModuleBuffer = this->requireModule();
+        ionir::Scope globalSymbolTable = ionIrModuleBuffer->context->getGlobalScope();
+
+        if (globalSymbolTable->contains(node->name)) {
+            // TODO: Use DiagnosticBuilder.
+            throw std::runtime_error("Struct was already previously defined in the module");
+        }
+
+        auto fieldsMap = node->fields->unwrap();
+
+        ionir::Fields ionIrFields =
+            ionshared::util::makePtrSymbolTable<ionir::Type>();
+
+        for (const auto &[name, type] : fieldsMap) {
+            this->visitType(type);
+            ionIrFields->set(name, this->typeStack.pop());
+        }
+
+        ionshared::Ptr<ionir::Struct> ionIrStruct =
+            std::make_shared<ionir::Struct>(node->name, ionIrFields);
+
+        ionIrModuleBuffer->context->getGlobalScope()->set(
+            node->name,
+            ionIrStruct
+        );
+
+        this->constructStack.push(ionIrStruct);
     }
 }

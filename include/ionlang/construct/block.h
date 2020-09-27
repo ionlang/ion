@@ -16,11 +16,10 @@ namespace ionlang {
     class StatementBuilder;
 
     // TODO: Must be verified to contain a single terminal instruction at the end?
-    class Block : public ChildConstruct<>, public ionshared::Scoped<VariableDeclStatement> {
-    private:
+    struct Block : ConstructWithParent<>, ionshared::Scoped<VariableDeclStatement> {
+        // TODO: When statements are mutated, the symbol table must be cleared and re-populated.
         std::vector<ionshared::Ptr<Statement>> statements;
 
-    public:
         explicit Block(
             ionshared::Ptr<Construct> parent,
 
@@ -34,28 +33,43 @@ namespace ionlang {
 
         [[nodiscard]] Ast getChildNodes() override;
 
-        [[nodiscard]] std::vector<ionshared::Ptr<Statement>> &getStatements() noexcept;
-
-        // TODO: When statements are set, the symbol table must be cleared and re-populated.
-        void setStatements(std::vector<ionshared::Ptr<Statement>> statements);
-
+        /**
+         * Append a statement to the local statement vector, and if
+         * applicable, register it on the local symbol table. No
+         * relocation is performed, and the statement's parent
+         * is left intact.
+         */
         void appendStatement(const ionshared::Ptr<Statement> &statement);
 
-        uint32_t relocateStatements(Block &target, uint32_t from = 0);
+        /**
+         * Move the statement at the provided order index from this block
+         * to another. The statement will be removed from the local vector,
+         * and registered on the target block's symbol table.
+         */
+        bool relocateStatement(size_t orderIndex, ionshared::Ptr<Block> target);
+
+        size_t relocateStatements(
+            const ionshared::Ptr<Block> &target,
+            size_t from = 0,
+            std::optional<size_t> to = std::nullopt
+        );
 
         /**
          * Splits the local basic block, relocating all instructions
-         * at and after the provided index to a new basic block with
-         * the provided id, having the same parent as the local basic
-         * block.
+         * within the provided range (or all after the starting index if
+         * no end index was provided) to a new basic block with the same
+         * parent as this local block.
          */
-        [[nodiscard]] ionshared::Ptr<Block> split(uint32_t atOrder);
+        [[nodiscard]] ionshared::Ptr<Block> slice(
+            size_t from,
+            std::optional<size_t> to = std::nullopt
+        );
 
         /**
-         * Attempt to find the index location of an instruction.
-         * Returns null if not found.
+         * Attempt to find the index location of a statement. Returns null
+         * if not found.
          */
-        [[nodiscard]] std::optional<uint32_t> locate(ionshared::Ptr<Statement> statement) const;
+        [[nodiscard]] std::optional<size_t> locate(ionshared::Ptr<Statement> statement) const;
 
         [[nodiscard]] ionshared::Ptr<StatementBuilder> createBuilder();
 
@@ -71,7 +85,7 @@ namespace ionlang {
 
         [[nodiscard]] ionshared::OptPtr<Statement> findLastStatement() noexcept;
 
-        [[nodiscard]] bool isFunctionBody() const;
+        [[nodiscard]] bool isFunctionBody();
 
         [[nodiscard]] ionshared::OptPtr<Function> findParentFunction();
     };

@@ -11,12 +11,4 @@ namespace ionlang {
     void StringLiteral::accept(Pass &visitor) {
         visitor.visitStringLiteral(this->dynamicCast<StringLiteral>());
     }
-
-    std::string StringLiteral::getValue() const {
-        return this->value;
-    }
-
-    void StringLiteral::setValue(std::string value) {
-        this->value = std::move(value);
-    }
 }

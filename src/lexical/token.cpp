@@ -1,19 +1,16 @@
 #include <ionlang/lexical/token.h>
 
 namespace ionlang {
-    Token::Token(
-        TokenKind kind,
-        std::string value,
-        uint32_t startPosition,
-        uint32_t lineNumber
-    ) :
-        BaseToken(kind, std::move(value), startPosition, lineNumber) {
-        //
-    }
-
     std::ostream &operator<<(std::ostream &stream, Token &token) {
         // TODO: Include line number as well.
-        return stream << "Token(" << token.getValue() << ", " << token.getKind() << ", " << token.getStartPosition()
-            << "-" << token.getEndPosition() << ")";
+        return stream << "Token("
+            << token.value
+            << ", "
+            << token.kind
+            << ", "
+            << token.startPosition
+            << "-"
+            << token.getEndPosition()
+            << ")";
     }
 }

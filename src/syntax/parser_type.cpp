@@ -1,12 +1,12 @@
 #include <ionlang/syntax/parser.h>
 #include <ionlang/const/const.h>
 #include <ionlang/lexical/classifier.h>
-#include <ionlang/misc/util.h>
 
 namespace ionlang {
     // TODO: Consider using Ref<> to register pending type reference if user-defined type is parsed?
     AstPtrResult<Type> Parser::parseType() {
-        ionshared::Ptr<TypeQualifiers> qualifiers = std::make_shared<TypeQualifiers>();
+        ionshared::Ptr<TypeQualifiers> qualifiers =
+            std::make_shared<TypeQualifiers>();
 
         // TODO: Simplify to support const mut &*type.
 
@@ -27,7 +27,7 @@ namespace ionlang {
             }
             // Otherwise, it must be a pointer.
             else {
-                IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolStar))
+                IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolHash))
 
                 qualifiers->add(TypeQualifier::Pointer);
             }
@@ -39,7 +39,7 @@ namespace ionlang {
         }
 
         // 4th qualifier: pointer.
-        if (this->is(TokenKind::SymbolStar)) {
+        if (this->is(TokenKind::SymbolHash)) {
             this->tokenStream.skip();
             qualifiers->add(TypeQualifier::Pointer);
         }
@@ -50,8 +50,8 @@ namespace ionlang {
         Token token = this->tokenStream.get();
 
         // Abstract the token's properties
-        std::string tokenValue = token.getValue();
-        TokenKind tokenKind = token.getKind();
+        std::string tokenValue = token.value;
+        TokenKind tokenKind = token.kind;
 
         IONLANG_PARSER_ASSERT((
             Classifier::isBuiltInType(tokenKind)
@@ -73,10 +73,9 @@ namespace ionlang {
         // TODO: Add support for missing types.
 
         /**
-         * Type could not be identified as integer nor void
-         * type, attempt to resolve its an internal type kind
-         * from the token's value, otherwise default to an
-         * user-defined type assumption.
+         * Type could not be identified as integer nor void type, attempt
+         * to resolve its an internal type kind from the token's value,
+         * otherwise default to an user-defined type assumption.
          */
         if (!util::hasValue(type)) {
             type = std::make_shared<Type>(
@@ -108,7 +107,7 @@ namespace ionlang {
     }
 
     AstPtrResult<IntegerType> Parser::parseIntegerType(const ionshared::Ptr<TypeQualifiers> &qualifiers) {
-        TokenKind currentTokenKind = this->tokenStream.get().getKind();
+        TokenKind currentTokenKind = this->tokenStream.get().kind;
 
         if (!Classifier::isIntegerType(currentTokenKind)) {
             // TODO: Use proper exception/error.

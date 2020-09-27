@@ -18,20 +18,4 @@ namespace ionlang {
             this->variableDeclStatementRef
         };
     }
-
-    PtrRef<VariableDeclStatement> AssignmentStatement::getVariableDeclStatement() const noexcept {
-        return this->variableDeclStatementRef;
-    }
-
-    void AssignmentStatement::setVariableDeclStatement(PtrRef<VariableDeclStatement> variableDeclStatement) noexcept {
-        this->variableDeclStatementRef = std::move(variableDeclStatement);
-    }
-
-    ionshared::Ptr<Construct> AssignmentStatement::getValue() const noexcept {
-        return this->value;
-    }
-
-    void AssignmentStatement::setValue(ionshared::Ptr<Construct> value) noexcept {
-        this->value = std::move(value);
-    }
 }

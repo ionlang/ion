@@ -11,12 +11,11 @@ namespace ionlang {
         {",", TokenKind::SymbolComma},
         {"=", TokenKind::SymbolEqual},
         {";", TokenKind::SymbolSemiColon},
-        {"*", TokenKind::SymbolStar},
         {"{", TokenKind::SymbolBraceL},
         {"}", TokenKind::SymbolBraceR},
         {"->", TokenKind::SymbolArrow},
         {"&", TokenKind::SymbolAmpersand},
         {"@", TokenKind::SymbolAt},
-        {"...", TokenKind::SymbolVariableArgs}
+        {"...", TokenKind::SymbolEllipsis}
     }));
 }

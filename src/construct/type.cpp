@@ -2,10 +2,14 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    Type::Type(std::string id, TypeKind kind, ionshared::Ptr<TypeQualifiers> qualifiers) :
+    Type::Type(
+        std::string id,
+        TypeKind kind,
+        ionshared::Ptr<TypeQualifiers> qualifiers
+    ) :
         Construct(ConstructKind::Type),
-        ionshared::Named(std::move(id)),
-        kind(kind),
+        ionshared::Named{std::move(id)},
+        typeKind(kind),
         qualifiers(std::move(qualifiers)) {
         //
     }
@@ -15,15 +19,7 @@ namespace ionlang {
     }
 
     TypeKind Type::getTypeKind() const noexcept {
-        return this->kind;
-    }
-
-    ionshared::Ptr<TypeQualifiers> Type::getQualifiers() const noexcept {
-        return this->qualifiers;
-    }
-
-    void Type::setQualifiers(ionshared::Ptr<TypeQualifiers> qualifiers) noexcept {
-        this->qualifiers = std::move(qualifiers);
+        return this->typeKind;
     }
 
     bool Type::addQualifier(TypeQualifier qualifier) noexcept {

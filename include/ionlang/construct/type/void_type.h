@@ -5,8 +5,7 @@
 namespace ionlang {
     class Pass;
 
-    class VoidType : public Type {
-    public:
+    struct VoidType : Type {
         VoidType();
 
         void accept(Pass &pass) override;

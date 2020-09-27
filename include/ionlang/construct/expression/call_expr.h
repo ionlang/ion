@@ -8,25 +8,15 @@ namespace ionlang {
 
     typedef std::vector<ionshared::Ptr<Value<>>> CallArgs;
 
-    class CallExpr : public Expression {
-    private:
-        PtrRef<Function> calleeRef;
+    struct CallExpr : Expression {
+        PtrRef<> calleeRef;
 
         CallArgs args;
 
-    public:
-        CallExpr(PtrRef<Function> callee, CallArgs args);
+        CallExpr(PtrRef<> callee, CallArgs args);
 
         void accept(Pass &visitor) override;
 
         [[nodiscard]] Ast getChildNodes() override;
-
-        [[nodiscard]] PtrRef<Function> getCalleeRef() const noexcept;
-
-        void setCalleeRef(PtrRef<Function> calleeRef) noexcept;
-
-        [[nodiscard]] CallArgs getArgs() const noexcept;
-
-        void setArgs(CallArgs args) noexcept;
     };
 }

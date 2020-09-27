@@ -18,6 +18,11 @@ namespace ionlang {
             ionshared::OptPtr<ionir::InstBuilder> builder = std::nullopt;
         };
 
+        [[nodiscard]] static ionshared::Ptr<ionir::Type> processTypeQualifiers(
+            ionshared::Ptr<ionir::Type> type,
+            const ionshared::Ptr<TypeQualifiers> &qualifiers
+        );
+
         ionshared::PtrSymbolTable<ionir::Module> modules;
 
         ionshared::Stack<ionshared::Ptr<ionir::Construct>> constructStack;
@@ -107,6 +112,8 @@ namespace ionlang {
         void visitVariableDecl(ionshared::Ptr<VariableDeclStatement> node) override;
 
         void visitCallExpr(ionshared::Ptr<CallExpr> node) override;
+
+        void visitStruct(ionshared::Ptr<Struct> node) override;
 
         // TODO: visitRef() if !isResolved() error, else this->visit(ref->getValue()); Is this a good idea? It may be required for example for if statement condition (if it's a ref). Investigate.
     };

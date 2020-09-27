@@ -11,7 +11,7 @@ namespace ionlang {
 
     void NameResolutionPass::visitModule(ionshared::Ptr<Module> node) {
         // TODO: Is it push_back() or push_front()?
-        this->scope.push_back(node->getContext()->getGlobalScope());
+        this->scope.push_back(node->context->getGlobalScope());
     }
 
     void NameResolutionPass::visitRef(PtrRef<> node) {
@@ -20,36 +20,36 @@ namespace ionlang {
             return;
         }
 
-        ionshared::Ptr<Construct> owner = node->getOwner();
-        std::string id = node->getId();
+        ionshared::Ptr<Construct> owner = node->owner;
+        std::string name = node->name;
 
-        auto throwUndefinedRef = [id]{
-            throw std::runtime_error("Undefined reference to " + id);
+        auto throwUndefinedRef = [name]{
+            throw std::runtime_error("Undefined reference to '" + name + "'");
         };
 
-        switch (node->getRefKind()) {
+        switch (node->refKind) {
             case RefKind::Variable: {
                 // TODO: Must use flow graph to find variable declarations from other blocks (remember blocks can be nested).
 
-                if (owner->getConstructKind() != ConstructKind::Block) {
+                if (owner->constructKind != ConstructKind::Block) {
                     // TODO: Better error.
                     throw std::runtime_error("Cannot resolve variable declaration when owner is not a block");
                 }
 
-                auto ownerBlockSymbolTable = owner->dynamicCast<Block>()->getSymbolTable();
-                auto valueLookupResult = ownerBlockSymbolTable->lookup(id);
+                auto ownerBlockSymbolTable = owner->dynamicCast<Block>()->symbolTable;
+                auto valueLookupResult = ownerBlockSymbolTable->lookup(name);
 
                 if (!ionshared::util::hasValue(valueLookupResult)) {
                     throwUndefinedRef();
                 }
 
-                node->resolve(*valueLookupResult);
+                node->value = *valueLookupResult;
 
                 break;
             }
 
             case RefKind::Function: {
-                if (owner->getConstructKind() != ConstructKind::Block) {
+                if (owner->constructKind != ConstructKind::Block) {
                     // TODO: Better error.
                     throw std::runtime_error("Cannot resolve function reference when owner is not a block");
                 }
@@ -63,15 +63,15 @@ namespace ionlang {
                 }
 
                 auto rootModuleSymbolTable =
-                    parentFunction->get()->getParent()->getContext()->getGlobalScope();
+                    parentFunction->get()->getUnboxedParent()->context->getGlobalScope();
 
-                auto lookupResult = rootModuleSymbolTable->lookup(id);
+                auto lookupResult = rootModuleSymbolTable->lookup(name);
 
                 if (!ionshared::util::hasValue(lookupResult)) {
                     throwUndefinedRef();
                 }
 
-                node->resolve(*lookupResult);
+                node->value = *lookupResult;
 
                 break;
             }

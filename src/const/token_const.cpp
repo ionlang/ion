@@ -144,6 +144,7 @@ namespace ionlang {
             {"global", TokenKind::KeywordGlobal},
             {"else", TokenKind::KeywordElse},
             {"unsafe", TokenKind::KeywordUnsafe},
+            {"struct", TokenKind::KeywordStruct},
 
             // Statement keywords.
             {ConstName::statementReturn, TokenKind::KeywordReturn},
