@@ -33,6 +33,6 @@ namespace ionlang::test::compare {
 
         // TODO: IonIR cannot yet convert constructs to strings (code representation). This forces comparison against resulting LLVM IR instead of IonIR code.
 
-        return compare::ir(ionshared::LlvmModule(*llvmModuleBuffer).getAsString(), fileName);
+        return compare::ir(ionshared::LlvmModule(*llvmModuleBuffer).makeIr(), fileName);
     }
 }

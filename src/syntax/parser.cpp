@@ -117,6 +117,8 @@ namespace ionlang {
     }
 
     AstPtrResult<> Parser::parseTopLevelFork(const ionshared::Ptr<Module> &parent) {
+        this->beginSourceLocationMapping();
+
         switch (this->tokenStream.get().kind) {
             case TokenKind::KeywordFunction: {
                 return util::getResultValue(this->parseFunction(parent));
@@ -135,8 +137,12 @@ namespace ionlang {
             }
 
             default: {
-                // TODO: Use proper exception.
-                throw std::runtime_error("Unknown top-level construct");
+                this->diagnosticBuilder
+                    ->bootstrap(diagnostic::internalUnexpectedToken)
+                    ->setLocation(this->makeSourceLocation())
+                    ->finish();
+
+                return this->makeErrorMarker();
             }
         }
     }

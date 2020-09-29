@@ -74,7 +74,7 @@ TEST(CodeGenTest, VisitIfStatement) {
     ionIrLlvmCodegenPass->visitModule(*ionIrModuleBuffer);
 
     // TODO: Debugging. It messes up with statements on original and successor/consequent blocks. Fix that, then remove this.
-    ionshared::LlvmModule(*ionIrLlvmCodegenPass->getModuleBuffer()).print();
+    ionshared::LlvmModule(*ionIrLlvmCodegenPass->getModuleBuffer()).printIr();
 
     // Then proceed to compare, as LLVM entities will have been emitted inside the ionir::LlvmCodegenPass.
     EXPECT_TRUE(test::compare::ir(ionIrLlvmCodegenPass, "statement_if"));
