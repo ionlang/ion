@@ -49,7 +49,7 @@ namespace ionlang {
             default: {
                 this->diagnosticBuilder
                     ->bootstrap(diagnostic::internalUnexpectedToken)
-                    ->setLocation(this->makeSourceLocation())
+                    ->setSourceLocation(this->makeSourceLocation())
                     ->finish();
 
                 return this->makeErrorMarker();
@@ -88,7 +88,7 @@ namespace ionlang {
             // Value conversion failed.
             this->diagnosticBuilder
                 ->bootstrap(diagnostic::syntaxConversionFailed)
-                ->setLocation(this->makeSourceLocation())
+                ->setSourceLocation(this->makeSourceLocation())
                 ->finish();
 
             return this->makeErrorMarker();
@@ -106,7 +106,7 @@ namespace ionlang {
         if (!valueIntegerKind.has_value()) {
             this->diagnosticBuilder
                 ->bootstrap(diagnostic::syntaxIntegerValueTypeUnknown)
-                ->setLocation(this->makeSourceLocation())
+                ->setSourceLocation(this->makeSourceLocation())
                 ->finish();
 
             return this->makeErrorMarker();
@@ -150,7 +150,7 @@ namespace ionlang {
         else {
             this->diagnosticBuilder
                 ->bootstrap(diagnostic::internalUnexpectedToken)
-                ->setLocation(this->makeSourceLocation())
+                ->setSourceLocation(this->makeSourceLocation())
                 ->finish();
 
             return this->makeErrorMarker();
@@ -179,7 +179,7 @@ namespace ionlang {
         if (stringValue.length() > 1) {
             this->diagnosticBuilder
                 ->bootstrap(diagnostic::syntaxCharLengthInvalid)
-                ->setLocation(this->makeSourceLocation())
+                ->setSourceLocation(this->makeSourceLocation())
                 ->finish();
 
             return this->makeErrorMarker();

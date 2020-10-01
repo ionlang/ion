@@ -17,49 +17,49 @@ namespace ionlang::diagnostic {
 
     IONLANG_NOTICE_DEFINE(
         internalUnexpectedToken,
-        ionshared::DiagnosticType::Error,
+        ionshared::DiagnosticKind::Error,
         "Unexpected token",
         std::nullopt
     );
 
     IONLANG_NOTICE_DEFINE(
         syntaxConversionFailed,
-        ionshared::DiagnosticType::Error,
+        ionshared::DiagnosticKind::Error,
         "Could not convert string to value",
         std::nullopt
     );
 
     IONLANG_NOTICE_DEFINE(
         syntaxCharLengthInvalid,
-        ionshared::DiagnosticType::Error,
+        ionshared::DiagnosticKind::Error,
         "Character value length must be at most 1 character",
         std::nullopt
     );
 
     IONLANG_NOTICE_DEFINE(
         syntaxIntegerValueTypeUnknown,
-        ionshared::DiagnosticType::Error,
+        ionshared::DiagnosticKind::Error,
         "Integer value's type kind could not be determined",
         std::nullopt
     );
 
     IONLANG_NOTICE_DEFINE(
         syntaxLeadingCommaInArgs,
-        ionshared::DiagnosticType::Warning,
+        ionshared::DiagnosticKind::Warning,
         "Leading comma in argument list",
         std::nullopt
     );
 
     IONLANG_NOTICE_DEFINE(
         syntaxExpectedToken,
-        ionshared::DiagnosticType::Error,
+        ionshared::DiagnosticKind::Error,
         "Expected token '%s' but got '%s'",
         std::nullopt
     );
 
     IONLANG_NOTICE_DEFINE(
         structFieldRedefinition,
-        ionshared::DiagnosticType::Error,
+        ionshared::DiagnosticKind::Error,
         "Field '%s' in struct '%s' was already previously defined",
         std::nullopt
     );

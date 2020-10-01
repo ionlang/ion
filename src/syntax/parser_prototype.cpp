@@ -19,7 +19,7 @@ namespace ionlang {
                 if (args->isEmpty()) {
                     this->diagnosticBuilder
                         ->bootstrap(diagnostic::syntaxLeadingCommaInArgs)
-                        ->setLocation(this->makeSourceLocation())
+                        ->setSourceLocation(this->makeSourceLocation())
                         ->finish();
                 }
 

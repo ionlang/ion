@@ -16,7 +16,7 @@ namespace ionlang {
         if (!this->is(tokenKind)) {
             this->diagnosticBuilder
                 ->bootstrap(diagnostic::syntaxExpectedToken)
-                ->setLocation(this->makeSourceLocation())
+                ->setSourceLocation(this->makeSourceLocation())
 
                 ->formatMessage(
                     TokenConst::getTokenKindName(tokenKind).value_or(ConstName::unknown),
@@ -139,7 +139,7 @@ namespace ionlang {
             default: {
                 this->diagnosticBuilder
                     ->bootstrap(diagnostic::internalUnexpectedToken)
-                    ->setLocation(this->makeSourceLocation())
+                    ->setSourceLocation(this->makeSourceLocation())
                     ->finish();
 
                 return this->makeErrorMarker();
@@ -220,7 +220,7 @@ namespace ionlang {
                 // TODO: Replace strings, since 'structFieldRedefinition' takes in field and struct names.
                 this->diagnosticBuilder
                     ->bootstrap(diagnostic::structFieldRedefinition)
-                    ->setLocation(this->makeSourceLocation())
+                    ->setSourceLocation(this->makeSourceLocation())
                     ->finish();
 
                 return this->makeErrorMarker();

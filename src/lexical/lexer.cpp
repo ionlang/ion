@@ -182,7 +182,11 @@ namespace ionlang {
                 if (std::regex_match(tokenValue, Regex::identifier)) {
                     // Ensure the requirement of a non-identifier character at the end is met.
                     std::string requirementInput = this->input.substr(this->index);
-                    bool postCharacterRequirement = std::regex_search(requirementInput, std::regex("^" + pair.first + "(?:\\s|\\W|$)"));
+
+                    bool postCharacterRequirement = std::regex_search(
+                        requirementInput,
+                        std::regex("^" + pair.first + "(?:\\s|\\W|$)")
+                    );
 
                     if (!postCharacterRequirement) {
                         continue;

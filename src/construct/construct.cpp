@@ -7,8 +7,7 @@ namespace ionlang {
         std::optional<ionshared::SourceLocation> sourceLocation,
         ionshared::OptPtr<Construct> parent
     ) :
-        ionshared::BaseConstruct<Construct, ConstructKind>(kind, std::move(parent)),
-        sourceLocation(std::move(sourceLocation)) {
+        ionshared::BaseConstruct<Construct, ConstructKind>(kind, sourceLocation, std::move(parent)) {
         //
     }
 

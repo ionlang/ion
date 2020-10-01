@@ -87,9 +87,8 @@ namespace ionlang {
             return children;
         }
 
-        std::optional<ionshared::SourceLocation> sourceLocation;
-
-        explicit Construct(ConstructKind kind,
+        explicit Construct(
+            ConstructKind kind,
             std::optional<ionshared::SourceLocation> sourceLocation = std::nullopt,
             ionshared::OptPtr<Construct> parent = std::nullopt
         );
