@@ -8,7 +8,7 @@
 #include <optional>
 #include <utility>
 #include <ionshared/misc/iterable.h>
-#include <ionlang/const/token_const.h>
+#include <ionlang/const/grammar.h>
 #include <ionlang/misc/util.h>
 #include <ionlang/misc/regex.h>
 #include "token.h"

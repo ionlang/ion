@@ -19,11 +19,11 @@ namespace ionlang {
                 ->setSourceLocation(this->makeSourceLocation())
 
                 ->formatMessage(
-                    TokenConst::getTokenKindName(tokenKind).value_or(ConstName::unknown),
+                    Grammar::getTokenKindName(tokenKind).value_or(const_name::unknown),
 
-                    TokenConst::getTokenKindName(
+                    Grammar::getTokenKindName(
                         this->tokenStream.get().kind
-                    ).value_or(ConstName::unknown)
+                    ).value_or(const_name::unknown)
                 )
 
                 ->finish();
@@ -105,14 +105,14 @@ namespace ionlang {
     Parser::Parser(
         TokenStream stream,
         ionshared::Ptr<ionshared::DiagnosticBuilder> diagnosticBuilder
-    ) :
+    ) noexcept :
         tokenStream(std::move(stream)),
         diagnosticBuilder(std::move(diagnosticBuilder)),
         sourceLocationMappingStartStack() {
         //
     }
 
-    ionshared::Ptr<ionshared::DiagnosticBuilder> Parser::getDiagnosticBuilder() const {
+    ionshared::Ptr<ionshared::DiagnosticBuilder> Parser::getDiagnosticBuilder() const noexcept {
         return this->diagnosticBuilder;
     }
 
@@ -169,11 +169,7 @@ namespace ionlang {
 
             valueResult = this->parseLiteralFork();
 
-            // Value must have been parsed at this point.
-            if (!util::hasValue(valueResult)) {
-                // TODO: Use proper exception/error.
-                throw std::runtime_error("Could not parse literal");
-            }
+            IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
         }
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
@@ -296,6 +292,8 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceR))
 
+        this->finishSourceLocationMapping(module);
+
         return module;
     }
 
@@ -326,6 +324,8 @@ namespace ionlang {
         parent->symbolTable->set(variableDecl->name, variableDecl);
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
+
+        this->finishSourceLocationMapping(variableDecl);
 
         return variableDecl;
     }

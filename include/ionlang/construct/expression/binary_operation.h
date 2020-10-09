@@ -9,36 +9,20 @@ namespace ionlang {
     struct BinaryOperationOpts {
         ionshared::Ptr<Type> type;
 
-        Operator operation;
+        IntrinsicOperatorKind operation;
 
-        ionshared::Ptr<Construct> leftSide;
+        ionshared::Ptr<Expression> leftSide;
 
-        ionshared::OptPtr<Construct> rightSide;
+        ionshared::Ptr<Expression> rightSide;
     };
 
-    class BinaryOperation : public Expression {
-    private:
-        Operator operation;
+    struct BinaryOperation : Expression {
+        IntrinsicOperatorKind operation;
 
-        ionshared::Ptr<Construct> leftSide;
+        ionshared::Ptr<Expression> leftSide;
 
-        ionshared::OptPtr<Construct> rightSide;
+        ionshared::Ptr<Expression> rightSide;
 
-    public:
         explicit BinaryOperation(const BinaryOperationOpts &opts);
-
-        [[nodiscard]] Operator getOperator() const noexcept;
-
-        void setOperator(Operator operation) noexcept;
-
-        [[nodiscard]] ionshared::Ptr<Construct> getLeftSide() const noexcept;
-
-        void setLeftSide(ionshared::Ptr<Construct> leftSide) noexcept;
-
-        [[nodiscard]] ionshared::OptPtr<Construct> getRightSide() const noexcept;
-
-        void setRightSide(ionshared::OptPtr<Construct> rightSide) noexcept;
-
-        [[nodiscard]] bool hasRightSide() const noexcept;
     };
 }

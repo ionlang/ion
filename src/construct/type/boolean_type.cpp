@@ -4,7 +4,7 @@
 
 namespace ionlang {
     BooleanType::BooleanType(ionshared::Ptr<TypeQualifiers> qualifiers) :
-        Type(ConstName::typeBool, TypeKind::Boolean, std::move(qualifiers)) {
+        Type(const_name::typeBool, TypeKind::Boolean, std::move(qualifiers)) {
         //
     }
 

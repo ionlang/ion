@@ -141,10 +141,10 @@ namespace ionlang {
 
         bool boolValue;
 
-        if (value == ConstName::booleanTrue) {
+        if (value == const_name::booleanTrue) {
             boolValue = true;
         }
-        else if (value == ConstName::booleanFalse) {
+        else if (value == const_name::booleanFalse) {
             boolValue = false;
         }
         else {

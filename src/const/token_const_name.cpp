@@ -1,7 +1,7 @@
-#include <ionlang/const/token_const.h>
+#include <ionlang/const/grammar.h>
 
 namespace ionlang {
-    std::map<TokenKind, std::string> TokenConst::names = {
+    std::map<TokenKind, std::string> Grammar::names = {
         {TokenKind::Unknown, "Unknown"},
         {TokenKind::Identifier, "Identifier"},
         {TokenKind::LiteralString, "LiteralString"},

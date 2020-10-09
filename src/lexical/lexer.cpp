@@ -9,8 +9,7 @@ namespace ionlang {
         input(input),
         length(input.length()),
         index(IONLANG_LEXER_INDEX_DEFAULT),
-        simpleIds(TokenConst::getSortedSimpleIds()),
-        complexIds(TokenConst::getComplexIds()) {
+        simpleIds(Grammar::getSortedSimpleIds()) {
         // Input string must contain at least one character.
         if (!this->length || this->length < 1) {
             throw std::invalid_argument("Input must be a string with one or more character(s)");
@@ -126,7 +125,7 @@ namespace ionlang {
         std::smatch match;
         std::string subject = this->getCharAsString();
 
-        while (std::regex_search(subject, match, Regex::whitespace) && this->hasNext()) {
+        while (std::regex_search(subject, match, const_regex::whitespace) && this->hasNext()) {
             this->skip();
             subject = this->getCharAsString();
         }
@@ -179,7 +178,7 @@ namespace ionlang {
                  * If the match starts with an identifier character, ensure that
                  * the token's value ends with a non-identifier character.
                  */
-                if (std::regex_match(tokenValue, Regex::identifier)) {
+                if (std::regex_match(tokenValue, const_regex::identifier)) {
                     // Ensure the requirement of a non-identifier character at the end is met.
                     std::string requirementInput = this->input.substr(this->index);
 

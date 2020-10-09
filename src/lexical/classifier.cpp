@@ -2,7 +2,7 @@
 
 namespace ionlang {
     bool Classifier::isSymbol(TokenKind tokenKind) {
-        return TokenConst::getSymbols().contains(tokenKind);
+        return Grammar::symbols.contains(tokenKind);
     }
 
     bool Classifier::isNumeric(TokenKind tokenKind) {
@@ -10,12 +10,12 @@ namespace ionlang {
         return false;
     }
 
-    bool Classifier::isOperator(TokenKind tokenKind) {
-        return TokenConst::getOperators().contains(tokenKind);
+    bool Classifier::isIntrinsicOperator(TokenKind tokenKind) {
+        return Grammar::intrinsicOperators.contains(tokenKind);
     }
 
     bool Classifier::isBuiltInType(TokenKind tokenKind) {
-        return TokenConst::contains(TokenConst::getBuiltInTypes(), tokenKind);
+        return Grammar::contains(Grammar::getBuiltInTypes(), tokenKind);
     }
 
     bool Classifier::isUnsignedIntegerType(TokenKind tokenKind) {
@@ -36,7 +36,7 @@ namespace ionlang {
     }
 
     bool Classifier::isKeyword(TokenKind tokenKind) {
-        return TokenConst::getKeywords().contains(tokenKind);
+        return Grammar::keywords.contains(tokenKind);
     }
 
     bool Classifier::isLiteral(TokenKind tokenKind) {
@@ -46,7 +46,10 @@ namespace ionlang {
             || tokenKind == TokenKind::LiteralString;
     }
 
-    bool Classifier::isStatement(TokenKind tokenKind, std::optional<TokenKind> nextTokenKind) {
+    bool Classifier::isStatement(
+        TokenKind tokenKind,
+        std::optional<TokenKind> nextTokenKind
+    ) {
         return Classifier::isBuiltInType(tokenKind)
             || (
                 nextTokenKind.has_value()

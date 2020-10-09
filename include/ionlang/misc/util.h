@@ -9,17 +9,24 @@
 #include <ionlang/lexical/token_kind.h>
 
 namespace ionlang::util {
+    // TODO: Should this be somewhere else?
     [[nodiscard]] std::string resolveIntegerKindName(IntegerKind kind);
 
+    // TODO: Should this be somewhere else?
     [[nodiscard]] TypeKind resolveTypeKind(const std::string &id);
 
     [[nodiscard]] std::optional<IntegerKind> calculateIntegerKindFromBitLength(uint32_t bitLength) noexcept;
 
+    // TODO: Should this be somewhere else?
     [[nodiscard]] std::optional<std::string> findConstructId(const ionshared::Ptr<Construct> &construct);
 
+    // TODO: Should this be somewhere else?
     [[nodiscard]] std::optional<std::string> findStatementId(const ionshared::Ptr<Statement> &statement) noexcept;
 
-    [[nodiscard]] std::optional<Operator> findOperator(TokenKind tokenKind);
+    // TODO: Should this be somewhere else?
+    [[nodiscard]] std::optional<IntrinsicOperatorKind> findIntrinsicOperatorKind(TokenKind tokenKind);
+
+    [[nodiscard]] std::optional<uint32_t> findIntrinsicOperatorKindPrecedence(TokenKind tokenKind);
 
     template<typename ...Args>
     [[nodiscard]] std::runtime_error makeAstError(std::string format, Args &&...args) {

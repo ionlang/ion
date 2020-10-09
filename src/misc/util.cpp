@@ -1,5 +1,6 @@
 #include <ionlang/misc/util.h>
 #include <ionlang/const/const_name.h>
+#include <ionlang/const/grammar.h>
 #include <ionlang/construct/function.h>
 #include <ionlang/construct/extern.h>
 #include <ionlang/construct/struct.h>
@@ -8,19 +9,19 @@ namespace ionlang::util {
     std::string resolveIntegerKindName(IntegerKind kind) {
         switch (kind) {
             case IntegerKind ::Int8: {
-                return ConstName::typeInt8;
+                return const_name::typeInt8;
             }
 
             case IntegerKind::Int16: {
-                return ConstName::typeInt16;
+                return const_name::typeInt16;
             }
 
             case IntegerKind::Int32: {
-                return ConstName::typeInt32;
+                return const_name::typeInt32;
             }
 
             case IntegerKind::Int64: {
-                return ConstName::typeInt64;
+                return const_name::typeInt64;
             }
 
             default: {
@@ -29,25 +30,25 @@ namespace ionlang::util {
         }
     }
 
-    TypeKind resolveTypeKind(const std::string &id) {
+    TypeKind resolveTypeKind(const std::string& id) {
         // TODO: CRITICAL: Add support new/missing types.
 
-        if (id == ConstName::typeInt8) {
+        if (id == const_name::typeInt8) {
             return TypeKind::Integer;
         }
-        else if (id == ConstName::typeInt16) {
+        else if (id == const_name::typeInt16) {
             return TypeKind::Integer;
         }
-        else if (id == ConstName::typeInt32) {
+        else if (id == const_name::typeInt32) {
             return TypeKind::Integer;
         }
-        else if (id == ConstName::typeInt64) {
+        else if (id == const_name::typeInt64) {
             return TypeKind::Integer;
         }
-        else if (id == ConstName::typeVoid) {
+        else if (id == const_name::typeVoid) {
             return TypeKind::Void;
         }
-        else if (id == ConstName::typeString) {
+        else if (id == const_name::typeString) {
             return TypeKind::String;
         }
 
@@ -74,7 +75,7 @@ namespace ionlang::util {
         return std::nullopt;
     }
 
-    std::optional<std::string> findConstructId(const ionshared::Ptr<Construct> &construct) {
+    std::optional<std::string> findConstructId(const ionshared::Ptr<Construct>& construct) {
         ConstructKind constructKind = construct->constructKind;
 
         /**
@@ -111,7 +112,7 @@ namespace ionlang::util {
         }
     }
 
-    std::optional<std::string> findStatementId(const ionshared::Ptr<Statement> &statement) noexcept {
+    std::optional<std::string> findStatementId(const ionshared::Ptr<Statement>& statement) noexcept {
         // TODO: Implement. Check for derivations from ionshared::Named first, then specific cases (similar to util::findConstructId()).
         // TODO: VariableDecl can easily be implemented as derived.
         switch (statement->statementKind) {
@@ -121,43 +122,49 @@ namespace ionlang::util {
         }
     }
 
-    std::optional<Operator> findOperator(TokenKind tokenKind) {
+    std::optional<IntrinsicOperatorKind> findIntrinsicOperatorKind(TokenKind tokenKind) {
         switch (tokenKind) {
             case TokenKind::OperatorAddition: {
-                return Operator::Addition;
+                return IntrinsicOperatorKind::Addition;
             }
 
             case TokenKind::OperatorSubtraction: {
-                return Operator::Subtraction;
+                return IntrinsicOperatorKind::Subtraction;
             }
 
             case TokenKind::OperatorMultiplication: {
-                return Operator::Multiplication;
+                return IntrinsicOperatorKind::Multiplication;
             }
 
             case TokenKind::OperatorDivision: {
-                return Operator::Division;
+                return IntrinsicOperatorKind::Division;
             }
 
             case TokenKind::OperatorExponent: {
-                return Operator::Exponent;
+                return IntrinsicOperatorKind::Exponent;
             }
 
             case TokenKind::OperatorModulo: {
-                return Operator::Modulo;
+                return IntrinsicOperatorKind::Modulo;
             }
 
             case TokenKind::OperatorLessThan: {
-                return Operator::LessThan;
+                return IntrinsicOperatorKind::LessThan;
             }
 
             case TokenKind::OperatorGreaterThan: {
-                return Operator::GreaterThan;
+                return IntrinsicOperatorKind::GreaterThan;
             }
 
             default: {
                 return std::nullopt;
             }
         }
+    }
+
+    std::optional<uint32_t> findIntrinsicOperatorKindPrecedence(TokenKind tokenKind) {
+        // TODO
+
+        return std::nullopt;
     }
 }

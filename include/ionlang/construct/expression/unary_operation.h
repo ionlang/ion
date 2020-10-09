@@ -5,7 +5,7 @@
 namespace ionlang {
     class Pass;
 
-    enum class Operator {
+    enum class IntrinsicOperatorKind {
         Addition,
 
         Subtraction,
@@ -23,25 +23,15 @@ namespace ionlang {
         GreaterThan
     };
 
-    class UnaryOperation : public Expression {
-    private:
-        Operator operation;
+    struct UnaryOperation : Expression {
+        IntrinsicOperatorKind operation;
 
         ionshared::Ptr<Construct> value;
 
-    public:
         UnaryOperation(
             ionshared::Ptr<Type> type,
-            Operator operation,
+            IntrinsicOperatorKind operation,
             ionshared::Ptr<Construct> value
         );
-
-        [[nodiscard]] Operator getOperator() const noexcept;
-
-        void setOperator(Operator operation) noexcept;
-
-        [[nodiscard]] ionshared::Ptr<Construct> getValue() const noexcept;
-
-        void setValue(ionshared::Ptr<Construct> value) noexcept;
     };
 }

@@ -2,21 +2,18 @@
 
 #include <regex>
 
-namespace ionlang {
-    class Regex {
-    public:
-        const static std::regex identifier;
+namespace ionlang::const_regex {
+    static const std::regex identifier = std::regex("^([_a-zA-Z]+[\\w]*)");
 
-        const static std::regex string;
+    static const std::regex string = std::regex("^\"([^\\\"]*)\"");
 
-        const static std::regex decimal;
+    static const std::regex decimal = std::regex("^([0-9]+\\.[0-9]+)");
 
-        const static std::regex integer;
+    static const std::regex integer = std::regex("^([0-9]+)");
 
-        const static std::regex boolean;
+    static const std::regex boolean = std::regex("^(true|false)");
 
-        const static std::regex character;
+    static const std::regex character = std::regex("^'([^'\\n\\\\]{0,1})'");
 
-        const static std::regex whitespace;
-    };
+    static const std::regex whitespace = std::regex("^([\\s]+)");
 }

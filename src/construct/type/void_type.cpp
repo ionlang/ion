@@ -3,7 +3,7 @@
 
 namespace ionlang {
     VoidType::VoidType()
-        : Type(ConstName::typeVoid, TypeKind::Void) {
+        : Type(const_name::typeVoid, TypeKind::Void) {
         //
     }
 

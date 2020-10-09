@@ -73,15 +73,14 @@ namespace ionlang {
         }
 
     public:
-        // TODO: Default value is hard-coded.
         explicit Parser(
             TokenStream stream,
 
             ionshared::Ptr<ionshared::DiagnosticBuilder> diagnosticBuilder =
                 ionshared::Ptr<ionshared::DiagnosticBuilder>()
-        );
+        ) noexcept;
 
-        [[nodiscard]] ionshared::Ptr<ionshared::DiagnosticBuilder> getDiagnosticBuilder() const;
+        [[nodiscard]] ionshared::Ptr<ionshared::DiagnosticBuilder> getDiagnosticBuilder() const noexcept;
 
         AstPtrResult<> parseTopLevelFork(const ionshared::Ptr<Module> &parent);
 
@@ -132,13 +131,19 @@ namespace ionlang {
 
         AstPtrResult<Value<>> parseLiteralFork();
 
+        AstPtrResult<Expression> parseExpression(const ionshared::Ptr<Block>& parent);
+
         AstPtrResult<Expression> parsePrimaryExpr(const ionshared::Ptr<Block> &parent);
 
         AstPtrResult<Expression> parseParenthesesExpr(const ionshared::Ptr<Block> &parent);
 
         AstPtrResult<Expression> parseIdExpr(const ionshared::Ptr<Block> &parent);
 
-        AstPtrResult<BinaryOperation> parseBinaryOperation(const ionshared::Ptr<Block> &parent);
+        AstPtrResult<Expression> parseBinaryOperation(
+            uint32_t expressionPrecedence,
+            ionshared::Ptr<Expression> leftSideExpression,
+            const ionshared::Ptr<Block>& parent
+        );
 
         AstPtrResult<CallExpr> parseCallExpr(const ionshared::Ptr<Block> &parent);
 

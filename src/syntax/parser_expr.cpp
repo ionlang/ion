@@ -1,9 +1,39 @@
+#include <ionlang/const/grammar.h>
+#include <ionlang/lexical/classifier.h>
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    AstPtrResult<Expression> Parser::parsePrimaryExpr(const ionshared::Ptr<Block> &parent) {
-        this->beginSourceLocationMapping();
+    AstPtrResult<Expression> Parser::parseExpression(const ionshared::Ptr<Block> &parent) {
+        AstPtrResult<Expression> primaryExpression = this->parsePrimaryExpr(parent);
 
+        IONLANG_PARSER_ASSERT(util::hasValue(primaryExpression))
+
+        TokenKind currentTokenKind = this->tokenStream.get().kind;
+
+        /**
+         * Check if the current token's kind is an intrinsic operator.
+         * If it is, then the expression being parsed is either a unary
+         * or binary expression.
+         */
+        if (Classifier::isIntrinsicOperator(currentTokenKind)) {
+            std::optional<IntrinsicOperatorKind> intrinsicOperatorKind = util::findIntrinsicOperatorKind(currentTokenKind);
+
+            // TODO
+//            if () {
+//
+//            }
+
+            return util::getResultValue(this->parseBinaryOperation(
+                0,
+                util::getResultValue(primaryExpression),
+                parent)
+            );
+        }
+
+        return primaryExpression;
+    }
+
+    AstPtrResult<Expression> Parser::parsePrimaryExpr(const ionshared::Ptr<Block> &parent) {
         if (this->is(TokenKind::SymbolParenthesesL)) {
             return this->parseParenthesesExpr(parent);
         }
@@ -26,11 +56,13 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
-        AstPtrResult<Expression> expr = this->parsePrimaryExpr(parent);
+        AstPtrResult<Expression> expression = this->parsePrimaryExpr(parent);
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
 
-        return expr;
+        this->finishSourceLocationMapping(util::getResultValue(expression));
+
+        return expression;
     }
 
     AstPtrResult<Expression> Parser::parseIdExpr(const ionshared::Ptr<Block> &parent) {
@@ -44,21 +76,57 @@ namespace ionlang {
         PtrRef<VariableDeclStatement> variableDeclRef =
             util::getResultValue(this->parseRef<VariableDeclStatement>(parent));
 
+        this->finishSourceLocationMapping(variableDeclRef);
+
         return std::make_shared<VariableRefExpr>(variableDeclRef);
     }
 
-    AstPtrResult<BinaryOperation> Parser::parseBinaryOperation(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<Expression> Parser::parseBinaryOperation(
+        uint32_t expressionPrecedence,
+        ionshared::Ptr<Expression> leftSideExpression,
+        const ionshared::Ptr<Block>& parent
+    ) {
         while (true) {
-            std::optional<Operator> operation =
-                util::findOperator(this->tokenStream.get().kind);
+            std::optional<IntrinsicOperatorKind> operation =
+                util::findIntrinsicOperatorKind(this->tokenStream.get().kind);
 
             IONLANG_PARSER_ASSERT(operation.has_value())
 
+            // TODO
+            uint32_t operatorPrecedence = 0/*util::findOperatorPrecedence(operation);*/;
+
+            // TODO: This shouldn't be determined here. Hence, this function should return BinaryOperation (right-side is non-optional).
+            // TODO: Also adjust documentation.
+            /**
+             * If this is a binop that binds at least as tightly as the current binop,
+             * consume it, otherwise we are done.
+             */
+            if (expressionPrecedence >= operatorPrecedence) {
+                return leftSideExpression;
+            }
+
             this->tokenStream.skip();
 
-            AstPtrResult<Expression> rightSideResult = this->parsePrimaryExpr(parent);
+            AstPtrResult<Expression> rightSideExpressionResult =
+                this->parsePrimaryExpr(parent);
 
-            IONLANG_PARSER_ASSERT(util::hasValue(rightSideResult))
+            IONLANG_PARSER_ASSERT(util::hasValue(rightSideExpressionResult))
+
+            // TODO: Adjust documentation.
+            /**
+             * If BinOp binds less tightly with RHS than the operator after RHS, let
+             * the pending operator take RHS as its LHS.
+             */
+            std::optional<uint32_t> nextOperatorPrecedence =
+                -1; /* TODO: util::findOperatorPrecedence(this->token.kind); */
+
+            if (nextOperatorPrecedence >= operatorPrecedence) {
+                rightSideExpressionResult = this->parseBinaryOperation(
+                    operatorPrecedence + 1,
+                    util::getResultValue(rightSideExpressionResult),
+                    parent
+                );
+            }
 
             // TODO: UNFINISHED!!!! ---------------------------------------
             // ------------------------------------------------------------
@@ -69,22 +137,13 @@ namespace ionlang {
             // Continue: https://github.com/ionlang/Ion.Net/blob/master/Ion/Parsing/BinaryOpRightSideParser.cs
             // ------------------------------------------------------------
 
-            // TODO: Type should be rightSide's type (but rightSide is a construct. It must be a value... CallExpr should be a expression too).
+            // TODO: Type.
             return std::make_shared<BinaryOperation>(BinaryOperationOpts{
                 nullptr,
                 *operation,
-                nullptr,
-                util::getResultValue(rightSideResult)
+                leftSideExpression,
+                util::getResultValue(rightSideExpressionResult)
             });
-
-            // ------------------------------------------------------------
-            // ------------------------------------------------------------
-            // ------------------------------------------------------------
-            // ------------------------------------------------------------
-            // ------------------------------------------------------------
-            // ------------------------------------------------------------
-            // ------------------------------------------------------------
-            // ------------------------------------------------------------
         }
     }
 
@@ -116,9 +175,13 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
 
-        return std::make_shared<CallExpr>(
+        ionshared::Ptr<CallExpr> callExpr = std::make_shared<CallExpr>(
             std::make_shared<Ref<>>(*calleeId, parent, RefKind::Function),
             callArgs
         );
+
+        this->finishSourceLocationMapping(callExpr);
+
+        return callExpr;
     }
 }
