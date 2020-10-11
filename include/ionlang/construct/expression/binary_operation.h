@@ -7,7 +7,7 @@ namespace ionlang {
     class Pass;
 
     struct BinaryOperationOpts {
-        ionshared::Ptr<Type> type;
+        PtrResolvable<Type> type;
 
         IntrinsicOperatorKind operation;
 
@@ -23,6 +23,6 @@ namespace ionlang {
 
         ionshared::Ptr<Expression> rightSide;
 
-        explicit BinaryOperation(const BinaryOperationOpts &opts);
+        explicit BinaryOperation(const BinaryOperationOpts& opts);
     };
 }

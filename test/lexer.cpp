@@ -6,12 +6,6 @@
 
 using namespace ionlang;
 
-TEST(LexerTest, GetInput) {
-    Lexer lexer = Lexer("test input");
-
-    EXPECT_EQ(lexer.getInput(), "test input");
-}
-
 TEST(LexerTest, TokenizeThrowOnEmptyInput) {
     EXPECT_THROW(Lexer(""), std::invalid_argument);
 }

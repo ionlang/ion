@@ -6,11 +6,12 @@
 namespace ionlang {
     class Pass;
 
-    struct StringLiteral : Value<> {
+    // TODO: Temporary wrong type (should be array of integer types (char = int)).
+    struct StringLiteral : Value<IntegerType> {
         std::string value;
 
         explicit StringLiteral(std::string value);
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
     };
 }

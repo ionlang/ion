@@ -2,9 +2,14 @@
 
 namespace ionlang {
     std::ostream &operator<<(std::ostream &stream, const TokenKind &tokenKind) {
-        return stream << Grammar::getTokenKindName(tokenKind).value_or("Unknown ("
+        std::string name = "Unknown ("
             + std::to_string((int)tokenKind)
-            + ")"
-        );
+            + ")";
+
+        if (Grammar::tokenKindNames.contains(tokenKind)) {
+            name = Grammar::tokenKindNames.at(tokenKind);
+        }
+
+        return stream << name;
     }
 }

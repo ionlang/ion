@@ -14,21 +14,25 @@ namespace ionlang {
         this->scope.push_back(node->context->getGlobalScope());
     }
 
-    void NameResolutionPass::visitRef(PtrRef<> node) {
+    void NameResolutionPass::visitRef(PtrResolvable<> node) {
         // Node is already resolved, no need to continue.
         if (node->isResolved()) {
             return;
         }
 
-        ionshared::Ptr<Construct> owner = node->owner;
-        std::string name = node->name;
+        /**
+         * NOTE: If the resolvable is not resolved, it's guaranteed
+         * to have its kind, name and context defined.
+         */
+        ionshared::Ptr<Construct> owner = *node->context;
+        std::string name = *node->name;
 
         auto throwUndefinedRef = [name]{
             throw std::runtime_error("Undefined reference to '" + name + "'");
         };
 
-        switch (node->refKind) {
-            case RefKind::Variable: {
+        switch (*node->resolvableKind) {
+            case ResolvableKind::Variable: {
                 // TODO: Must use flow graph to find variable declarations from other blocks (remember blocks can be nested).
 
                 if (owner->constructKind != ConstructKind::Block) {
@@ -48,7 +52,7 @@ namespace ionlang {
                 break;
             }
 
-            case RefKind::Function: {
+            case ResolvableKind::Prototype: {
                 if (owner->constructKind != ConstructKind::Block) {
                     // TODO: Better error.
                     throw std::runtime_error("Cannot resolve function reference when owner is not a block");

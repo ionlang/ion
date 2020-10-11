@@ -8,15 +8,19 @@
 #include "util.h"
 
 namespace ionlang::test::bootstrap {
-    Token token(TokenKind kind = TokenKind::Unknown);
+    [[nodiscard]] Token token(TokenKind kind = TokenKind::Unknown);
 
-    TokenStream tokenStream(int amountOfItems = 1);
+    [[nodiscard]] TokenStream tokenStream(size_t amountOfItems = 1);
 
-    Parser parser(const std::vector<Token> &tokens);
+    [[nodiscard]] Parser parser(const std::vector<Token>& tokens);
 
-    ionshared::Ptr<ionir::Module> ionIrModule(const std::string &identifier = "test");
+    [[nodiscard]]  ionshared::Ptr<ionir::Module> ionIrModule(
+        const std::string& identifier = "test"
+    );
 
-    ionshared::Ptr<IonIrLoweringPass> ionIrLoweringPass();
+    [[nodiscard]] ionshared::Ptr<IonIrLoweringPass> ionIrLoweringPass();
 
-    ionshared::Ptr<Function> emptyFunction(std::vector<ionshared::Ptr<Statement>> statements = {});
+    [[nodiscard]] ionshared::Ptr<Function> emptyFunction(
+        std::vector<ionshared::Ptr<Statement>> statements = {}
+    );
 }

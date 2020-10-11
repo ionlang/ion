@@ -78,10 +78,8 @@ namespace ionlang {
          * otherwise default to an user-defined type assumption.
          */
         if (!util::hasValue(type)) {
-            type = std::make_shared<Type>(
-                tokenValue,
-                util::resolveTypeKind(tokenValue)
-            );
+            // TODO: Proper construction?
+            type = std::make_shared<UserDefinedType>();
 
             this->tokenStream.skip();
         }

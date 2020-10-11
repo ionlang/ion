@@ -95,8 +95,6 @@ namespace ionlang {
 
         void visitGlobal(ionshared::Ptr<Global> node) override;
 
-        void visitType(ionshared::Ptr<Type> node) override;
-
         void visitIntegerType(ionshared::Ptr<IntegerType> node) override;
 
         void visitBooleanType(ionshared::Ptr<BooleanType> node) override;

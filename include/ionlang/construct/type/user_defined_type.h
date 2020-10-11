@@ -5,10 +5,10 @@
 namespace ionlang {
     class Pass;
 
-    struct BooleanType : Type {
-        explicit BooleanType(
+    struct UserDefinedType : Type {
+        explicit UserDefinedType(
             ionshared::Ptr<TypeQualifiers> qualifiers =
-                std::make_shared<TypeQualifiers>()
+            std::make_shared<TypeQualifiers>()
         );
 
         void accept(Pass &pass) override;

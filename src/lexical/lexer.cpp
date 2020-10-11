@@ -8,10 +8,9 @@ namespace ionlang {
     Lexer::Lexer(const std::string &input) :
         input(input),
         length(input.length()),
-        index(IONLANG_LEXER_INDEX_DEFAULT),
-        simpleIds(Grammar::getSortedSimpleIds()) {
+        index(IONLANG_LEXER_INDEX_DEFAULT) {
         // Input string must contain at least one character.
-        if (!this->length || this->length < 1) {
+        if (this->length == 0) {
             throw std::invalid_argument("Input must be a string with one or more character(s)");
         }
     }
@@ -157,16 +156,17 @@ namespace ionlang {
             return std::nullopt;
         }
 
-        // Set the initial Token buffer as Unknown.
+        // Set the initial token buffer as Unknown.
         Token token = Token(TokenKind::Unknown, this->getCharAsString(), this->index);
 
-        // Abstract the Token's value for easier access.
-        std::string tokenValue = token.value;
-
-        // Begin by testing against all simple until a possible match is found.
-        for (const auto &pair : this->simpleIds) {
+        // TODO: getSimpleRules() is an expression (being evaluated N times).
+        /**
+         * Begin by testing against all simple rules until a
+         * possible match is found.
+         */
+        for (const auto &pair : Grammar::getSimpleRules()) {
             // Test the first letter of the subject to continue.
-            if (tokenValue[0] == pair.first[0]) {
+            if (token.value[0] == pair.first[0]) {
                 /**
                  * Produce a Regex instance to match the exact value of the
                  * simple identifier. It is important that the initial value
@@ -178,7 +178,7 @@ namespace ionlang {
                  * If the match starts with an identifier character, ensure that
                  * the token's value ends with a non-identifier character.
                  */
-                if (std::regex_match(tokenValue, const_regex::identifier)) {
+                if (std::regex_match(token.value, const_regex::identifier)) {
                     // Ensure the requirement of a non-identifier character at the end is met.
                     std::string requirementInput = this->input.substr(this->index);
 
@@ -213,7 +213,7 @@ namespace ionlang {
         }
 
         // No simple was matched, proceed to test complex.
-        for (const auto &pair : this->complexIds) {
+        for (const auto &pair : Grammar::complexRules) {
             MatchResult matchResult = this->matchExpression(MatchOpts{
                 token,
                 pair.second,
@@ -228,22 +228,18 @@ namespace ionlang {
         }
 
         // At this point the token was not identified. Skip over any captured value.
-        this->skip(tokenValue.length());
+        this->skip(token.value.length());
 
         // Return the default token. The token kind defaults to Unknown.
         return token;
-    }
-
-    std::string Lexer::getInput() const noexcept {
-        return this->input;
     }
 
     std::vector<Token> Lexer::scan() {
         // Reset index to avoid carrying over previous information.
         this->begin();
 
-        std::vector<Token> tokens = {};
-        std::optional<Token> token;
+        std::vector<Token> tokens{};
+        std::optional<Token> token = std::nullopt;
 
         while (this->hasNext()) {
             token = this->tryNext();
@@ -251,11 +247,6 @@ namespace ionlang {
             // No more tokens to process.
             if (!token.has_value()) {
                 break;
-            }
-            // Display a warning if the token's type is unknown.
-            else if (token->kind == TokenKind::Unknown) {
-                // TODO: Issue warning instead of plain std::cout.
-                std::cout << "Warning: Unknown token encountered" << std::endl;
             }
 
             // Append the token to the result.

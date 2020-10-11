@@ -7,10 +7,9 @@
 namespace ionlang {
     bool Grammar::isInitialized = false;
 
-    ionshared::BiMap<std::string, TokenKind> Grammar::simple =
-        ionshared::BiMap<std::string, TokenKind>();
+    SimplePairVector Grammar::simpleRules{};
 
-    const std::vector<std::pair<std::regex, TokenKind>> Grammar::complex({
+    const std::vector<std::pair<std::regex, TokenKind>> Grammar::complexRules({
         {const_regex::string, TokenKind::LiteralString},
         {const_regex::decimal, TokenKind::LiteralDecimal},
         {const_regex::integer, TokenKind::LiteralInteger},
@@ -23,6 +22,43 @@ namespace ionlang {
          * precedence over other regexes, for example booleans.
          */
         {const_regex::identifier, TokenKind::Identifier}
+    });
+
+    const ionshared::BiMap<std::string, TokenKind> Grammar::keywords(std::map<std::string, TokenKind>{
+        // Keywords.
+        {"fn", TokenKind::KeywordFunction},
+        {"module", TokenKind::KeywordModule},
+        {"extern", TokenKind::KeywordExtern},
+        {"global", TokenKind::KeywordGlobal},
+        {"else", TokenKind::KeywordElse},
+        {"unsafe", TokenKind::KeywordUnsafe},
+        {"struct", TokenKind::KeywordStruct},
+
+        // Statement keywords.
+        {const_name::statementReturn, TokenKind::KeywordReturn},
+        {const_name::statementIf, TokenKind::KeywordIf},
+
+        // Type keywords.
+        {const_name::typeVoid, TokenKind::TypeVoid},
+        {const_name::typeBool, TokenKind::TypeBool},
+        {const_name::typeInt8, TokenKind::TypeInt8},
+        {const_name::typeInt16, TokenKind::TypeInt16},
+        {const_name::typeInt32, TokenKind::TypeInt32},
+        {const_name::typeInt64, TokenKind::TypeInt64},
+        // TODO: Int128?
+        // TODO
+        //            {const_name::typeUnsignedInt16, TokenKind::TypeUnsignedInt16},
+        //            {const_name::typeUnsignedInt32, TokenKind::TypeUnsignedInt32},
+        //            {const_name::typeUnsignedInt64, TokenKind::TypeUnsignedInt64},
+        {const_name::typeFloat16, TokenKind::TypeFloat16},
+        {const_name::typeFloat32, TokenKind::TypeFloat32},
+        {const_name::typeFloat64, TokenKind::TypeFloat64},
+        {const_name::typeChar, TokenKind::TypeChar},
+        {const_name::typeString, TokenKind::TypeString},
+
+        // Qualifier keywords.
+        {"const", TokenKind::QualifierConst},
+        {"mut", TokenKind::QualifierMutable}
     });
 
     const ionshared::BiMap<std::string, TokenKind> Grammar::symbols({
@@ -82,10 +118,6 @@ namespace ionlang {
         TokenKind::TypeString
     };
 
-    bool Grammar::pushSimple(std::string value, TokenKind tokenKind) {
-        return Grammar::simple.insert(std::move(value), tokenKind);
-    }
-
     bool Grammar::sortByKeyLength(
         const std::pair<std::string, TokenKind>& a,
         const std::pair<std::string, TokenKind>& b
@@ -103,22 +135,8 @@ namespace ionlang {
         return std::find(subject.begin(), subject.end(), item) != subject.end();
     }
 
-    const ionshared::BiMap<std::string, TokenKind> &Grammar::getSimpleIds() {
-        return Grammar::simple;
-    }
-
-    const SimplePairVector Grammar::getSortedSimpleIds() {
-        Grammar::ensureInit();
-
-        SimplePairVector result = {};
-
-        for (const auto &pair : Grammar::simple.firstMap.unwrapConst()) {
-            result.push_back(pair);
-        }
-
-        std::sort(result.begin(), result.end(), Grammar::sortByKeyLength);
-
-        return result;
+    const SimplePairVector& Grammar::getSimpleRules() {
+        return Grammar::simpleRules;
     }
 
     const TokenKindVector& Grammar::getBuiltInTypes() {
@@ -127,34 +145,8 @@ namespace ionlang {
         return Grammar::types;
     }
 
-    std::map<TokenKind, std::string> Grammar::getNames() {
-        Grammar::ensureInit();
-
-        return Grammar::names;
-    }
-
-    std::optional<std::string> Grammar::getTokenKindName(TokenKind tokenKind) {
-        Grammar::ensureInit();
-
-        if (!ionshared::util::mapContains<TokenKind, std::string>(Grammar::names, tokenKind)) {
-            return std::nullopt;
-        }
-
-        return Grammar::names[tokenKind];
-    }
-
     bool Grammar::getIsInitialized() {
         return Grammar::isInitialized;
-    }
-
-    std::optional<std::string> Grammar::findSimpleValue(TokenKind tokenKind) {
-        for (const auto &entry : Grammar::simple.firstMap.unwrapConst()) {
-            if (entry.second == tokenKind) {
-                return entry.first;
-            }
-        }
-
-        return std::nullopt;
     }
 
     void Grammar::init() {
@@ -163,49 +155,53 @@ namespace ionlang {
             return;
         }
 
-        // Initialize keywords bidirectional map.
-        Grammar::keywords = ionshared::BiMap<std::string, TokenKind>(std::map<std::string, TokenKind>{
-            // Keywords.
-            {"fn", TokenKind::KeywordFunction},
-            {"module", TokenKind::KeywordModule},
-            {"extern", TokenKind::KeywordExtern},
-            {"global", TokenKind::KeywordGlobal},
-            {"else", TokenKind::KeywordElse},
-            {"unsafe", TokenKind::KeywordUnsafe},
-            {"struct", TokenKind::KeywordStruct},
-
-            // Statement keywords.
-            {const_name::statementReturn, TokenKind::KeywordReturn},
-            {const_name::statementIf, TokenKind::KeywordIf},
-
-            // Type keywords.
-            {const_name::typeVoid, TokenKind::TypeVoid},
-            {const_name::typeBool, TokenKind::TypeBool},
-            {const_name::typeInt8, TokenKind::TypeInt8},
-            {const_name::typeInt16, TokenKind::TypeInt16},
-            {const_name::typeInt32, TokenKind::TypeInt32},
-            {const_name::typeInt64, TokenKind::TypeInt64},
-            // TODO: Int128?
-            // TODO
-//            {const_name::typeUnsignedInt16, TokenKind::TypeUnsignedInt16},
-//            {const_name::typeUnsignedInt32, TokenKind::TypeUnsignedInt32},
-//            {const_name::typeUnsignedInt64, TokenKind::TypeUnsignedInt64},
-            {const_name::typeFloat16, TokenKind::TypeFloat16},
-            {const_name::typeFloat32, TokenKind::TypeFloat32},
-            {const_name::typeFloat64, TokenKind::TypeFloat64},
-            {const_name::typeChar, TokenKind::TypeChar},
-            {const_name::typeString, TokenKind::TypeString},
-
-            // Qualifier keywords.
-            {"const", TokenKind::QualifierConst},
-            {"mut", TokenKind::QualifierMutable}
-        });
+        auto throwDuplicateEntryException = []{
+            throw std::runtime_error("Rule merging failed; This may be due to duplicate entries");
+        };
 
         // TODO: What is this syntax? Investigate -- might be wrong. Are we using the wrong initialization syntax?
         // Merge simple maps.
-        Grammar::simple = Grammar::symbols.merge(Grammar::simple);
-        Grammar::simple = Grammar::keywords.merge(Grammar::simple);
-        Grammar::simple = Grammar::intrinsicOperators.merge(Grammar::simple);
+        std::optional<ionshared::BiMap<std::string, TokenKind>> mergeBufferBiMap{};
+
+        mergeBufferBiMap = Grammar::symbols.merge(*mergeBufferBiMap);
+
+        // TODO: Find a way to simplify these repeated std::nullopt tests.
+        if (!mergeBufferBiMap.has_value()) {
+            throwDuplicateEntryException();
+        }
+
+        mergeBufferBiMap = Grammar::keywords.merge(*mergeBufferBiMap);
+
+        if (!mergeBufferBiMap.has_value()) {
+            throwDuplicateEntryException();
+        }
+
+        mergeBufferBiMap = Grammar::intrinsicOperators.merge(*mergeBufferBiMap);
+
+        if (!mergeBufferBiMap.has_value()) {
+            throwDuplicateEntryException();
+        }
+
+        // Sort.
+        auto mergeBufferBiNativeMap = mergeBufferBiMap->firstMap.unwrapConst();
+
+        for (const auto &pair : mergeBufferBiNativeMap) {
+            Grammar::simpleRules.push_back(pair);
+        }
+
+        std::sort(
+            Grammar::simpleRules.begin(),
+            Grammar::simpleRules.end(),
+            Grammar::sortByKeyLength
+        );
+
+        // TODO
+//        size_t expectedEntriesMerged = Grammar::symbols.firstMap.getSize()
+//            + Grammar::keywords.firstMap.getSize()
+//            + Grammar::intrinsicOperators.firstMap.getSize();
+//
+//        assert(Grammar::simple.firstMap.getSize() == expectedEntriesMerged);
+//        assert(Grammar::simple.firstMap.getSize() == Grammar::simple.secondMap.getSize());
 
         /**
          * Raise initialized flag to prevent further

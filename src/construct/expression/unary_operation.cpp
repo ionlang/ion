@@ -2,7 +2,7 @@
 
 namespace ionlang {
     UnaryOperation::UnaryOperation(
-        ionshared::Ptr<Type> type,
+        PtrResolvable<Type> type,
         IntrinsicOperatorKind operation,
         ionshared::Ptr<Construct> value
     ) :

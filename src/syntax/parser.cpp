@@ -14,18 +14,22 @@ namespace ionlang {
 
     bool Parser::expect(TokenKind tokenKind) {
         if (!this->is(tokenKind)) {
+            std::string expectedTokenKindName = const_name::unknown;
+            std::string actualTokenKindName = const_name::unknown;
+            TokenKind currentTokenKind = this->tokenStream.get().kind;
+
+            if (Grammar::tokenKindNames.contains(tokenKind)) {
+                expectedTokenKindName = Grammar::tokenKindNames.at(tokenKind);
+            }
+
+            if (Grammar::tokenKindNames.contains(currentTokenKind)) {
+                expectedTokenKindName = Grammar::tokenKindNames.at(currentTokenKind);
+            }
+
             this->diagnosticBuilder
                 ->bootstrap(diagnostic::syntaxExpectedToken)
                 ->setSourceLocation(this->makeSourceLocation())
-
-                ->formatMessage(
-                    Grammar::getTokenKindName(tokenKind).value_or(const_name::unknown),
-
-                    Grammar::getTokenKindName(
-                        this->tokenStream.get().kind
-                    ).value_or(const_name::unknown)
-                )
-
+                ->formatMessage(expectedTokenKindName, actualTokenKindName)
                 ->finish();
 
             return false;
@@ -90,7 +94,7 @@ namespace ionlang {
         return errorMarker;
     }
 
-    void Parser::mapSourceLocation(const AstPtrResult<> &construct) {
+    void Parser::mapSourceLocation(const AstPtrResult<>& construct) {
         // TODO: Causing error regarding std::pair.
 //        this->sourceMap->set(
 //            util::getResultValue(std::move(construct)),
@@ -98,7 +102,7 @@ namespace ionlang {
 //        );
     }
 
-    void Parser::finishSourceLocationMapping(const ionshared::Ptr<Construct> &construct) {
+    void Parser::finishSourceLocationMapping(const ionshared::Ptr<Construct>& construct) {
         construct->sourceLocation = this->finishSourceLocation();
     }
 
@@ -116,7 +120,7 @@ namespace ionlang {
         return this->diagnosticBuilder;
     }
 
-    AstPtrResult<> Parser::parseTopLevelFork(const ionshared::Ptr<Module> &parent) {
+    AstPtrResult<> Parser::parseTopLevelFork(const ionshared::Ptr<Module>& parent) {
         this->beginSourceLocationMapping();
 
         switch (this->tokenStream.get().kind) {
@@ -147,7 +151,7 @@ namespace ionlang {
         }
     }
 
-    AstPtrResult<Global> Parser::parseGlobal(const ionshared::Ptr<Module> &parent) {
+    AstPtrResult<Global> Parser::parseGlobal(const ionshared::Ptr<Module>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordGlobal))
@@ -186,7 +190,7 @@ namespace ionlang {
         return global;
     }
 
-    AstPtrResult<Struct> Parser::parseStruct(const ionshared::Ptr<Module> &parent) {
+    AstPtrResult<Struct> Parser::parseStruct(const ionshared::Ptr<Module>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordStruct))
@@ -230,7 +234,7 @@ namespace ionlang {
         return std::make_shared<Struct>(parent, *structNameResult, fields);
     }
 
-    AstPtrResult<Block> Parser::parseBlock(const ionshared::Ptr<Construct> &parent) {
+    AstPtrResult<Block> Parser::parseBlock(const ionshared::Ptr<Construct>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
@@ -297,7 +301,7 @@ namespace ionlang {
         return module;
     }
 
-    AstPtrResult<VariableDeclStatement> Parser::parseVariableDecl(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<VariableDeclStatement> Parser::parseVariableDecl(const ionshared::Ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         AstPtrResult<Type> typeResult = this->parseType();

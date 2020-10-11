@@ -3,7 +3,7 @@
 #include <ionshared/misc/helpers.h>
 #include <ionshared/passes/base_pass.h>
 #include <ionshared/passes/base_pass_manager.h>
-#include <ionlang/construct/pseudo/ref.h>
+#include <ionlang/construct/pseudo/resolvable.h>
 #include <ionlang/construct/pseudo/error_marker.h>
 #include <ionlang/construct/construct.h>
 #include <ionlang/construct/module.h>
@@ -29,6 +29,7 @@
 #include <ionlang/construct/type.h>
 #include <ionlang/construct/type/void_type.h>
 #include <ionlang/construct/type/boolean_type.h>
+#include <ionlang/construct/type/user_defined_type.h>
 #include <ionlang/construct/function.h>
 #include <ionlang/construct/global.h>
 #include <ionlang/construct/attribute.h>
@@ -72,8 +73,6 @@ namespace ionlang {
 
         virtual void visitVariableRefExpr(ionshared::Ptr<VariableRefExpr> node);
 
-        virtual void visitValue(ionshared::Ptr<Value<>> node);
-
         virtual void visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> node);
 
         virtual void visitCharLiteral(ionshared::Ptr<CharLiteral> node);
@@ -82,13 +81,13 @@ namespace ionlang {
 
         virtual void visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> node);
 
-        virtual void visitType(ionshared::Ptr<Type> node);
-
         virtual void visitVoidType(ionshared::Ptr<VoidType> node);
 
         virtual void visitBooleanType(ionshared::Ptr<BooleanType> node);
 
-        virtual void visitRef(PtrRef<> node);
+        virtual void visitUserDefinedType(ionshared::Ptr<UserDefinedType> node);
+
+        virtual void visitRef(PtrResolvable<> node);
 
         virtual void visitFunction(ionshared::Ptr<Function> node);
 

@@ -8,15 +8,15 @@ namespace ionlang {
 
     class VariableRefExpr : public Expression {
     private:
-        PtrRef<VariableDeclStatement> variableDecl;
+        PtrResolvable<VariableDeclStatement> variableDecl;
 
     public:
-        explicit VariableRefExpr(PtrRef<VariableDeclStatement> variableDecl);
+        explicit VariableRefExpr(PtrResolvable<VariableDeclStatement> variableDecl);
 
         void accept(Pass &visitor) override;
 
-        [[nodiscard]] PtrRef<VariableDeclStatement> getVariableDecl() const noexcept;
+        [[nodiscard]] PtrResolvable<VariableDeclStatement> getVariableDecl() const noexcept;
 
-        void setVariableDecl(PtrRef<VariableDeclStatement> variableDecl) noexcept;
+        void setVariableDecl(PtrResolvable<VariableDeclStatement> variableDecl) noexcept;
     };
 }

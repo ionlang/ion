@@ -3,7 +3,7 @@
 #include <iostream>
 
 namespace ionlang {
-    enum class TokenKind {
+    enum struct TokenKind {
         Unknown,
 
         Identifier,

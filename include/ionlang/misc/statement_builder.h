@@ -18,7 +18,7 @@ namespace ionlang {
 
         [[nodiscard]] ionshared::Ptr<Block> getBlock() const noexcept;
 
-        void appendStatement(const ionshared::Ptr<Statement> &statement);
+        void appendStatement(const ionshared::Ptr<Statement>& statement);
 
         template<class TStatement, typename... TArgs>
         ionshared::Ptr<TStatement> make(TArgs... args) {

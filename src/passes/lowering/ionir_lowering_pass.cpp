@@ -291,7 +291,7 @@ namespace ionlang {
 
     void IonIrLoweringPass::visitPrototype(ionshared::Ptr<Prototype> node) {
         this->requireModule();
-        this->visitType(node->returnType);
+        this->visit(node->returnType);
 
         ionshared::Ptr<ionir::Type> ionIrReturnType = this->typeStack.pop();
         ionshared::Ptr<ionir::Args> ionIrArguments = std::make_shared<ionir::Args>();
@@ -302,7 +302,7 @@ namespace ionlang {
 
         // TODO: Should Args be a construct, and be visited?
         for (const auto &[id, argument] : nativeArguments) {
-            this->visitType(argument.first);
+            this->visit(argument.first);
 
             ionIrArguments->getItems()->set(
                 argument.second,
@@ -396,13 +396,19 @@ namespace ionlang {
     }
 
     void IonIrLoweringPass::visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> node) {
-        ionshared::Ptr<Type> nodeType = node->getType();
+        PtrResolvable<IntegerType> integerTypeResolvable = node->type;
 
-        if (nodeType->getTypeKind() != TypeKind::Integer) {
+        if (!integerTypeResolvable->isResolved()) {
+            throw std::runtime_error("Type is unresolved");
+        }
+
+        ionshared::Ptr<Type> integerType = *node->type->value;
+
+        if (integerType->typeKind != TypeKind::Integer) {
             throw std::runtime_error("Integer value's type must be integer type");
         }
 
-        this->visitIntegerType(nodeType->dynamicCast<IntegerType>());
+        this->visit(integerType);
 
         ionshared::Ptr<ionir::IntegerType> ionIrIntegerType =
             this->typeStack.pop()->dynamicCast<ionir::IntegerType>();
@@ -410,36 +416,35 @@ namespace ionlang {
         ionshared::Ptr<ionir::IntegerLiteral> ionIrIntegerLiteral =
             std::make_shared<ionir::IntegerLiteral>(ionIrIntegerType, node->value);
 
-        // Use static pointer cast when downcasting to ionir::Value<>.
-        this->constructStack.push(ionIrIntegerLiteral->staticCast<ionir::Value<>>());
+        this->constructStack.push(ionIrIntegerLiteral);
     }
 
     void IonIrLoweringPass::visitCharLiteral(ionshared::Ptr<CharLiteral> node) {
         ionshared::Ptr<ionir::CharLiteral> ionIrCharLiteral =
             std::make_shared<ionir::CharLiteral>(node->value);
 
-        this->constructStack.push(ionIrCharLiteral->dynamicCast<ionir::Value<>>());
+        this->constructStack.push(ionIrCharLiteral);
     }
 
     void IonIrLoweringPass::visitStringLiteral(ionshared::Ptr<StringLiteral> node) {
         ionshared::Ptr<ionir::StringLiteral> ionIrStringLiteral =
             std::make_shared<ionir::StringLiteral>(node->value);
 
-        this->constructStack.push(ionIrStringLiteral->dynamicCast<ionir::Value<>>());
+        this->constructStack.push(ionIrStringLiteral);
     }
 
     void IonIrLoweringPass::visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> node) {
         ionshared::Ptr<ionir::BooleanLiteral> ionIrBooleanLiteral =
             std::make_shared<ionir::BooleanLiteral>(node->value);
 
-        this->constructStack.push(ionIrBooleanLiteral->dynamicCast<ionir::Value<>>());
+        this->constructStack.push(ionIrBooleanLiteral);
     }
 
     void IonIrLoweringPass::visitGlobal(ionshared::Ptr<Global> node) {
         // Module buffer will be used, therefore it must be set.
         ionshared::Ptr<ionir::Module> ionIrModuleBuffer = this->requireModule();
 
-        this->visitType(node->type);
+        this->visit(node->type);
 
         ionshared::Ptr<ionir::Type> type = this->typeStack.pop();
         ionshared::OptPtr<Value<>> nodeValue = node->value;
@@ -447,7 +452,7 @@ namespace ionlang {
 
         // Assign value if applicable.
         if (ionshared::util::hasValue(nodeValue)) {
-            Pass::visitValue(*nodeValue);
+            this->visit(*nodeValue);
 
             // Use static pointer cast when downcasting to ionir::Value<>.
             value = this->constructStack.pop()->staticCast<ionir::Value<>>();
@@ -474,47 +479,6 @@ namespace ionlang {
         );
 
         this->constructStack.push(ionIrGlobalVariable);
-    }
-
-    void IonIrLoweringPass::visitType(ionshared::Ptr<Type> node) {
-        // Convert type to a pointer if applicable.
-        // TODO: Now it's PointerType (soon to be implemented or already).
-        //        if (node->getIsPointer()) {
-        //            /**
-        //             * TODO: Convert type to pointer before passing on
-        //             * to explicit handlers, thus saving time and code.
-        //             */
-        //        }
-
-        switch (node->getTypeKind()) {
-            case TypeKind::Void: {
-                return this->visitVoidType(node->staticCast<VoidType>());
-            }
-
-            case TypeKind::Integer: {
-                return this->visitIntegerType(node->staticCast<IntegerType>());
-            }
-
-            case TypeKind::Boolean: {
-                return this->visitBooleanType(node->staticCast<BooleanType>());
-            }
-
-            case TypeKind::String: {
-                // TODO
-
-                throw std::runtime_error("Not implemented");
-            }
-
-            case TypeKind::UserDefined: {
-                // TODO
-
-                throw std::runtime_error("Not implemented");
-            }
-
-            default: {
-                throw std::runtime_error("Could not identify type kind");
-            }
-        }
     }
 
     void IonIrLoweringPass::visitIntegerType(ionshared::Ptr<IntegerType> node) {
@@ -718,7 +682,7 @@ namespace ionlang {
         ionshared::Ptr<ionir::InstBuilder> ionIrInstBuilder = *this->buffers.builder;
 
         // First, visit the type and create a IonIR alloca inst,  and push it onto the stack.
-        this->visitType(node->type);
+        this->visit(node->type);
 
         ionshared::Ptr<ionir::Type> ionIrType = this->typeStack.pop();
 
@@ -743,7 +707,7 @@ namespace ionlang {
     }
 
     void IonIrLoweringPass::visitCallExpr(ionshared::Ptr<CallExpr> node) {
-        PtrRef<> calleeRef = node->calleeRef;
+        PtrResolvable<> calleeRef = node->calleeResolvable;
 
         if (!calleeRef->isResolved()) {
             throw std::runtime_error("Expected callee function reference to be resolved");
@@ -812,7 +776,7 @@ namespace ionlang {
             ionshared::util::makePtrSymbolTable<ionir::Type>();
 
         for (const auto &[name, type] : fieldsMap) {
-            this->visitType(type);
+            this->visit(type);
             ionIrFields->set(name, this->typeStack.pop());
         }
 

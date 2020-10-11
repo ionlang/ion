@@ -3,7 +3,7 @@
 #include <iostream>
 #include <array>
 #include <string>
-#include <ionir/passes/codegen/llvm_codegen_pass.h>
+#include <ionir/passes/lowering/llvm_lowering_pass.h>
 #include <ionlang/passes/lowering/ionir_lowering_pass.h>
 #include <ionlang/lexical/token.h>
 #include "util.h"
@@ -22,9 +22,12 @@ namespace ionlang::test::compare {
      * before comparison. Returns false if the stored
      * LLVM IR file does not exist.
      */
-    bool ir(std::string output, const std::string &fileName);
+    bool ir(std::string output, const std::string& fileName);
 
-    bool ir(const ionshared::Ptr<ionir::LlvmCodegenPass> &llvmCodegenPass, const std::string &fileName);
+    bool ir(
+        const ionshared::Ptr<ionir::LlvmLoweringPass>& llvmLoweringPass,
+        const std::string& fileName
+    );
 
     template<unsigned int N>
     void tokenSets(std::array<Token, N> expected, std::vector<Token> actual) {

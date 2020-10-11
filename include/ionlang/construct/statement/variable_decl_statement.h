@@ -21,7 +21,7 @@ namespace ionlang {
 
         ionshared::Ptr<Construct> value;
 
-        explicit VariableDeclStatement(const VariableDeclStatementOpts &opts);
+        explicit VariableDeclStatement(const VariableDeclStatementOpts& opts) noexcept;
 
         void accept(Pass &visitor) override;
     };

@@ -14,7 +14,11 @@ namespace ionlang {
         this->block->appendStatement(statement);
     }
 
-    ionshared::Ptr<VariableDeclStatement> StatementBuilder::createVariableDecl(ionshared::Ptr<Type> type, std::string id, ionshared::Ptr<Construct> value) {
+    ionshared::Ptr<VariableDeclStatement> StatementBuilder::createVariableDecl(
+        ionshared::Ptr<Type> type,
+        std::string id,
+        ionshared::Ptr<Construct> value
+    ) {
         return this->make<VariableDeclStatement, VariableDeclStatementOpts>(VariableDeclStatementOpts{
             this->block,
             std::move(type),
@@ -23,22 +27,22 @@ namespace ionlang {
         });
     }
 
-    ionshared::Ptr<AssignmentStatement> StatementBuilder::createAssignment(ionshared::Ptr<VariableDeclStatement> variableDeclStatement, ionshared::Ptr<Construct> value) {
+    ionshared::Ptr<AssignmentStatement> StatementBuilder::createAssignment(
+        ionshared::Ptr<VariableDeclStatement> variableDeclStatement,
+        ionshared::Ptr<Construct> value
+    ) {
         return this->make<AssignmentStatement, AssignmentStatementOpts>(AssignmentStatementOpts{
             this->block,
-
-            std::make_shared<Ref<VariableDeclStatement>>(
-                variableDeclStatement->name,
-                this->block,
-                RefKind::Variable,
-                variableDeclStatement
-            ),
-
+            Resolvable<VariableDeclStatement>::make(std::move(variableDeclStatement)),
             std::move(value)
         });
     }
 
-    ionshared::Ptr<IfStatement> StatementBuilder::createIf(ionshared::Ptr<Construct> condition, ionshared::Ptr<Block> consequentBlock, ionshared::OptPtr<Block> alternativeBlock) {
+    ionshared::Ptr<IfStatement> StatementBuilder::createIf(
+        ionshared::Ptr<Construct> condition,
+        ionshared::Ptr<Block> consequentBlock,
+        ionshared::OptPtr<Block> alternativeBlock
+    ) {
         return this->make<IfStatement, IfStatementOpts>(IfStatementOpts{
             this->block,
             std::move(condition),

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ionlang/construct/pseudo/resolvable.h>
 #include <ionlang/construct/expression.h>
 #include <ionlang/construct/function.h>
 
@@ -9,13 +10,17 @@ namespace ionlang {
     typedef std::vector<ionshared::Ptr<Value<>>> CallArgs;
 
     struct CallExpr : Expression {
-        PtrRef<> calleeRef;
+        PtrResolvable<> calleeResolvable;
 
         CallArgs args;
 
-        CallExpr(PtrRef<> callee, CallArgs args);
+        CallExpr(
+            PtrResolvable<> calleeResolvable,
+            CallArgs args,
+            const PtrResolvable<Type>& type
+        ) noexcept;
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
 
         [[nodiscard]] Ast getChildNodes() override;
     };

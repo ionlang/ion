@@ -3,7 +3,7 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    AstPtrResult<Expression> Parser::parseExpression(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<Expression> Parser::parseExpression(const ionshared::Ptr<Block>& parent) {
         AstPtrResult<Expression> primaryExpression = this->parsePrimaryExpr(parent);
 
         IONLANG_PARSER_ASSERT(util::hasValue(primaryExpression))
@@ -33,7 +33,7 @@ namespace ionlang {
         return primaryExpression;
     }
 
-    AstPtrResult<Expression> Parser::parsePrimaryExpr(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<Expression> Parser::parsePrimaryExpr(const ionshared::Ptr<Block>& parent) {
         if (this->is(TokenKind::SymbolParenthesesL)) {
             return this->parseParenthesesExpr(parent);
         }
@@ -51,7 +51,7 @@ namespace ionlang {
         return util::castAstPtrResult<Value<>, Expression>(literal, false);
     }
 
-    AstPtrResult<Expression> Parser::parseParenthesesExpr(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<Expression> Parser::parseParenthesesExpr(const ionshared::Ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
@@ -65,7 +65,7 @@ namespace ionlang {
         return expression;
     }
 
-    AstPtrResult<Expression> Parser::parseIdExpr(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<Expression> Parser::parseIdExpr(const ionshared::Ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         if (this->isNext(TokenKind::SymbolParenthesesL)) {
@@ -73,8 +73,8 @@ namespace ionlang {
         }
 
         // TODO: Is this the correct parent for the ref?
-        PtrRef<VariableDeclStatement> variableDeclRef =
-            util::getResultValue(this->parseRef<VariableDeclStatement>(parent));
+        PtrResolvable<VariableDeclStatement> variableDeclRef =
+            util::getResultValue(this->parseResolvable<VariableDeclStatement>(parent));
 
         this->finishSourceLocationMapping(variableDeclRef);
 
@@ -147,7 +147,7 @@ namespace ionlang {
         }
     }
 
-    AstPtrResult<CallExpr> Parser::parseCallExpr(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<CallExpr> Parser::parseCallExpr(const ionshared::Ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         std::optional<std::string> calleeId = this->parseId();
@@ -155,7 +155,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(calleeId.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
-        CallArgs callArgs = CallArgs();
+        CallArgs callArgs{};
 
         while (!this->is(TokenKind::SymbolParenthesesR)) {
             AstPtrResult<Expression> primaryExpr = this->parsePrimaryExpr(parent);
@@ -176,8 +176,9 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
 
         ionshared::Ptr<CallExpr> callExpr = std::make_shared<CallExpr>(
-            std::make_shared<Ref<>>(*calleeId, parent, RefKind::Function),
-            callArgs
+            Resolvable<>::make(ResolvableKind::Prototype, *calleeId, parent),
+            callArgs,
+            Resolvable<Type>::make(ResolvableKind::PrototypeReturnType, *calleeId, parent)
         );
 
         this->finishSourceLocationMapping(callExpr);

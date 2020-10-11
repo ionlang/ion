@@ -3,7 +3,7 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    AstPtrResult<Statement> Parser::parseStatement(const ionshared::Ptr<Block> &parent) {
+    AstPtrResult<Statement> Parser::parseStatement(const ionshared::Ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         AstPtrResult<Statement> statement;
@@ -142,10 +142,10 @@ namespace ionlang {
         return std::make_shared<AssignmentStatement>(AssignmentStatementOpts{
             parent,
 
-            std::make_shared<Ref<VariableDeclStatement>>(
+            std::make_shared<Resolvable<VariableDeclStatement>>(
+                ResolvableKind::Variable,
                 *id,
-                parent,
-                RefKind::Variable
+                parent
             ),
 
             util::getResultValue(value)

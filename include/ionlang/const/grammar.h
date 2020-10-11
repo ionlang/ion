@@ -13,17 +13,15 @@
 #include <ionlang/misc/helpers.h>
 
 namespace ionlang {
+    typedef std::vector<std::pair<std::string, TokenKind>> SimplePairVector;
+
     class Grammar {
     private:
         static bool isInitialized;
 
-        static ionshared::BiMap<std::string, TokenKind> simple;
+        static SimplePairVector simpleRules;
 
         static TokenKindVector types;
-
-        static std::map<TokenKind, std::string> names;
-
-        static bool pushSimple(std::string value, TokenKind tokenKind);
 
         static bool sortByKeyLength(
             const std::pair<std::string, TokenKind>& a,
@@ -33,9 +31,11 @@ namespace ionlang {
         static void ensureInit();
 
     public:
-        static const std::vector<std::pair<std::regex, TokenKind>> complex;
+        static const std::map<TokenKind, std::string> tokenKindNames;
 
-        static ionshared::BiMap<std::string, TokenKind> keywords;
+        static const std::vector<std::pair<std::regex, TokenKind>> complexRules;
+
+        static const ionshared::BiMap<std::string, TokenKind> keywords;
 
         static const ionshared::BiMap<std::string, TokenKind> symbols;
 
@@ -43,24 +43,14 @@ namespace ionlang {
 
         static const std::map<IntrinsicOperatorKind, uint32_t> intrinsicOperatorPrecedences;
 
-        static bool contains(TokenKindVector subject, TokenKind item);
+        [[nodiscard]] static bool contains(TokenKindVector subject, TokenKind item);
 
-        static const ionshared::BiMap<std::string, TokenKind>& getSimpleIds();
+        [[nodiscard]] static const SimplePairVector& getSimpleRules();
 
-        static const std::vector<std::pair<std::string, TokenKind>> getSortedSimpleIds();
+        [[nodiscard]] static const TokenKindVector& getBuiltInTypes();
 
-        static const TokenKindVector& getBuiltInTypes();
-
-        static std::map<TokenKind, std::string> getNames();
-
-        static std::optional<std::string> getTokenKindName(TokenKind tokenKind);
-
-        static bool getIsInitialized();
-
-        static std::optional<std::string> findSimpleValue(TokenKind tokenKind);
+        [[nodiscard]] static bool getIsInitialized();
 
         static void init();
     };
-
-    typedef std::vector<std::pair<std::string, TokenKind>> SimplePairVector;
 }

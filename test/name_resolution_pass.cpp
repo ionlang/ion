@@ -35,7 +35,7 @@ TEST(NameResolutionPassTest, Run) {
 
     auto assignmentStatement = std::make_shared<AssignmentStatement>(AssignmentStatementOpts{
         functionBody,
-        std::make_shared<Ref<VariableDeclStatement>>(id, functionBody, RefKind::Variable),
+        Resolvable<VariableDeclStatement>::make(ResolvableKind::Variable, id, functionBody),
         nullptr
     });
 

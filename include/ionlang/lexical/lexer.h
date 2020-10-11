@@ -34,15 +34,9 @@ namespace ionlang {
             const bool expectCapturedValue = false;
         };
 
-        std::string input;
-
         size_t length;
 
         size_t index;
-
-        SimplePairVector simpleIds;
-
-        std::vector<std::pair<std::regex, TokenKind>> complexIds;
 
         [[nodiscard]] char getChar() const noexcept;
 
@@ -59,6 +53,8 @@ namespace ionlang {
         void processWhitespace();
 
     public:
+        const std::string input;
+
         explicit Lexer(const std::string &input);
 
         [[nodiscard]] size_t getIndex() const noexcept;
@@ -75,8 +71,6 @@ namespace ionlang {
          */
         std::optional<Token> tryNext() override;
 
-        [[nodiscard]] std::string getInput() const noexcept;
-
-        std::vector<Token> scan();
+        [[nodiscard]] std::vector<Token> scan();
     };
 }

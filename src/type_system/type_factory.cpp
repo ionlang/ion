@@ -30,10 +30,10 @@ namespace ionlang::type_factory {
     }
 
     ionshared::Ptr<IntegerType> typeChar() {
-        return type_factory::typeInteger(IntegerKind::Int8, false);
+        return type_factory::typeInteger8(false);
     }
 
-    ionshared::Ptr<Type> typeString() {
+    ionshared::Ptr<IntegerType> typeString() {
         // TODO: Awaiting array types support.
         return type_factory::typeChar();
     }

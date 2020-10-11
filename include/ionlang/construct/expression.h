@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ionlang/construct/pseudo/resolvable.h>
 #include "value.h"
 #include "type.h"
 
@@ -14,11 +15,11 @@ namespace ionlang {
         BinaryOperation
     };
 
-    struct Expression : public Value<> {
+    struct Expression : Value<> {
         const ExpressionKind expressionKind;
 
-        Expression(ExpressionKind kind, ionshared::Ptr<Type> type);
+        Expression(ExpressionKind kind, PtrResolvable<Type> typeRef);
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
     };
 }

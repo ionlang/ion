@@ -1,6 +1,6 @@
 #include <ionshared/misc/helpers.h>
 #include <ionshared/llvm/llvm_module.h>
-#include <ionir/passes/codegen/llvm_codegen_pass.h>
+#include <ionir/passes/lowering/llvm_lowering_pass.h>
 #include "compare.h"
 #include "filesystem.h"
 
@@ -11,7 +11,7 @@ namespace ionlang::test::compare {
         return util::trim(std::move(expected)) == util::trim(std::move(actual));
     }
 
-    bool ir(std::string output, const std::string &fileName) {
+    bool ir(std::string output, const std::string& fileName) {
         std::optional<std::string> contents = fs::readTestFile(fs::joinPaths(outputIrPath, fileName + ".ll"));
 
         // TODO: Consider returning int or enum for better verbosity.
@@ -24,8 +24,8 @@ namespace ionlang::test::compare {
         return util::trim(std::move(output)) == util::trim(*contents);
     }
 
-    bool ir(const ionshared::Ptr<ionir::LlvmCodegenPass> &llvmCodegenPass, const std::string &fileName) {
-        std::optional<llvm::Module *> llvmModuleBuffer = llvmCodegenPass->getModuleBuffer();
+    bool ir(const ionshared::Ptr<ionir::LlvmLoweringPass>& llvmLoweringPass, const std::string &fileName) {
+        std::optional<llvm::Module*> llvmModuleBuffer = llvmLoweringPass->getModuleBuffer();
 
         if (!ionshared::util::hasValue(llvmModuleBuffer)) {
             throw std::runtime_error("Module buffer in LlvmCodegenPass is not set");

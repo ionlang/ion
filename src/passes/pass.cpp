@@ -9,10 +9,7 @@ namespace ionlang {
     void Pass::visit(ionshared::Ptr<Construct> node) {
         // TODO: Hotfix for circular dep.
         if (node->constructKind == ConstructKind::Ref) {
-            this->visitRef(node->staticCast<Ref<>>());
-        }
-        else if (node->constructKind == ConstructKind::Value) {
-            this->visitValue(node->staticCast<Value<>>());
+            this->visitRef(node->staticCast<Resolvable<>>());
         }
         // TODO: This should be at the top alone with visitChildren() once fixed.
         else {
@@ -155,44 +152,6 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitValue(ionshared::Ptr<Value<>> node) {
-        switch (node->getValueKind()) {
-            case ValueKind::Character: {
-                this->visitCharLiteral(node->dynamicCast<CharLiteral>());
-
-                break;
-            }
-
-            case ValueKind::Integer: {
-                this->visitIntegerLiteral(node->dynamicCast<IntegerLiteral>());
-
-                break;
-            }
-
-            case ValueKind::String: {
-                this->visitStringLiteral(node->dynamicCast<StringLiteral>());
-
-                break;
-            }
-
-            case ValueKind::Boolean: {
-                this->visitBooleanLiteral(node->dynamicCast<BooleanLiteral>());
-
-                break;
-            }
-
-            case ValueKind::Expression: {
-                this->visitExpression(node->dynamicCast<Expression>());
-
-                break;
-            }
-
-            default: {
-                throw std::runtime_error("Unknown value kind");
-            }
-        }
-    }
-
     void Pass::visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> node) {
         //
     }
@@ -209,10 +168,6 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitType(ionshared::Ptr<Type> node) {
-        //
-    }
-
     void Pass::visitVoidType(ionshared::Ptr<VoidType> node) {
         //
     }
@@ -221,7 +176,11 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitRef(PtrRef<> node) {
+    void Pass::visitUserDefinedType(ionshared::Ptr<UserDefinedType> node) {
+        //
+    }
+
+    void Pass::visitRef(PtrResolvable<> node) {
         //
     }
 

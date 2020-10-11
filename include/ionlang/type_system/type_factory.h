@@ -34,7 +34,8 @@ namespace ionlang::type_factory {
 
     [[nodiscard]] ionshared::Ptr<IntegerType> typeChar();
 
-    [[nodiscard]] ionshared::Ptr<Type> typeString();
+    // TODO: return type.
+    [[nodiscard]] ionshared::Ptr<IntegerType> typeString();
 
     [[nodiscard]] ionshared::Ptr<VoidType> typeVoid();
 }

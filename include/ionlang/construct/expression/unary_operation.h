@@ -5,7 +5,7 @@
 namespace ionlang {
     class Pass;
 
-    enum class IntrinsicOperatorKind {
+    enum struct IntrinsicOperatorKind {
         Addition,
 
         Subtraction,
@@ -29,7 +29,7 @@ namespace ionlang {
         ionshared::Ptr<Construct> value;
 
         UnaryOperation(
-            ionshared::Ptr<Type> type,
+            PtrResolvable<Type> type,
             IntrinsicOperatorKind operation,
             ionshared::Ptr<Construct> value
         );

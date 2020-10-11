@@ -166,7 +166,7 @@ namespace ionlang {
         // TODO: Add comment-parsing support.
 
         template<typename T = Construct>
-        AstPtrResult<Ref<T>> parseRef(ionshared::Ptr<Construct> owner) {
+        AstPtrResult<Resolvable<T>> parseResolvable(ionshared::Ptr<Construct> owner) {
             this->beginSourceLocationMapping();
 
             std::optional<std::string> id = this->parseId();
@@ -174,7 +174,7 @@ namespace ionlang {
             IONLANG_PARSER_ASSERT(id.has_value())
 
             // TODO: Parsing variable ref. only! Not taking in what kind in params!
-            return std::make_shared<Ref<T>>(*id, owner, RefKind::Variable);
+            return std::make_shared<Resolvable<T>>(ResolvableKind::Variable, *id, owner);
         }
     };
 }

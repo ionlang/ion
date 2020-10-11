@@ -11,7 +11,7 @@ namespace ionlang::test::bootstrap {
         return Token(kind, "");
     }
 
-    TokenStream tokenStream(int amountOfItems) {
+    TokenStream tokenStream(size_t amountOfItems) {
         std::vector<Token> tokens = {};
 
         // Reserve the amount of items in the vector.
@@ -27,10 +27,10 @@ namespace ionlang::test::bootstrap {
     }
 
     Parser parser(const std::vector<Token> &tokens) {
-        return ionlang::Parser(ionlang::TokenStream(tokens));
+        return Parser(TokenStream(tokens));
     }
 
-    ionshared::Ptr<ionir::Module> ionIrModule(const std::string &identifier) {
+    ionshared::Ptr<ionir::Module> ionIrModule(const std::string& identifier) {
         return std::make_shared<ionir::Module>(
             std::make_shared<ionir::Identifier>(identifier)
         );
