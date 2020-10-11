@@ -21,8 +21,18 @@ namespace ionlang {
         PrototypeReturnType
     };
 
+    /**
+     * A wrapper for a value that may be present or may need
+     * to be resolved. Resolution can only occur once, and attempts
+     * to re-resolve a value will be denied but no exception will
+     * be thrown.
+     */
     template<typename T = Construct>
-    struct Resolvable : Construct {
+    class Resolvable : public Construct {
+    private:
+        ionshared::OptPtr<T> value;
+
+    public:
         [[nodiscard]] static ionshared::Ptr<Resolvable<T>> make(
             ionshared::Ptr<T> value
         ) noexcept {
@@ -42,8 +52,6 @@ namespace ionlang {
         const std::optional<std::string> name;
 
         const ionshared::OptPtr<Construct> context;
-
-        ionshared::OptPtr<T> value;
 
         Resolvable(
             ResolvableKind kind,
@@ -84,6 +92,10 @@ namespace ionlang {
             this->resolve(value);
         }
 
+        ionshared::OptPtr<T> getValue() const noexcept {
+            return this->value;
+        }
+
         template<typename TValue>
         [[nodiscard]] ionshared::OptPtr<TValue> getValueAs() const {
             // TODO: Ensure T is or derives from Construct.
@@ -92,12 +104,23 @@ namespace ionlang {
                 : std::nullopt;
         }
 
-        void removeValue() noexcept {
-            this->resolve(std::nullopt);
-        }
-
         [[nodiscard]] bool isResolved() noexcept {
             return ionshared::util::hasValue(this->value);
+        }
+
+        /**
+         * Returns true if the value had not previously been resolved,
+         * and was now resolved, false otherwise. Resolution can only
+         * occur once.
+         */
+        bool resolve(ionshared::Ptr<T> value) noexcept {
+            if (this->isResolved()) {
+                return false;
+            }
+
+            this->value = value;
+
+            return true;
         }
     };
 

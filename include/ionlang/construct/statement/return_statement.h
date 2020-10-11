@@ -20,6 +20,6 @@ namespace ionlang {
 
         [[nodiscard]] Ast getChildNodes() override;
 
-        bool hasValue() const noexcept;
+        [[nodiscard]] bool hasValue() const noexcept;
     };
 }

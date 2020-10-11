@@ -10,6 +10,7 @@
 #include <ionir/construct/struct.h>
 #include <ionir/misc/inst_builder.h>
 #include <ionir/const/const.h>
+#include <ionlang/construct/statement/return_statement.h>
 #include <ionlang/passes/lowering/ionir_lowering_pass.h>
 #include <ionlang/const/notice.h>
 #include <ionlang/const/const.h>
@@ -17,7 +18,7 @@
 namespace ionlang {
     ionshared::Ptr<ionir::Type> IonIrLoweringPass::processTypeQualifiers(
         ionshared::Ptr<ionir::Type> type,
-        const ionshared::Ptr<TypeQualifiers> &qualifiers
+        const ionshared::Ptr<TypeQualifiers>& qualifiers
     ) {
         ionshared::Ptr<ionir::TypeQualifiers> ionIrTypeQualifiers =
             std::make_shared<ionir::TypeQualifiers>();
@@ -104,7 +105,7 @@ namespace ionlang {
         this->buffers.basicBlock = basicBlock;
     }
 
-    void IonIrLoweringPass::lockBuffers(const std::function<void()> &callback) {
+    void IonIrLoweringPass::lockBuffers(const std::function<void()>& callback) {
         Buffers buffersBackup = this->buffers;
 
         callback();
@@ -148,7 +149,7 @@ namespace ionlang {
         return this->buffers.module;
     }
 
-    bool IonIrLoweringPass::setModuleBuffer(const std::string &id) {
+    bool IonIrLoweringPass::setModuleBuffer(const std::string& id) {
         if (this->modules->contains(id)) {
             this->buffers.module = this->modules->lookup(id);
 
@@ -402,7 +403,7 @@ namespace ionlang {
             throw std::runtime_error("Type is unresolved");
         }
 
-        ionshared::Ptr<Type> integerType = *node->type->value;
+        ionshared::Ptr<Type> integerType = *node->type->getValue();
 
         if (integerType->typeKind != TypeKind::Integer) {
             throw std::runtime_error("Integer value's type must be integer type");
@@ -713,7 +714,7 @@ namespace ionlang {
             throw std::runtime_error("Expected callee function reference to be resolved");
         }
 
-        ionshared::Ptr<Construct> callee = *calleeRef->value;
+        ionshared::Ptr<Construct> callee = *calleeRef->getValue();
         ConstructKind calleeConstructKind = callee->constructKind;
 
         // The callee must be either a function or an extern.
@@ -744,7 +745,7 @@ namespace ionlang {
 
         std::vector<ionshared::Ptr<ionir::Construct>> ionIrArgs = {};
 
-        for (const auto &arg : node->args) {
+        for (const auto& arg : node->args) {
             arg->accept(*this);
             ionIrArgs.push_back(this->constructStack.pop());
         }
@@ -761,6 +762,21 @@ namespace ionlang {
         this->constructStack.push(ionIrCallInst);
     }
 
+    void IonIrLoweringPass::visitBinaryOperation(ionshared::Ptr<BinaryOperation> node) {
+        switch (node->operation) {
+            case IntrinsicOperatorKind::Addition: {
+                // TODO
+//                this->requireBuilder()->createBinaryOperation();
+
+                throw std::runtime_error("Not yet implemented");
+            }
+
+            default: {
+                throw std::runtime_error("Unsupported intrinsic operator kind");
+            }
+        }
+    }
+
     void IonIrLoweringPass::visitStruct(ionshared::Ptr<Struct> node) {
         ionshared::Ptr<ionir::Module> ionIrModuleBuffer = this->requireModule();
         ionir::Scope globalSymbolTable = ionIrModuleBuffer->context->getGlobalScope();
@@ -775,7 +791,7 @@ namespace ionlang {
         ionir::Fields ionIrFields =
             ionshared::util::makePtrSymbolTable<ionir::Type>();
 
-        for (const auto &[name, type] : fieldsMap) {
+        for (const auto& [name, type] : fieldsMap) {
             this->visit(type);
             ionIrFields->set(name, this->typeStack.pop());
         }
