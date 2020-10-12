@@ -203,11 +203,3 @@ TEST(LexerTest, LexDecimal) {
 
     EXPECT_EQ(actual, expected);
 }
-
-// TODO: Just debugging.
-TEST(LexerTest, LexDebugging) {
-    Lexer lexer = Lexer("fn main() -> void { @entry: { ret void; } }");
-
-    // Tokenize input and begin inspection.
-    std::vector<Token> actual = lexer.scan();
-}
