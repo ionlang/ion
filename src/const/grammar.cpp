@@ -16,12 +16,15 @@ namespace ionlang {
         {const_regex::boolean, TokenKind::LiteralBoolean},
         {const_regex::character, TokenKind::LiteralCharacter},
         {const_regex::whitespace, TokenKind::Whitespace},
+        {const_regex::singleLineComment, TokenKind::SingleLineComment},
+        {const_regex::multiLineComment, TokenKind::MultiLineComment},
 
         /**
          * NOTE: Identifier regex MUST be placed last, otherwise it will gain
          * precedence over other regexes, for example booleans.
          */
-        {const_regex::identifier, TokenKind::Identifier}
+        {const_regex::identifier, TokenKind::Identifier},
+
     });
 
     const ionshared::BiMap<std::string, TokenKind> Grammar::keywords(std::map<std::string, TokenKind>{
@@ -85,7 +88,6 @@ namespace ionlang {
         {"*", TokenKind::OperatorMultiplication},
         {"/", TokenKind::OperatorDivision},
         {"%", TokenKind::OperatorModulo},
-        {"^", TokenKind::OperatorExponent},
         {">", TokenKind::OperatorGreaterThan},
         {"<", TokenKind::OperatorLessThan}
     });
@@ -96,8 +98,7 @@ namespace ionlang {
         {IntrinsicOperatorKind::Subtraction, 20},
         {IntrinsicOperatorKind::Multiplication, 40},
         {IntrinsicOperatorKind::Division, 40},
-        {IntrinsicOperatorKind::Modulo, 40},
-        {IntrinsicOperatorKind::Exponent, 60}
+        {IntrinsicOperatorKind::Modulo, 40}
     });
 
     TokenKindVector Grammar::types = {

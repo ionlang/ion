@@ -14,8 +14,7 @@ namespace ionlang {
         {TokenKind::OperatorSubtraction, 20},
         {TokenKind::OperatorMultiplication, 40},
         {TokenKind::OperatorDivision, 40},
-        {TokenKind::OperatorModulo, 40},
-        {TokenKind::OperatorExponent, 80}
+        {TokenKind::OperatorModulo, 40}
     };
 
     std::map<ConstructKind, std::string> Const::constructNames = {
@@ -30,8 +29,8 @@ namespace ionlang {
         {ConstructKind::VariableDecl, "VariableDeclaration"},
         {ConstructKind::StructDecl, "StructDeclaration"},
         {ConstructKind::Module, "Module"},
-        {ConstructKind::Ref, "Reference"},
-        {ConstructKind::Value, "Value"},
+        {ConstructKind::Resolvable, "Reference"},
+        {ConstructKind::Expression, "Expression"},
         {ConstructKind::Statement, "Statement"},
         {ConstructKind::ErrorMarker, "ErrorMarker"},
         {ConstructKind::Attribute, "Attribute"},

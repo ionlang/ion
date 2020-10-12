@@ -111,7 +111,7 @@ namespace ionlang {
 
         void visitCallExpr(ionshared::Ptr<CallExpr> node) override;
 
-        void visitBinaryOperation(ionshared::Ptr<BinaryOperation> node) override;
+        void visitOperationExpr(ionshared::Ptr<OperationExpr> node) override;
 
         void visitStruct(ionshared::Ptr<Struct> node) override;
 

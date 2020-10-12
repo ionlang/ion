@@ -1,14 +1,10 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    Expression::Expression(ExpressionKind kind, PtrResolvable<Type> typeRef) :
-        Value<>(ValueKind::Expression, std::move(typeRef)),
-        expressionKind(kind) {
+    Expression::Expression(ExpressionKind kind, PtrResolvable<Type> type) :
+        Construct(ConstructKind::Expression),
+        expressionKind(kind),
+        type(std::move(type)) {
         //
-    }
-
-    void Expression::accept(Pass& visitor) {
-        // TODO: Verify this works.
-        visitor.visitExpression(this->dynamicCast<Expression>());
     }
 }

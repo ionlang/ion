@@ -14,6 +14,7 @@
 #include <ionlang/passes/lowering/ionir_lowering_pass.h>
 #include <ionlang/const/notice.h>
 #include <ionlang/const/const.h>
+#include <ionlang/misc/util.h>
 
 namespace ionlang {
     ionshared::Ptr<ionir::Type> IonIrLoweringPass::processTypeQualifiers(
@@ -762,19 +763,33 @@ namespace ionlang {
         this->constructStack.push(ionIrCallInst);
     }
 
-    void IonIrLoweringPass::visitBinaryOperation(ionshared::Ptr<BinaryOperation> node) {
-        switch (node->operation) {
-            case IntrinsicOperatorKind::Addition: {
-                // TODO
-//                this->requireBuilder()->createBinaryOperation();
+    void IonIrLoweringPass::visitOperationExpr(ionshared::Ptr<OperationExpr> node) {
+        std::optional<ionir::OperatorKind> ionIrOperatorKindResult =
+            util::findIonIrOperatorKind(node->operation);
 
-                throw std::runtime_error("Not yet implemented");
-            }
-
-            default: {
-                throw std::runtime_error("Unsupported intrinsic operator kind");
-            }
+        if (!ionIrOperatorKindResult.has_value()) {
+            throw std::runtime_error("Unknown intrinsic operator kind");
         }
+
+        this->visit(node->leftSide);
+
+        ionshared::Ptr<ionir::Value<>> ionIrLeftSideValue =
+            this->constructStack.pop()->staticCast<ionir::Value<>>();
+
+        ionshared::OptPtr<ionir::Value<>> ionIrRightSideValue = std::nullopt;
+
+        if (ionshared::util::hasValue(node->rightSide)) {
+            this->visit(*node->rightSide);
+
+            ionIrRightSideValue =
+                this->constructStack.pop()->staticCast<ionir::Value<>>();
+        }
+
+        this->constructStack.push(this->requireBuilder()->createOperation(
+            *ionIrOperatorKindResult,
+            ionIrLeftSideValue,
+            ionIrRightSideValue
+        ));
     }
 
     void IonIrLoweringPass::visitStruct(ionshared::Ptr<Struct> node) {

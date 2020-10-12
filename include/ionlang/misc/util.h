@@ -2,8 +2,9 @@
 
 #include <variant>
 #include <ionshared/misc/util.h>
+#include <ionir/construct/inst/operation.h>
 #include <ionlang/syntax/ast_result.h>
-#include <ionlang/construct/expression/unary_operation.h>
+#include <ionlang/construct/expression/operation.h>
 #include <ionlang/construct/type/integer_type.h>
 #include <ionlang/construct/statement.h>
 #include <ionlang/lexical/token_kind.h>
@@ -27,6 +28,10 @@ namespace ionlang::util {
     [[nodiscard]] std::optional<IntrinsicOperatorKind> findIntrinsicOperatorKind(TokenKind tokenKind);
 
     [[nodiscard]] std::optional<uint32_t> findIntrinsicOperatorKindPrecedence(TokenKind tokenKind);
+
+    [[nodiscard]] std::optional<ionir::OperatorKind> findIonIrOperatorKind(
+        IntrinsicOperatorKind intrinsicOperatorKind
+    ) noexcept;
 
     template<typename ...Args>
     [[nodiscard]] std::runtime_error makeAstError(std::string format, Args &&...args) {

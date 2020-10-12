@@ -30,7 +30,7 @@ namespace ionlang {
 
         void visitScopeAnchor(ionshared::Ptr<ionshared::Scoped<Construct>> node) override;
 
-        void visitRef(PtrResolvable<> node) override;
+        void visitResolvable(PtrResolvable<> node) override;
 
         [[nodiscard]] const std::list<ionshared::PtrSymbolTable<Construct>> &getScope() const;
     };

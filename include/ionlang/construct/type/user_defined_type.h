@@ -7,10 +7,12 @@ namespace ionlang {
 
     struct UserDefinedType : Type {
         explicit UserDefinedType(
+            std::string name,
+
             ionshared::Ptr<TypeQualifiers> qualifiers =
             std::make_shared<TypeQualifiers>()
-        );
+        ) noexcept;
 
-        void accept(Pass &pass) override;
+        void accept(Pass& pass) override;
     };
 }

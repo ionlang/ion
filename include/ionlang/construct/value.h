@@ -1,10 +1,10 @@
 #pragma once
 
 #include <ionlang/construct/pseudo/resolvable.h>
-#include <ionlang/construct/type.h>
+#include "expression.h"
 
 namespace ionlang {
-    enum class ValueKind {
+    enum struct ValueKind {
         Integer,
 
         Character,
@@ -16,16 +16,16 @@ namespace ionlang {
         Expression
     };
 
+    // TODO: What if Type is never included?
+    struct Type;
+
     template<typename T = Type>
-    struct Value : Construct {
+    struct Value : Expression {
         const ValueKind valueKind;
 
-        PtrResolvable<T> type;
-
         Value(ValueKind kind, PtrResolvable<T> type) noexcept :
-            Construct(ConstructKind::Value),
-            valueKind(kind),
-            type(type) {
+            Expression(ExpressionKind::Value, type),
+            valueKind(kind) {
             //
         }
     };

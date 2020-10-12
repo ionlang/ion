@@ -3,9 +3,11 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    UserDefinedType::UserDefinedType(ionshared::Ptr<TypeQualifiers> qualifiers) :
-        // TODO: Proper construction of parent.
-        Type(const_name::typeBool, TypeKind::Boolean, std::move(qualifiers)) {
+    UserDefinedType::UserDefinedType(
+        std::string name,
+        ionshared::Ptr<TypeQualifiers> qualifiers
+    ) noexcept :
+        Type(name, TypeKind::UserDefined, std::move(qualifiers)) {
         //
     }
 

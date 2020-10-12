@@ -9,7 +9,7 @@ namespace ionlang {
         //
     }
 
-    void IntegerType::accept(Pass &pass) {
+    void IntegerType::accept(Pass& pass) {
         return pass.visitIntegerType(this->dynamicCast<IntegerType>());
     }
 }

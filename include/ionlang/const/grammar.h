@@ -7,7 +7,7 @@
 #include <string>
 #include <regex>
 #include <ionshared/container/bi_map.h>
-#include <ionlang/construct/expression/unary_operation.h>
+#include <ionlang/construct/expression/operation.h>
 #include <ionlang/lexical/token_kind.h>
 #include <ionlang/misc/regex.h>
 #include <ionlang/misc/helpers.h>

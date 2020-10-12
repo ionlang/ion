@@ -8,8 +8,8 @@ namespace ionlang {
 
     void Pass::visit(ionshared::Ptr<Construct> node) {
         // TODO: Hotfix for circular dep.
-        if (node->constructKind == ConstructKind::Ref) {
-            this->visitRef(node->staticCast<Resolvable<>>());
+        if (node->constructKind == ConstructKind::Resolvable) {
+            this->visitResolvable(node->staticCast<Resolvable<>>());
         }
         // TODO: This should be at the top alone with visitChildren() once fixed.
         else {
@@ -110,14 +110,8 @@ namespace ionlang {
 
     void Pass::visitExpression(ionshared::Ptr<Expression> node) {
         switch (node->expressionKind) {
-            case ExpressionKind::UnaryOperation: {
-                this->visitUnaryOperation(node->dynamicCast<UnaryOperation>());
-
-                break;
-            }
-
-            case ExpressionKind::BinaryOperation: {
-                this->visitBinaryOperation(node->dynamicCast<BinaryOperation>());
+            case ExpressionKind::Operation: {
+                this->visitOperationExpr(node->dynamicCast<OperationExpr>());
 
                 break;
             }
@@ -136,11 +130,7 @@ namespace ionlang {
         }
     }
 
-    void Pass::visitUnaryOperation(ionshared::Ptr<UnaryOperation> node) {
-        //
-    }
-
-    void Pass::visitBinaryOperation(ionshared::Ptr<BinaryOperation> node) {
+    void Pass::visitOperationExpr(ionshared::Ptr<OperationExpr> node) {
         //
     }
 
@@ -180,7 +170,7 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitRef(PtrResolvable<> node) {
+    void Pass::visitResolvable(PtrResolvable<> node) {
         //
     }
 

@@ -66,23 +66,14 @@ namespace ionlang {
         else if (tokenKind == TokenKind::TypeBool) {
             type = util::getResultValue(this->parseBooleanType(qualifiers));
         }
-        if (Classifier::isIntegerType(tokenKind)) {
+        else if (Classifier::isIntegerType(tokenKind)) {
             type = util::getResultValue(this->parseIntegerType(qualifiers));
+        }
+        else if (tokenKind == TokenKind::Identifier) {
+            type = util::getResultValue(this->parseUserDefinedType(qualifiers));
         }
 
         // TODO: Add support for missing types.
-
-        /**
-         * Type could not be identified as integer nor void type, attempt
-         * to resolve its an internal type kind from the token's value,
-         * otherwise default to an user-defined type assumption.
-         */
-        if (!util::hasValue(type)) {
-            // TODO: Proper construction?
-            type = std::make_shared<UserDefinedType>();
-
-            this->tokenStream.skip();
-        }
 
         // Create and return the resulting type construct.
         return type;
@@ -98,13 +89,17 @@ namespace ionlang {
         return std::make_shared<VoidType>();
     }
 
-    AstPtrResult<BooleanType> Parser::parseBooleanType(const ionshared::Ptr<TypeQualifiers> &qualifiers) {
+    AstPtrResult<BooleanType> Parser::parseBooleanType(
+        const ionshared::Ptr<TypeQualifiers>& qualifiers
+    ) {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::TypeBool))
 
         return std::make_shared<BooleanType>(qualifiers);
     }
 
-    AstPtrResult<IntegerType> Parser::parseIntegerType(const ionshared::Ptr<TypeQualifiers> &qualifiers) {
+    AstPtrResult<IntegerType> Parser::parseIntegerType(
+        const ionshared::Ptr<TypeQualifiers>& qualifiers
+    ) {
         TokenKind currentTokenKind = this->tokenStream.get().kind;
 
         if (!Classifier::isIntegerType(currentTokenKind)) {
@@ -127,7 +122,25 @@ namespace ionlang {
 
         return std::make_shared<IntegerType>(
             *integerKind,
-            false,
+
+            // TODO: Determine if signed or not.
+            true,
+
+            qualifiers
+        );
+    }
+
+    AstPtrResult<UserDefinedType> Parser::parseUserDefinedType(
+        const ionshared::Ptr<TypeQualifiers>& qualifiers
+    ) {
+        IONLANG_PARSER_ASSERT(this->expect(TokenKind::Identifier))
+
+        std::string name = this->tokenStream.get().value;
+
+        this->tokenStream.skip();
+
+        return std::make_shared<UserDefinedType>(
+            name,
             qualifiers
         );
     }

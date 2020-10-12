@@ -107,6 +107,7 @@ namespace ionlang {
 
             this->tokenStream.skip();
 
+            // TODO: Debugging exception here.
             AstPtrResult<Expression> rightSideExpressionResult =
                 this->parsePrimaryExpr(parent);
 
@@ -138,7 +139,7 @@ namespace ionlang {
             // ------------------------------------------------------------
 
             // TODO: Type.
-            return std::make_shared<BinaryOperation>(BinaryOperationOpts{
+            return std::make_shared<OperationExpr>(OperationExprOpts{
                 nullptr,
                 *operation,
                 leftSideExpression,

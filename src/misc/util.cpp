@@ -140,10 +140,6 @@ namespace ionlang::util {
                 return IntrinsicOperatorKind::Division;
             }
 
-            case TokenKind::OperatorExponent: {
-                return IntrinsicOperatorKind::Exponent;
-            }
-
             case TokenKind::OperatorModulo: {
                 return IntrinsicOperatorKind::Modulo;
             }
@@ -166,5 +162,67 @@ namespace ionlang::util {
         // TODO
 
         return std::nullopt;
+    }
+
+    std::optional<ionir::OperatorKind> findIonIrOperatorKind(
+        IntrinsicOperatorKind intrinsicOperatorKind
+    ) noexcept {
+        switch (intrinsicOperatorKind) {
+            case IntrinsicOperatorKind::Equal: {
+                return ionir::OperatorKind::Equal;
+            }
+
+            case IntrinsicOperatorKind::NotEqual: {
+                return ionir::OperatorKind::NotEqual;
+            }
+
+            case IntrinsicOperatorKind::Addition: {
+                return ionir::OperatorKind::Addition;
+            }
+
+            case IntrinsicOperatorKind::Subtraction: {
+                return ionir::OperatorKind::Subtraction;
+            }
+
+            case IntrinsicOperatorKind::Multiplication: {
+                return ionir::OperatorKind::Multiplication;
+            }
+
+            case IntrinsicOperatorKind::LessThan: {
+                return ionir::OperatorKind::LessThan;
+            }
+
+            case IntrinsicOperatorKind::GreaterThan: {
+                return ionir::OperatorKind::GreaterThan;
+            }
+
+            case IntrinsicOperatorKind::LessThanOrEqualTo: {
+                return ionir::OperatorKind::LessThanOrEqualTo;
+            }
+
+            case IntrinsicOperatorKind::GreaterThanOrEqualTo: {
+                return ionir::OperatorKind::GreaterThanOrEqualTo;
+            }
+
+            case IntrinsicOperatorKind::Division: {
+                return ionir::OperatorKind::Division;
+            }
+
+            case IntrinsicOperatorKind::And: {
+                return ionir::OperatorKind::And;
+            }
+
+            case IntrinsicOperatorKind::Or: {
+                return ionir::OperatorKind::Or;
+            }
+
+            case IntrinsicOperatorKind::Not: {
+                return ionir::OperatorKind::Not;
+            }
+
+            default: {
+                return std::nullopt;
+            }
+        }
     }
 }

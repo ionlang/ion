@@ -58,7 +58,7 @@ namespace ionlang {
             std::string name,
             ionshared::Ptr<Construct> context // TODO: Change type to Scope (or Context for deeper lookup?).
         ) noexcept :
-            Construct(ConstructKind::Ref),
+            Construct(ConstructKind::Resolvable),
             resolvableKind(kind),
             name(std::move(name)),
             context(std::move(context)),
@@ -67,7 +67,7 @@ namespace ionlang {
         }
 
         explicit Resolvable(ionshared::Ptr<T> value) noexcept :
-            Construct(ConstructKind::Ref),
+            Construct(ConstructKind::Resolvable),
             resolvableKind(std::nullopt),
             name(std::nullopt),
             context(std::nullopt),

@@ -51,7 +51,7 @@ namespace ionlang {
         this->scope.push_back(node->context->getGlobalScope());
     }
 
-    void NameResolutionPass::visitRef(PtrResolvable<> node) {
+    void NameResolutionPass::visitResolvable(PtrResolvable<> node) {
         // Node is already resolved, no need to continue.
         if (node->isResolved()) {
             return;
@@ -109,7 +109,7 @@ namespace ionlang {
                     NameResolutionPass::findFunctionLikeTarget(name, owner);
 
                 if (!ionshared::util::hasValue(functionLikeTargetResult)) {
-                    throwUndefinedReference;
+                    throwUndefinedReference();
                 }
 
                 ionshared::Ptr<Construct> functionLikeTarget =

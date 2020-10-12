@@ -30,6 +30,6 @@ namespace ionlang {
                 std::make_shared<TypeQualifiers>()
         );
 
-        void accept(Pass &pass) override;
+        void accept(Pass& pass) override;
     };
 }

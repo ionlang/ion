@@ -28,9 +28,9 @@ namespace ionlang {
 
         Module,
 
-        Ref,
+        Resolvable,
 
-        Value,
+        Expression,
 
         Statement,
 

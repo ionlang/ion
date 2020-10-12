@@ -31,13 +31,13 @@ namespace ionlang {
         }
         // Otherwise, it must be a primary expression.
         else {
-            AstPtrResult<Expression> primaryExpr = this->parsePrimaryExpr(parent);
+            AstPtrResult<Expression> expression = this->parseExpression(parent);
 
-            IONLANG_PARSER_ASSERT(util::hasValue(primaryExpr))
+            IONLANG_PARSER_ASSERT(util::hasValue(expression))
 
             statement = std::make_shared<ExprWrapperStatement>(ExprWrapperStatementOpts{
                 parent,
-                util::getResultValue(primaryExpr)
+                util::getResultValue(expression)
             });
 
             IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))

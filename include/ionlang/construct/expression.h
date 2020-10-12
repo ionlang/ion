@@ -1,25 +1,25 @@
 #pragma once
 
 #include <ionlang/construct/pseudo/resolvable.h>
-#include "value.h"
-#include "type.h"
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
-    enum class ExpressionKind {
+    struct Type;
+
+    enum struct ExpressionKind {
+        Value,
+
         Call,
 
-        UnaryOperation,
-
-        BinaryOperation
+        Operation
     };
 
-    struct Expression : Value<> {
+    struct Expression : Construct {
         const ExpressionKind expressionKind;
 
-        Expression(ExpressionKind kind, PtrResolvable<Type> typeRef);
+        PtrResolvable<Type> type;
 
-        void accept(Pass& visitor) override;
+        Expression(ExpressionKind kind, PtrResolvable<Type> type);
     };
 }

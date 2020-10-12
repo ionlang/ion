@@ -3,17 +3,22 @@
 #include <regex>
 
 namespace ionlang::const_regex {
-    static const std::regex identifier = std::regex("^([_a-zA-Z]+[\\w]*)");
+    static const std::regex identifier{"^([_a-zA-Z]+[\\w]*)"};
 
-    static const std::regex string = std::regex("^\"([^\\\"]*)\"");
+    static const std::regex string{"^\"([^\\\"]*)\""};
 
-    static const std::regex decimal = std::regex("^([0-9]+\\.[0-9]+)");
+    static const std::regex decimal{"^([0-9]+\\.[0-9]+)"};
 
-    static const std::regex integer = std::regex("^([0-9]+)");
+    static const std::regex integer{"^([0-9]+)"};
 
-    static const std::regex boolean = std::regex("^(true|false)");
+    static const std::regex boolean{"^(true|false)"};
 
-    static const std::regex character = std::regex("^'([^'\\n\\\\]{0,1})'");
+    static const std::regex character{R"(^'([^'\n\\]{0,1})')"};
 
-    static const std::regex whitespace = std::regex("^([\\s]+)");
+    static const std::regex whitespace{"^([\\s]+)"};
+
+    static const std::regex singleLineComment{R"(^\/\/[^\n]{0,})"};
+
+    // TODO: Improve it. Certain test cases fail.
+    static const std::regex multiLineComment{R"(\/\*[^*\\]{0,}\*\/)"};
 }

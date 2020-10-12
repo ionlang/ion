@@ -43,7 +43,6 @@ namespace ionlang {
         {TokenKind::OperatorMultiplication, "OperatorMultiply"},
         {TokenKind::OperatorDivision, "OperatorDivide"},
         {TokenKind::OperatorModulo, "OperatorModulo"},
-        {TokenKind::OperatorExponent, "OperatorExponent"},
         {TokenKind::OperatorGreaterThan, "OperatorGreaterThan"},
         {TokenKind::OperatorLessThan, "OperatorLessThan"}
     };

@@ -104,11 +104,13 @@ namespace ionlang {
 
         OperatorModulo,
 
-        OperatorExponent,
-
         OperatorGreaterThan,
 
-        OperatorLessThan
+        OperatorLessThan,
+
+        SingleLineComment,
+
+        MultiLineComment
     };
 
     std::ostream &operator<<(std::ostream &stream, const TokenKind &tokenKind);
