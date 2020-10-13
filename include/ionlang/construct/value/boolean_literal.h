@@ -1,12 +1,12 @@
 #pragma once
 
 #include <ionlang/construct/type/boolean_type.h>
-#include <ionlang/construct/value.h>
+#include <ionlang/construct/expression.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
-    struct BooleanLiteral : Value<BooleanType> {
+    struct BooleanLiteral : Expression<BooleanType> {
         bool value;
 
         explicit BooleanLiteral(bool value);

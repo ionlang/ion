@@ -6,17 +6,11 @@
 namespace ionlang {
     class Pass;
 
-    class VariableRefExpr : public Expression {
-    private:
+    struct VariableRefExpr : Expression<> {
         PtrResolvable<VariableDeclStatement> variableDecl;
 
-    public:
         explicit VariableRefExpr(PtrResolvable<VariableDeclStatement> variableDecl);
 
-        void accept(Pass &visitor) override;
-
-        [[nodiscard]] PtrResolvable<VariableDeclStatement> getVariableDecl() const noexcept;
-
-        void setVariableDecl(PtrResolvable<VariableDeclStatement> variableDecl) noexcept;
+        void accept(Pass& visitor) override;
     };
 }

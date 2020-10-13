@@ -2,12 +2,12 @@
 
 #include <ionshared/misc/helpers.h>
 #include <ionlang/construct/type/integer_type.h>
-#include <ionlang/construct/value.h>
+#include <ionlang/construct/expression.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
-    struct IntegerLiteral : Value<IntegerType> {
+    struct IntegerLiteral : Expression<IntegerType> {
         int64_t value;
 
         IntegerLiteral(ionshared::Ptr<IntegerType> type, int64_t value);

@@ -164,14 +164,14 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(id.has_value())
 
-        AstPtrResult<Value<>> valueResult;
+        AstPtrResult<Expression<>> valueResult;
 
         // Global is being initialized inline with a value. Parse & process the value.
         if (this->is(TokenKind::SymbolEqual)) {
             // Skip the equal symbol before continuing parsing.
             this->tokenStream.skip();
 
-            valueResult = this->parseLiteralFork();
+            valueResult = this->parseLiteral();
 
             IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
         }
@@ -313,7 +313,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(id.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual))
 
-        AstPtrResult<Value<>> valueResult = this->parseLiteralFork();
+        AstPtrResult<Expression<>> valueResult = this->parseLiteral();
 
         IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
 

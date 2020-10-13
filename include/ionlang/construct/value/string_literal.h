@@ -1,13 +1,13 @@
 #pragma once
 
 #include <string>
-#include <ionir/construct/value.h>
+#include <ionlang/construct/expression.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     // TODO: Temporary wrong type (should be array of integer types (char = int)).
-    struct StringLiteral : Value<IntegerType> {
+    struct StringLiteral : Expression<IntegerType> {
         std::string value;
 
         explicit StringLiteral(std::string value);

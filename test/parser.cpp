@@ -93,6 +93,7 @@ TEST(ParserTest, ParseInteger32Type) {
     EXPECT_EQ(type->typeKind, TypeKind::Integer);
 
     // Convert to integer type and inspect.
+    // TODO: Is static cast correct here, or should it be a dynamic pointer cast?
     ionshared::Ptr<IntegerType> integerType = type->staticCast<IntegerType>();
 
     EXPECT_EQ(integerType->integerKind, IntegerKind::Int32);
@@ -238,7 +239,7 @@ TEST(ParserTest, ParseBinaryOperationExpr) {
         Token(TokenKind::LiteralInteger, expectedValueString)
     });
 
-    AstPtrResult<Expression> binaryOperationExprResult =
+    AstPtrResult<Expression<>> binaryOperationExprResult =
         parser.parseExpression(nullptr);
 
     EXPECT_TRUE(util::hasValue(binaryOperationExprResult));
@@ -252,15 +253,15 @@ TEST(ParserTest, ParseBinaryOperationExpr) {
         util::getResultValue(binaryOperationExprResult)->dynamicCast<OperationExpr>();
 
     EXPECT_EQ(binaryOperationExpr->operation, IntrinsicOperatorKind::Addition);
-    EXPECT_EQ(binaryOperationExpr->leftSide->valueKind, ValueKind::Integer);
-    EXPECT_TRUE(ionshared::util::hasValue(binaryOperationExpr->rightSide));
+    EXPECT_EQ(binaryOperationExpr->leftSideValue->expressionKind, ExpressionKind::IntegerLiteral);
+    EXPECT_TRUE(ionshared::util::hasValue(binaryOperationExpr->rightSideValue));
 
-    ionshared::Ptr<Expression> rightSide = *binaryOperationExpr->rightSide;
+    ionshared::Ptr<Expression<>> rightSide = *binaryOperationExpr->rightSideValue;
 
-    EXPECT_EQ(rightSide->valueKind, ValueKind::Integer);
+    EXPECT_EQ(rightSide->expressionKind, ExpressionKind::IntegerLiteral);
 
     ionshared::Ptr<IntegerLiteral> leftSideIntegerLiteral =
-        binaryOperationExpr->leftSide->dynamicCast<IntegerLiteral>();
+        binaryOperationExpr->leftSideValue->dynamicCast<IntegerLiteral>();
 
     ionshared::Ptr<IntegerLiteral> rightSideIntegerLiteral =
         rightSide->dynamicCast<IntegerLiteral>();

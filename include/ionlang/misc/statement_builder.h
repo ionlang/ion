@@ -34,12 +34,12 @@ namespace ionlang {
         ionshared::Ptr<VariableDeclStatement> createVariableDecl(
             ionshared::Ptr<Type> type,
             std::string id,
-            ionshared::Ptr<Construct> value
+            ionshared::Ptr<Expression<>> value
         );
 
         ionshared::Ptr<AssignmentStatement> createAssignment(
             ionshared::Ptr<VariableDeclStatement> variableDeclStatement,
-            ionshared::Ptr<Construct> value
+            ionshared::Ptr<Expression<>> value
         );
 
         ionshared::Ptr<IfStatement> createIf(
@@ -49,7 +49,7 @@ namespace ionlang {
         );
 
         ionshared::Ptr<ReturnStatement> createReturn(
-            ionshared::OptPtr<Expression> value = std::nullopt
+            ionshared::OptPtr<Expression<>> value = std::nullopt
         );
     };
 }

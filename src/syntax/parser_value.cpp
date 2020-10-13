@@ -4,7 +4,7 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    AstPtrResult<Value<>> Parser::parseLiteralFork() {
+    AstPtrResult<Expression<>> Parser::parseLiteral() {
         // TODO: Should this go here?
 //        this->beginSourceLocationMapping();
 
@@ -18,7 +18,7 @@ namespace ionlang {
 
                 IONLANG_PARSER_ASSERT(util::hasValue(integerLiteralResult))
 
-                return util::getResultValue(integerLiteralResult)->staticCast<Value<>>();
+                return util::getResultValue(integerLiteralResult)->flatten();
             }
 
             case TokenKind::LiteralCharacter: {
@@ -26,7 +26,7 @@ namespace ionlang {
 
                 IONLANG_PARSER_ASSERT(util::hasValue(charLiteralResult))
 
-                return util::getResultValue(charLiteralResult)->staticCast<Value<>>();
+                return util::getResultValue(charLiteralResult)->flatten();
             }
 
             case TokenKind::LiteralString: {
@@ -34,7 +34,7 @@ namespace ionlang {
 
                 IONLANG_PARSER_ASSERT(util::hasValue(stringLiteralResult))
 
-                return util::getResultValue(stringLiteralResult)->staticCast<Value<>>();
+                return util::getResultValue(stringLiteralResult)->flatten();
             }
 
             case TokenKind::LiteralBoolean: {
@@ -42,7 +42,7 @@ namespace ionlang {
 
                 IONLANG_PARSER_ASSERT(util::hasValue(booleanLiteralResult))
 
-                return util::getResultValue(booleanLiteralResult)->staticCast<Value<>>();
+                return util::getResultValue(booleanLiteralResult)->flatten();
             }
 
             // TODO: Missing literals.

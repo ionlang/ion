@@ -367,7 +367,7 @@ namespace ionlang {
 
         for (const auto &statement : statements) {
             // Visit the statement.
-            this->visitStatement(statement);
+            this->visit(statement);
 
             // TODO: IMPORTANT: DO note that (some?) visitStatements, (ex. visitReturnStatement) already register insts via builder. (They use buffered builder, which is set on code above and bound to the buffered block, set above).
             // TODO: Insts and registers must be popped off and added onto the block.
@@ -449,7 +449,7 @@ namespace ionlang {
         this->visit(node->type);
 
         ionshared::Ptr<ionir::Type> type = this->typeStack.pop();
-        ionshared::OptPtr<Value<>> nodeValue = node->value;
+        ionshared::OptPtr<Expression<>> nodeValue = node->value;
         ionshared::OptPtr<ionir::Value<>> value = std::nullopt;
 
         // Assign value if applicable.
@@ -457,7 +457,8 @@ namespace ionlang {
             this->visit(*nodeValue);
 
             // Use static pointer cast when downcasting to ionir::Value<>.
-            value = this->constructStack.pop()->staticCast<ionir::Value<>>();
+            value = this->constructStack.pop()
+                ->staticCast<ionir::Value<>>();
 
             // Ensure cast value is not nullptr as a precaution.
             if (!ionshared::util::hasValue(value)) {
@@ -771,15 +772,15 @@ namespace ionlang {
             throw std::runtime_error("Unknown intrinsic operator kind");
         }
 
-        this->visit(node->leftSide);
+        this->visit(node->leftSideValue);
 
         ionshared::Ptr<ionir::Value<>> ionIrLeftSideValue =
             this->constructStack.pop()->staticCast<ionir::Value<>>();
 
         ionshared::OptPtr<ionir::Value<>> ionIrRightSideValue = std::nullopt;
 
-        if (ionshared::util::hasValue(node->rightSide)) {
-            this->visit(*node->rightSide);
+        if (ionshared::util::hasValue(node->rightSideValue)) {
+            this->visit(*node->rightSideValue);
 
             ionIrRightSideValue =
                 this->constructStack.pop()->staticCast<ionir::Value<>>();

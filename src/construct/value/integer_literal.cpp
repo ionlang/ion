@@ -2,7 +2,7 @@
 
 namespace ionlang {
     IntegerLiteral::IntegerLiteral(ionshared::Ptr<IntegerType> type, int64_t value) :
-        Value(ValueKind::Integer, Resolvable<IntegerType>::make(std::move(type))),
+        Expression<IntegerType>(ExpressionKind::IntegerLiteral, std::move(type)),
         value(value) {
         //
     }

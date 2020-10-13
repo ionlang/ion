@@ -1,22 +1,21 @@
 #pragma once
 
 #include <ionlang/construct/statement.h>
-#include <ionlang/construct/value.h>
 #include <ionlang/construct/expression.h>
 
 namespace ionlang {
     class Pass;
 
     struct ReturnStatementOpts : StatementOpts {
-        ionshared::OptPtr<Expression> value = std::nullopt;
+        ionshared::OptPtr<Expression<>> value = std::nullopt;
     };
 
     struct ReturnStatement : Statement {
-        ionshared::OptPtr<Expression> value;
+        ionshared::OptPtr<Expression<>> value;
 
-        explicit ReturnStatement(const ReturnStatementOpts &opts);
+        explicit ReturnStatement(const ReturnStatementOpts& opts);
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
 
         [[nodiscard]] Ast getChildNodes() override;
 

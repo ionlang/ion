@@ -17,7 +17,7 @@ namespace ionlang {
     ionshared::Ptr<VariableDeclStatement> StatementBuilder::createVariableDecl(
         ionshared::Ptr<Type> type,
         std::string id,
-        ionshared::Ptr<Construct> value
+        ionshared::Ptr<Expression<>> value
     ) {
         return this->make<VariableDeclStatement, VariableDeclStatementOpts>(VariableDeclStatementOpts{
             this->block,
@@ -29,7 +29,7 @@ namespace ionlang {
 
     ionshared::Ptr<AssignmentStatement> StatementBuilder::createAssignment(
         ionshared::Ptr<VariableDeclStatement> variableDeclStatement,
-        ionshared::Ptr<Construct> value
+        ionshared::Ptr<Expression<>> value
     ) {
         return this->make<AssignmentStatement, AssignmentStatementOpts>(AssignmentStatementOpts{
             this->block,
@@ -51,7 +51,7 @@ namespace ionlang {
         });
     }
 
-    ionshared::Ptr<ReturnStatement> StatementBuilder::createReturn(ionshared::OptPtr<Expression> value) {
+    ionshared::Ptr<ReturnStatement> StatementBuilder::createReturn(ionshared::OptPtr<Expression<>> value) {
         return this->make<ReturnStatement, ReturnStatementOpts>(ReturnStatementOpts{
             this->block,
             std::move(value)

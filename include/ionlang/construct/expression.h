@@ -12,14 +12,40 @@ namespace ionlang {
 
         Call,
 
-        Operation
+        Operation,
+
+        VariableReference,
+
+        BooleanLiteral,
+
+        CharLiteral,
+
+        IntegerLiteral,
+
+        StringLiteral
     };
 
+    template<typename T = Type>
+        requires std::derived_from<T, Type>
     struct Expression : Construct {
         const ExpressionKind expressionKind;
 
-        PtrResolvable<Type> type;
+        PtrResolvable<T> type;
 
-        Expression(ExpressionKind kind, PtrResolvable<Type> type);
+        Expression(ExpressionKind kind, PtrResolvable<T> type) noexcept :
+            Construct(ConstructKind::Expression),
+            expressionKind(kind),
+            type(std::move(type)) {
+            //
+        }
+
+        Expression(ExpressionKind kind, ionshared::Ptr<T> type) noexcept :
+            Expression(kind, Resolvable<T>::make(std::move(type))) {
+            //
+        }
+
+        ionshared::Ptr<Expression<>> flatten() {
+            return this->staticCast<Expression<>>();
+        }
     };
 }

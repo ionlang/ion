@@ -3,7 +3,7 @@
 
 namespace ionlang {
     StringLiteral::StringLiteral(std::string value) :
-        Value(ValueKind::String, Resolvable<IntegerType>::make(type_factory::typeString())), // TODO: Awaiting arrays type support (string type).
+        Expression<IntegerType>(ExpressionKind::StringLiteral, type_factory::typeString()), // TODO: Awaiting arrays type support (string type).
         value(std::move(value)) {
         //
     }

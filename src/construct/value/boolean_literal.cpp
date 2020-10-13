@@ -3,7 +3,7 @@
 
 namespace ionlang {
     BooleanLiteral::BooleanLiteral(bool value) :
-        Value(ValueKind::Boolean, Resolvable<BooleanType>::make(type_factory::typeBoolean())),
+        Expression<BooleanType>(ExpressionKind::BooleanLiteral, type_factory::typeBoolean()),
         value(value) {
         //
     }

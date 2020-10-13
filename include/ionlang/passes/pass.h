@@ -21,7 +21,6 @@
 #include <ionlang/construct/expression/operation.h>
 #include <ionlang/construct/expression/call_expr.h>
 #include <ionlang/construct/expression/variable_ref_expr.h>
-#include <ionlang/construct/value.h>
 #include <ionlang/construct/value/boolean_literal.h>
 #include <ionlang/construct/value/char_literal.h>
 #include <ionlang/construct/value/integer_literal.h>
@@ -51,8 +50,6 @@ namespace ionlang {
 
         virtual void visitBlock(ionshared::Ptr<Block> node);
 
-        virtual void visitStatement(ionshared::Ptr<Statement> node);
-
         virtual void visitIfStatement(ionshared::Ptr<IfStatement> node);
 
         virtual void visitReturnStatement(ionshared::Ptr<ReturnStatement> node);
@@ -62,8 +59,6 @@ namespace ionlang {
         virtual void visitExprWrapperStatement(ionshared::Ptr<ExprWrapperStatement> node);
 
         virtual void visitBlockWrapperStatement(ionshared::Ptr<BlockWrapperStatement> node);
-
-        virtual void visitExpression(ionshared::Ptr<Expression> node);
 
         virtual void visitOperationExpr(ionshared::Ptr<OperationExpr> node);
 

@@ -1,12 +1,12 @@
 #pragma once
 
 #include <ionlang/construct/type/integer_type.h>
-#include <ionlang/construct/value.h>
+#include <ionlang/construct/expression.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
-    struct CharLiteral : Value<IntegerType> {
+    struct CharLiteral : Expression<IntegerType> {
         char value;
 
         explicit CharLiteral(char value) noexcept;

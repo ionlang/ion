@@ -7,9 +7,9 @@
 namespace ionlang {
     class Pass;
 
-    typedef std::vector<ionshared::Ptr<Value<>>> CallArgs;
+    typedef std::vector<ionshared::Ptr<Expression<>>> CallArgs;
 
-    struct CallExpr : Expression {
+    struct CallExpr : Expression<> {
         PtrResolvable<> calleeResolvable;
 
         CallArgs args;

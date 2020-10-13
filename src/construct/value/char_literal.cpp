@@ -3,7 +3,7 @@
 
 namespace ionlang {
     CharLiteral::CharLiteral(char value) noexcept :
-        Value(ValueKind::Character, Resolvable<IntegerType>::make(type_factory::typeChar())),
+        Expression<IntegerType>(ExpressionKind::CharLiteral, type_factory::typeChar()),
         value(value) {
         //
     }

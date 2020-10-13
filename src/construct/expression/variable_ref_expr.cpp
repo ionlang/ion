@@ -3,21 +3,18 @@
 
 namespace ionlang {
     VariableRefExpr::VariableRefExpr(PtrResolvable<VariableDeclStatement> variableDecl) :
-        // TODO: Expression requires 'type' but since the callee is a PtrRef, it's type is not necessarily resolved yet. What to do?
-        Expression(ExpressionKind::Call, nullptr),
+        Expression<>(
+            ExpressionKind::VariableReference,
+
+            // TODO: What if variableDecl Resolvable was resolved when being passed in? Then ->name would be std::nullopt.
+            Resolvable<Type>::make(ResolvableKind::Variable, *variableDecl->name, nullptr)
+        ),
+
         variableDecl(std::move(variableDecl)) {
         //
     }
 
-    void VariableRefExpr::accept(Pass &visitor) {
+    void VariableRefExpr::accept(Pass& visitor) {
         visitor.visitVariableRefExpr(this->dynamicCast<VariableRefExpr>());
-    }
-
-    PtrResolvable<VariableDeclStatement> VariableRefExpr::getVariableDecl() const noexcept {
-        return this->variableDecl;
-    }
-
-    void VariableRefExpr::setVariableDecl(PtrResolvable<VariableDeclStatement> variableDecl) noexcept {
-        this->variableDecl = std::move(variableDecl);
     }
 }

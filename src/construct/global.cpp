@@ -5,7 +5,7 @@ namespace ionlang {
         ionshared::Ptr<Module> parent,
         ionshared::Ptr<Type> type,
         std::string name,
-        ionshared::OptPtr<Value<>> value
+        ionshared::OptPtr<Expression<>> value
     ) :
         ConstructWithParent<Module>(std::move(parent), ConstructKind::Global),
         ionshared::Named{std::move(name)},
@@ -14,7 +14,7 @@ namespace ionlang {
         //
     }
 
-    void Global::accept(Pass &visitor) {
+    void Global::accept(Pass& visitor) {
         visitor.visitGlobal(this->dynamicCast<Global>());
     }
 

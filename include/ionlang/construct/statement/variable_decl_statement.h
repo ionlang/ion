@@ -2,7 +2,7 @@
 
 #include <string>
 #include <ionshared/misc/helpers.h>
-#include <ionlang/construct/value.h>
+#include <ionlang/construct/expression.h>
 #include "ionlang/construct/statement.h"
 
 namespace ionlang {
@@ -13,16 +13,16 @@ namespace ionlang {
 
         std::string id;
 
-        ionshared::Ptr<Construct> value;
+        ionshared::Ptr<Expression<>> value;
     };
 
     struct VariableDeclStatement : Statement, ionshared::Named {
         ionshared::Ptr<Type> type;
 
-        ionshared::Ptr<Construct> value;
+        ionshared::Ptr<Expression<>> value;
 
         explicit VariableDeclStatement(const VariableDeclStatementOpts& opts) noexcept;
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
     };
 }

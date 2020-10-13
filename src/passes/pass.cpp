@@ -48,46 +48,6 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitStatement(ionshared::Ptr<Statement> node) {
-        switch (node->statementKind) {
-            case StatementKind::If: {
-                this->visitIfStatement(node->dynamicCast<IfStatement>());
-
-                break;
-            }
-
-            case StatementKind::Return: {
-                this->visitReturnStatement(node->dynamicCast<ReturnStatement>());
-
-                break;
-            }
-
-            case StatementKind::VariableDeclaration: {
-                this->visitVariableDecl(node->dynamicCast<VariableDeclStatement>());
-
-                break;
-            }
-
-            case StatementKind::Assignment: {
-                this->visitAssignmentStatement(node->dynamicCast<AssignmentStatement>());
-
-                break;
-            }
-
-            case StatementKind::ExprWrapper: {
-                this->visitExpression(node->dynamicCast<ExprWrapperStatement>()->getExpression());
-
-                break;
-            }
-
-            // TODO: Add for all statements. Critical!
-
-            default: {
-                throw std::runtime_error("Unknown statement kind");
-            }
-        }
-    }
-
     void Pass::visitIfStatement(ionshared::Ptr<IfStatement> node) {
         //
     }
@@ -106,28 +66,6 @@ namespace ionlang {
 
     void Pass::visitBlockWrapperStatement(ionshared::Ptr<BlockWrapperStatement> node) {
         //
-    }
-
-    void Pass::visitExpression(ionshared::Ptr<Expression> node) {
-        switch (node->expressionKind) {
-            case ExpressionKind::Operation: {
-                this->visitOperationExpr(node->dynamicCast<OperationExpr>());
-
-                break;
-            }
-
-            case ExpressionKind::Call: {
-                this->visitCallExpr(node->dynamicCast<CallExpr>());
-
-                break;
-            }
-
-            // TODO: Add support for missing expression(s)...
-
-            default: {
-                throw std::runtime_error("Unknown expression kind");
-            }
-        }
     }
 
     void Pass::visitOperationExpr(ionshared::Ptr<OperationExpr> node) {

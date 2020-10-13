@@ -7,7 +7,7 @@ namespace ionlang {
         CallArgs args,
         const PtrResolvable<Type>& type
     ) noexcept :
-        Expression(ExpressionKind::Call, type),
+        Expression<>(ExpressionKind::Call, type),
         calleeResolvable(std::move(calleeResolvable)),
         args(std::move(args)) {
         //

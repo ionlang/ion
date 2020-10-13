@@ -134,19 +134,19 @@ namespace ionlang {
 
         AstPtrResult<Struct> parseStruct(const ionshared::Ptr<Module>& parent);
 
-        AstPtrResult<Value<>> parseLiteralFork();
+        AstPtrResult<Expression<>> parseLiteral();
 
-        AstPtrResult<Expression> parseExpression(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<Expression<>> parseExpression(const ionshared::Ptr<Block>& parent);
 
-        AstPtrResult<Expression> parsePrimaryExpr(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<Expression<>> parsePrimaryExpr(const ionshared::Ptr<Block>& parent);
 
-        AstPtrResult<Expression> parseParenthesesExpr(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<Expression<>> parseParenthesesExpr(const ionshared::Ptr<Block>& parent);
 
-        AstPtrResult<Expression> parseIdExpr(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<Expression<>> parseIdExpr(const ionshared::Ptr<Block>& parent);
 
-        AstPtrResult<Expression> parseBinaryOperation(
+        AstPtrResult<Expression<>> parseOperationExpr(
             uint32_t expressionPrecedence,
-            ionshared::Ptr<Expression> leftSideExpression,
+            const ionshared::Ptr<Expression<>>& leftSideExpression,
             const ionshared::Ptr<Block>& parent
         );
 

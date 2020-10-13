@@ -1,13 +1,13 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    ReturnStatement::ReturnStatement(const ReturnStatementOpts &opts) :
+    ReturnStatement::ReturnStatement(const ReturnStatementOpts& opts) :
         Statement(opts.parent, StatementKind::Return),
         value(opts.value) {
         //
     }
 
-    void ReturnStatement::accept(Pass &visitor) {
+    void ReturnStatement::accept(Pass& visitor) {
         visitor.visitReturnStatement(this->dynamicCast<ReturnStatement>());
     }
 

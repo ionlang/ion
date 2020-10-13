@@ -3,7 +3,7 @@
 #include <ionlang/construct/expression.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     enum struct IntrinsicOperatorKind {
         Equal,
@@ -40,18 +40,22 @@ namespace ionlang {
 
         IntrinsicOperatorKind operation;
 
-        ionshared::Ptr<Expression> leftSide;
+        ionshared::Ptr<Expression<>> leftSideValue;
 
-        ionshared::OptPtr<Expression> rightSide;
+        ionshared::OptPtr<Expression<>> rightSideValue;
     };
 
-    struct OperationExpr : Expression {
-        IntrinsicOperatorKind operation;
+    struct OperationExpr : Expression<> {
+        const IntrinsicOperatorKind operation;
 
-        ionshared::Ptr<Expression> leftSide;
+        ionshared::Ptr<Expression<>> leftSideValue;
 
-        ionshared::OptPtr<Expression> rightSide;
+        ionshared::OptPtr<Expression<>> rightSideValue;
 
         explicit OperationExpr(const OperationExprOpts& opts);
+
+        void accept(Pass& visitor) override;
+
+        [[nodiscard]] Ast getChildNodes() override;
     };
 }

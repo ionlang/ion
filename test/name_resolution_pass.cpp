@@ -30,7 +30,11 @@ TEST(NameResolutionPassTest, Run) {
     statementBuilder->createVariableDecl(
         type_factory::typeInteger32(),
         id,
-        std::make_shared<IntegerLiteral>(type_factory::typeInteger32(), 1)
+
+        std::make_shared<IntegerLiteral>(
+            type_factory::typeInteger32(),
+            1
+        )->flatten()
     );
 
     auto assignmentStatement = std::make_shared<AssignmentStatement>(AssignmentStatementOpts{

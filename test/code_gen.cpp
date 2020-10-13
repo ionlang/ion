@@ -89,7 +89,7 @@ TEST(CodeGenTest, VisitVariableDecl) {
 
         std::make_shared<BooleanType>(),
         test::constant::foo,
-        std::make_shared<BooleanLiteral>(true)
+        std::make_shared<BooleanLiteral>(true)->flatten()
     });
 
     ionshared::Ptr<Function> function = test::bootstrap::emptyFunction({
