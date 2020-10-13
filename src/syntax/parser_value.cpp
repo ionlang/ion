@@ -6,7 +6,7 @@
 namespace ionlang {
     AstPtrResult<Expression<>> Parser::parseLiteral() {
         // TODO: Should this go here?
-//        this->beginSourceLocationMapping();
+        this->beginSourceLocationMapping();
 
         /**
          * Always use static pointer cast when downcasting to Value<>,

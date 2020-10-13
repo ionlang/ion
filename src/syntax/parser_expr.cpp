@@ -8,31 +8,16 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(util::hasValue(primaryExpression))
 
-        TokenKind currentTokenKind = this->tokenStream.get().kind;
-
+        // TODO: Change this so the check of whether it's a bin. operation is done here, and the parseOperationExpr() is forcefully invoked.
         /**
-         * Check if the current token's kind is an intrinsic operator.
-         * If it is, then the expression being parsed is either a unary
-         * or binary expression.
+         * NOTE: Will return the parsed primary expression if a binary
+         * operator isn't present as the next (current) token.
          */
-        if (Classifier::isIntrinsicOperator(currentTokenKind)) {
-            std::optional<IntrinsicOperatorKind> intrinsicOperatorKind =
-                util::findIntrinsicOperatorKind(currentTokenKind);
-
-            // TODO
-//            if () {
-//
-//            }
-
-            return util::getResultValue(this->parseOperationExpr(
-                0,
-                util::getResultValue(primaryExpression),
-                parent
-                )
-            );
-        }
-
-        return primaryExpression;
+        return util::getResultValue(this->parseOperationExpr(
+            0,
+            util::getResultValue(primaryExpression),
+            parent
+        ));
     }
 
     AstPtrResult<Expression<>> Parser::parsePrimaryExpr(const ionshared::Ptr<Block>& parent) {
@@ -84,70 +69,103 @@ namespace ionlang {
     }
 
     AstPtrResult<Expression<>> Parser::parseOperationExpr(
-        uint32_t expressionPrecedence,
-        const ionshared::Ptr<Expression<>>& leftSideExpression,
+        uint32_t minimumOperatorPrecedence,
+        ionshared::Ptr<Expression<>> leftSideExpression,
         const ionshared::Ptr<Block>& parent
     ) {
-        while (true) {
-            std::optional<IntrinsicOperatorKind> operation =
-                util::findIntrinsicOperatorKind(this->tokenStream.get().kind);
+        auto isOperatorAndPrecedenceGraterThan = [](TokenKind tokenKind, uint32_t precedence) -> bool {
+            return Classifier::isIntrinsicOperator(tokenKind)
+                && *util::findIntrinsicOperatorKindPrecedence(tokenKind) >= precedence;
+        };
 
-            IONLANG_PARSER_ASSERT(operation.has_value())
+        TokenKind tokenKindBuffer = this->tokenStream.get().kind;
 
-            // TODO
-            uint32_t operatorPrecedence = 0/*util::findOperatorPrecedence(operation);*/;
+        while (isOperatorAndPrecedenceGraterThan(tokenKindBuffer, minimumOperatorPrecedence)) {
+            std::optional<IntrinsicOperatorKind> operatorKind =
+                util::findIntrinsicOperatorKind(tokenKindBuffer);
 
-            // TODO: This shouldn't be determined here. Hence, this function should return BinaryOperation (right-side is non-optional).
-            // TODO: Also adjust documentation.
-            /**
-             * If this is a binop that binds at least as tightly as the current binop,
-             * consume it, otherwise we are done.
-             */
-            if (expressionPrecedence >= operatorPrecedence) {
-                return leftSideExpression;
-            }
+            IONLANG_PARSER_ASSERT(operatorKind.has_value())
 
+            std::optional<uint32_t> operatorPrecedence =
+                util::findIntrinsicOperatorKindPrecedence(tokenKindBuffer);
+
+            IONLANG_PARSER_ASSERT(operatorPrecedence.has_value())
+
+            // Skip the operator token.
             this->tokenStream.skip();
 
-            // TODO: Debugging exception here.
-            AstPtrResult<Expression<>> rightSideExpressionResult =
+            AstPtrResult<Expression<>> rightSidePrimaryExpressionResult =
                 this->parsePrimaryExpr(parent);
 
-            IONLANG_PARSER_ASSERT(util::hasValue(rightSideExpressionResult))
+            tokenKindBuffer = this->tokenStream.get().kind;
 
-            // TODO: Adjust documentation.
             /**
-             * If BinOp binds less tightly with RHS than the operator after RHS, let
-             * the pending operator take RHS as its LHS.
+             * TODO: https://en.wikipedia.org/wiki/Operator-precedence_parser.
+             * ... or a right-associative operator ... check is missing here.
              */
-            std::optional<uint32_t> nextOperatorPrecedence =
-                -1; /* TODO: util::findOperatorPrecedence(this->token.kind); */
-
-            if (nextOperatorPrecedence >= operatorPrecedence) {
-                rightSideExpressionResult = this->parseOperationExpr(
-                    operatorPrecedence + 1,
-                    util::getResultValue(rightSideExpressionResult),
+            while (isOperatorAndPrecedenceGraterThan(tokenKindBuffer, *operatorPrecedence)) {
+                rightSidePrimaryExpressionResult = this->parseOperationExpr(
+                    util::findIntrinsicOperatorKindPrecedence(tokenKindBuffer).value_or(0),
+                    util::getResultValue(rightSidePrimaryExpressionResult),
                     parent
                 );
+
+                tokenKindBuffer = this->tokenStream.get().kind;
             }
 
-            // TODO: UNFINISHED!!!! ---------------------------------------
-            // ------------------------------------------------------------
-            // ------------------------------------------------------------
-            // ------------------------------------------------------------
-            // ------------------------------------------------------------
-            // ------------------------------------------------------------
-            // Continue: https://github.com/ionlang/Ion.Net/blob/master/Ion/Parsing/BinaryOpRightSideParser.cs
-            // ------------------------------------------------------------
-
-            // TODO: Should verify that both left and right side's type are the same?
-            return std::make_shared<OperationExpr>(OperationExprOpts{
+            // TODO: Make sure both side's type are the same? Or leave it up to type-checking?
+            leftSideExpression = std::make_shared<OperationExpr>(OperationExprOpts{
                 leftSideExpression->type,
-                *operation,
+                *operatorKind,
                 leftSideExpression,
-                util::getResultValue(rightSideExpressionResult)
+                util::getResultValue(rightSidePrimaryExpressionResult)
             });
         }
+
+        return leftSideExpression;
+
+//        while (true) {
+//            std::optional<IntrinsicOperatorKind> operation =
+//                util::findIntrinsicOperatorKind(this->tokenStream.get().kind);
+//
+//            IONLANG_PARSER_ASSERT(operation.has_value())
+//
+//            uint32_t operatorPrecedence =
+//                Grammar::intrinsicOperatorPrecedences.at(*operation);
+//
+//            // Skip the operator token.
+//            this->tokenStream.skip();
+//
+//            // TODO: This shouldn't be determined here. Hence, this function should return BinaryOperation (right-side is non-optional).
+//            // TODO: Also adjust documentation.
+//            /**
+//             * If this is a binop that binds at least as tightly as the current binop,
+//             * consume it, otherwise we are done.
+//             */
+//            if (expressionPrecedence >= operatorPrecedence) {
+//                return leftSideExpression;
+//            }
+//
+//            // TODO: Debugging exception here.
+//            // TODO: The problem is that it's while(true) so it's parsing right side @ EOF, which makes rightSideExprResult null.
+//            AstPtrResult<Expression<>> rightSideExpressionResult =
+//                this->parseOperationExpr(expressionPrecedence + 1, nullptr, parent);
+//
+//            IONLANG_PARSER_ASSERT(util::hasValue(rightSideExpressionResult))
+//
+//            // TODO: UNFINISHED!!!!
+//            // ------------------------------------------------------------
+//            // Continue: https://github.com/ionlang/Ion.Net/blob/master/Ion/Parsing/BinaryOpRightSideParser.cs
+//            // ------------------------------------------------------------
+//
+//            // TODO: Should verify that both left and right side's type are the same?
+//            return std::make_shared<OperationExpr>(OperationExprOpts{
+//                leftSideExpression->type,
+//                *operation,
+//                leftSideExpression,
+//                util::getResultValue(rightSideExpressionResult)
+//            });
+//        }
     }
 
     AstPtrResult<CallExpr> Parser::parseCallExpr(const ionshared::Ptr<Block>& parent) {

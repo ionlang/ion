@@ -52,10 +52,12 @@ namespace ionlang {
 
         ionshared::OptPtr<Expression<>> rightSideValue;
 
-        explicit OperationExpr(const OperationExprOpts& opts);
+        explicit OperationExpr(const OperationExprOpts& opts) noexcept;
 
         void accept(Pass& visitor) override;
 
         [[nodiscard]] Ast getChildNodes() override;
+
+        [[nodiscard]] bool isBinary() const noexcept;
     };
 }

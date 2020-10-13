@@ -239,18 +239,18 @@ TEST(ParserTest, ParseBinaryOperationExpr) {
         Token(TokenKind::LiteralInteger, expectedValueString)
     });
 
-    AstPtrResult<Expression<>> binaryOperationExprResult =
+    AstPtrResult<Expression<>> operationExprResult =
         parser.parseExpression(nullptr);
 
-    EXPECT_TRUE(util::hasValue(binaryOperationExprResult));
+    EXPECT_TRUE(util::hasValue(operationExprResult));
 
     EXPECT_EQ(
-        util::getResultValue(binaryOperationExprResult)->expressionKind,
+        util::getResultValue(operationExprResult)->expressionKind,
         ExpressionKind::Operation
     );
 
     ionshared::Ptr<OperationExpr> binaryOperationExpr =
-        util::getResultValue(binaryOperationExprResult)->dynamicCast<OperationExpr>();
+        util::getResultValue(operationExprResult)->dynamicCast<OperationExpr>();
 
     EXPECT_EQ(binaryOperationExpr->operation, IntrinsicOperatorKind::Addition);
     EXPECT_EQ(binaryOperationExpr->leftSideValue->expressionKind, ExpressionKind::IntegerLiteral);

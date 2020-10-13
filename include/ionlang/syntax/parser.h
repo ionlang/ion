@@ -146,7 +146,7 @@ namespace ionlang {
 
         AstPtrResult<Expression<>> parseOperationExpr(
             uint32_t expressionPrecedence,
-            const ionshared::Ptr<Expression<>>& leftSideExpression,
+            ionshared::Ptr<Expression<>> leftSideExpression,
             const ionshared::Ptr<Block>& parent
         );
 

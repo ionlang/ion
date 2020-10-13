@@ -1,7 +1,7 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    OperationExpr::OperationExpr(const OperationExprOpts& opts) :
+    OperationExpr::OperationExpr(const OperationExprOpts& opts) noexcept :
         Expression<>(ExpressionKind::Operation, opts.type),
         operation(opts.operation),
         leftSideValue(opts.leftSideValue),
@@ -21,5 +21,9 @@ namespace ionlang {
         }
 
         return children;
+    }
+
+    bool OperationExpr::isBinary() const noexcept {
+        return ionshared::util::hasValue(this->rightSideValue);
     }
 }

@@ -159,7 +159,12 @@ namespace ionlang::util {
     }
 
     std::optional<uint32_t> findIntrinsicOperatorKindPrecedence(TokenKind tokenKind) {
-        // TODO
+        std::optional<IntrinsicOperatorKind> intrinsicOperatorKind =
+            util::findIntrinsicOperatorKind(tokenKind);
+
+        if (intrinsicOperatorKind.has_value() && Grammar::intrinsicOperatorPrecedences.contains(*intrinsicOperatorKind)) {
+            return Grammar::intrinsicOperatorPrecedences.at(*intrinsicOperatorKind);
+        }
 
         return std::nullopt;
     }
