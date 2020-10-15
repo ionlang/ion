@@ -52,7 +52,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIf))
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
-        AstPtrResult<Expression<>> condition = this->parseLiteral();
+        AstPtrResult<Expression<>> condition = this->parseExpression(parent);
 
         IONLANG_PARSER_ASSERT(util::hasValue(condition))
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
@@ -107,7 +107,7 @@ namespace ionlang {
 
         // Return statement contains a value. Parse it and save it.
         if (!this->is(TokenKind::SymbolSemiColon)) {
-            valueResult = this->parsePrimaryExpr(parent);
+            valueResult = this->parseExpression(parent);
 
             IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
         }

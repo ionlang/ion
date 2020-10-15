@@ -300,13 +300,13 @@ namespace ionlang {
         ionshared::Ptr<Args> arguments = node->args;
         auto nativeArguments = arguments->items->unwrap();
 
-        ionIrArguments->setIsVariable(arguments->isVariable);
+        ionIrArguments->isVariable = arguments->isVariable;
 
         // TODO: Should Args be a construct, and be visited?
         for (const auto &[id, argument] : nativeArguments) {
             this->visit(argument.first);
 
-            ionIrArguments->getItems()->set(
+            ionIrArguments->items->set(
                 argument.second,
                 std::make_pair(this->typeStack.pop(), argument.second)
             );
@@ -550,7 +550,7 @@ namespace ionlang {
     void IonIrLoweringPass::visitIfStatement(ionshared::Ptr<IfStatement> node) {
         ionshared::Ptr<ionir::BasicBlock> ionIrBasicBlockBuffer = this->requireBasicBlock();
 
-        Pass::visit(node->condition);
+        this->visit(node->condition);
 
         ionshared::Ptr<Block> parentBlock = node->getUnboxedParent();
         ionshared::Ptr<ionir::Construct> ionIrCondition = this->constructStack.pop();
@@ -637,7 +637,7 @@ namespace ionlang {
         ionshared::OptPtr<ionir::Value<>> ionIrValue = std::nullopt;
 
         if (node->hasValue()) {
-            Pass::visit(*node->value);
+            this->visit(*node->value);
 
             // Use a static pointer cast to cast to ionir::Value<>.
             ionIrValue = this->constructStack.pop()->staticCast<ionir::Value<>>();
@@ -696,7 +696,7 @@ namespace ionlang {
         this->constructStack.push(ionIrAllocaInst);
 
         // Lastly, then create a IonIR store inst, and push it onto the stack.
-        Pass::visit(node->value);
+        this->visit(node->value);
 
         // TODO: Value can be an expression as well. Check that ConstructKind == Value, otherwise handle appropriately.
         ionshared::Ptr<ionir::Value<>> ionIrValue =

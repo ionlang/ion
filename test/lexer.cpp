@@ -43,6 +43,24 @@ TEST(LexerTest, LexTwoSymbols) {
     test::compare::tokenSets<2>(expected, actual);
 }
 
+TEST(LexerTest, LexKeywords) {
+    // Create the Lexer instance with two symbols to tokenize.
+    Lexer lexer = Lexer("module fn if return");
+
+    // Tokenize input and begin inspection.
+    std::vector<Token> actual = lexer.scan();
+
+    std::array<Token, 4> expected = {
+        Token(TokenKind::KeywordModule, "module", 0),
+        Token(TokenKind::KeywordFunction, "fn", 8),
+        Token(TokenKind::KeywordIf, "if", 11),
+        Token(TokenKind::KeywordReturn, "return", 14)
+    };
+
+    // Compare result with expected.
+    test::compare::tokenSets<4>(expected, actual);
+}
+
 TEST(LexerTest, LexSymbols) {
     // Create the Lexer instance with all the existing symbols.
     Lexer lexer = Lexer("@=$#()[],;{}->");

@@ -171,6 +171,7 @@ namespace ionlang {
             // Skip the equal symbol before continuing parsing.
             this->tokenStream.skip();
 
+            // TODO: What about full expressions on globals?
             valueResult = this->parseLiteral();
 
             IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
@@ -313,7 +314,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(id.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual))
 
-        AstPtrResult<Expression<>> valueResult = this->parseLiteral();
+        AstPtrResult<Expression<>> valueResult = this->parseExpression(parent);
 
         IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
 

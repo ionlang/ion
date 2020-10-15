@@ -31,6 +31,7 @@ namespace ionlang {
         {TokenKind::KeywordModule, "KeywordModule"},
         {TokenKind::KeywordUnsafe, "KeywordUnsafe"},
         {TokenKind::KeywordStruct, "KeywordStruct"},
+        {TokenKind::KeywordReturn, "KeywordReturn"},
         {TokenKind::TypeVoid, "TypeVoid"},
         {TokenKind::TypeString, "TypeString"},
         {TokenKind::TypeInt16, "TypeInt16"},

@@ -12,9 +12,61 @@ set(PROJECT_URL "https://github.com/ionlang/ionlang")
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-# Scan dependencies.
-find_package(ionshared REQUIRED)
-find_package(ionir REQUIRED)
+# Dependencies: ionshared.
+find_package(ionshared QUIET)
+
+# Download & build ionshared if it's not installed on
+# the system, via CMake's FetchContent.
+if(NOT ionshared_FOUND)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        ionshared
+
+        # TODO: Using dev. branch temporarily.
+        URL https://github.com/ionlang/ionshared/archive/dev.tar.gz
+    )
+
+    # Has ionshared been downloaded yet?
+    if(NOT ionshared_POPULATED)
+        set(FETCHCONTENT_QUIET OFF)
+        FetchContent_Populate(ionshared)
+
+        # Do not build tests for it.
+        set(IONSHARED_BUILD_TESTS OFF)
+
+        # Build ionshared.
+        add_subdirectory(${ionshared_SOURCE_DIR} ${ionshared_BINARY_DIR})
+    endif()
+endif()
+
+# Dependencies: ionir.
+find_package(ionir QUIET)
+
+# Download & build ionshared if it's not installed on
+# the system, via CMake's FetchContent.
+if(NOT ionir_FOUND)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        ionir
+
+        # TODO: Using dev. branch temporarily.
+        URL https://github.com/ionlang/ionir/archive/dev.tar.gz
+    )
+
+    # Has ionir been downloaded yet?
+    if(NOT ionir_POPULATED)
+        set(FETCHCONTENT_QUIET OFF)
+        FetchContent_Populate(ionir)
+
+        # Do not build tests for it.
+        set(IONSHARED_BUILD_TESTS OFF)
+
+        # Build ionshared.
+        add_subdirectory(${ionir_SOURCE_DIR} ${ionir_BINARY_DIR})
+    endif()
+endif()
 
 # Setup default build flags.
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
@@ -88,15 +140,15 @@ target_include_directories(
 llvm_map_components_to_libnames(llvm_libs all)
 
 # Link against various libraries including LLVM, libionshared & libionir.
-target_link_libraries("${PROJECT_NAME}" LLVM ionshared::ionshared ionir::ionir)
+target_link_libraries("${PROJECT_NAME}" LLVM ionshared ionir)
 
 # Setup unit testing using Google Test (GTest) if applicable. This binds the CMakeLists.txt on the test project.
-option(BUILD_TESTS "Build tests" ON)
+option(IONLANG_BUILD_TESTS "Build tests" OFF)
 
-if (BUILD_TESTS)
-    add_subdirectory(libs/googletest)
-    add_subdirectory(test)
-endif ()
+if(IONLANG_BUILD_TESTS)
+    add_subdirectory(./libs/googletest)
+    add_subdirectory(./test)
+endif()
 
 # Setup install target.
 install(

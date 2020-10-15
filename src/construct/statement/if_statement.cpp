@@ -1,7 +1,7 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    IfStatement::IfStatement(const IfStatementOpts &opts) :
+    IfStatement::IfStatement(const IfStatementOpts& opts) :
         Statement(opts.parent, StatementKind::If),
         condition(opts.condition),
         consequentBlock(opts.consequentBlock),
@@ -9,7 +9,7 @@ namespace ionlang {
         //
     }
 
-    void IfStatement::accept(Pass &visitor) {
+    void IfStatement::accept(Pass& visitor) {
         visitor.visitIfStatement(this->dynamicCast<IfStatement>());
     }
 

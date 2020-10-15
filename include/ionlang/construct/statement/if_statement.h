@@ -20,9 +20,9 @@ namespace ionlang {
 
         ionshared::OptPtr<Block> alternativeBlock;
 
-        explicit IfStatement(const IfStatementOpts &opts);
+        explicit IfStatement(const IfStatementOpts& opts);
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
 
         [[nodiscard]] Ast getChildNodes() override;
 
