@@ -12,6 +12,9 @@ set(PROJECT_URL "https://github.com/ionlang/ionlang")
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
+# Linux installation support.
+include(GNUInstallDirs)
+
 # Dependencies: ionshared.
 find_package(ionshared QUIET)
 
@@ -61,12 +64,22 @@ if(NOT ionir_FOUND)
         FetchContent_Populate(ionir)
 
         # Do not build tests for it.
-        set(IONSHARED_BUILD_TESTS OFF)
+        set(IONIR_BUILD_TESTS OFF)
 
-        # Build ionshared.
+        # Build ionir.
         add_subdirectory(${ionir_SOURCE_DIR} ${ionir_BINARY_DIR})
     endif()
 endif()
+
+# Configure and use LLVM. Also ensures LLVM 10.0.0 is installed.
+find_package(LLVM 10.0.0 REQUIRED CONFIG)
+
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+# Include LLVM source directories (for lexical support, etc.). The SYSTEM symbol supposedly marks the directory to suppress warning(s).
+include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
+add_definitions(${LLVM_DEFINITIONS})
 
 # Setup default build flags.
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
@@ -81,29 +94,11 @@ if (USE_MD)
     message(STATUS "Using /MD flag")
 endif (USE_MD)
 
-# Options.
-option(USE_CLANG "Use Clang and Clang++ as compilers")
-
-if (USE_CLANG)
-    # TODO
-    set(T "")
-endif (USE_CLANG)
-
 # Setup versioning.
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "0")
 set(VERSION_PATCH "0")
 set(VERSION "$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)")
-
-# Configure and use LLVM. Also ensures LLVM 10.0.0 is installed.
-find_package(LLVM 10.0.0 REQUIRED CONFIG)
-
-message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
-
-# Include LLVM source directories (for lexical support, etc.). The SYSTEM symbol supposedly marks the directory to suppress warning(s).
-include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
-add_definitions(${LLVM_DEFINITIONS})
 
 # Disable warnings from includes.
 #add_library(llvm INTERFACE)
@@ -140,7 +135,7 @@ target_include_directories(
 llvm_map_components_to_libnames(llvm_libs all)
 
 # Link against various libraries including LLVM, libionshared & libionir.
-target_link_libraries("${PROJECT_NAME}" LLVM ionshared ionir)
+target_link_libraries("${PROJECT_NAME}" PUBLIC ${llvm_libs} ionshared ionir)
 
 # Setup unit testing using Google Test (GTest) if applicable. This binds the CMakeLists.txt on the test project.
 option(IONLANG_BUILD_TESTS "Build tests" OFF)
