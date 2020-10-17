@@ -143,4 +143,8 @@ namespace ionlang {
     void Pass::visitStruct(ionshared::Ptr<Struct> node) {
         //
     }
+
+    void Pass::visitStructDefinition(ionshared::Ptr<StructDefinition> construct) {
+        //
+    }
 }

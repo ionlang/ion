@@ -2,13 +2,13 @@
 #include <ionlang/passes/semantic/name_resolution_pass.h>
 
 namespace ionlang {
-    ionshared::OptPtr<Construct> NameResolutionPass::findFunctionLikeTarget(
+    ionshared::OptPtr<Construct> NameResolutionPass::findGlobalConstruct(
         std::string name,
         const ionshared::Ptr<Construct>& owner
     ) {
         if (owner->constructKind != ConstructKind::Block) {
             // TODO: Better error.
-            throw std::runtime_error("Cannot resolve function reference when owner is not a block");
+            throw std::runtime_error("Cannot resolve entity reference when owner is not a block");
         }
 
         ionshared::OptPtr<Function> parentFunction =
@@ -26,13 +26,6 @@ namespace ionlang {
 
         if (!ionshared::util::hasValue(lookupResult)) {
             return std::nullopt;
-        }
-
-        ConstructKind lookupResultConstructKind = lookupResult->get()->constructKind;
-
-        if (lookupResultConstructKind != ConstructKind::Function && lookupResultConstructKind != ConstructKind::Extern) {
-            // TODO: Should be internal error?
-            throw std::runtime_error("Expected construct to be a function or extern");
         }
 
         return *lookupResult;
@@ -68,6 +61,13 @@ namespace ionlang {
             throw std::runtime_error("Undefined reference to '" + name + "'");
         };
 
+        auto ensureFunctionLikeConstructKind = [](ConstructKind constructKind){
+            if (constructKind != ConstructKind::Function && constructKind != ConstructKind::Extern) {
+                // TODO: Should be internal error?
+                throw std::runtime_error("Expected construct to be a function or extern");
+            }
+        };
+
         switch (*node->resolvableKind) {
             case ResolvableKind::Variable: {
                 // TODO: Must use flow graph to find variable declarations from other blocks (remember blocks can be nested).
@@ -91,12 +91,13 @@ namespace ionlang {
 
             case ResolvableKind::Prototype: {
                 ionshared::OptPtr<Construct> lookupResult =
-                    NameResolutionPass::findFunctionLikeTarget(name, owner);
+                    NameResolutionPass::findGlobalConstruct(name, owner);
 
                 if (!ionshared::util::hasValue(lookupResult)) {
                     throwUndefinedReference();
                 }
 
+                ensureFunctionLikeConstructKind(lookupResult->get()->constructKind);
                 node->resolve(*lookupResult);
 
                 break;
@@ -106,7 +107,7 @@ namespace ionlang {
                 ionshared::Ptr<Prototype> prototype;
 
                 ionshared::OptPtr<Construct> functionLikeTargetResult =
-                    NameResolutionPass::findFunctionLikeTarget(name, owner);
+                    NameResolutionPass::findGlobalConstruct(name, owner);
 
                 if (!ionshared::util::hasValue(functionLikeTargetResult)) {
                     throwUndefinedReference();
@@ -114,6 +115,8 @@ namespace ionlang {
 
                 ionshared::Ptr<Construct> functionLikeTarget =
                     *functionLikeTargetResult;
+
+                ensureFunctionLikeConstructKind(functionLikeTarget->constructKind);
 
                 if (functionLikeTarget->constructKind == ConstructKind::Function) {
                     prototype = functionLikeTarget->dynamicCast<Function>()->prototype;
@@ -127,9 +130,22 @@ namespace ionlang {
                 break;
             }
 
+            case ResolvableKind::Struct: {
+                ionshared::OptPtr<Construct> lookupResult =
+                    NameResolutionPass::findGlobalConstruct(name, owner);
+
+                if (!ionshared::util::hasValue(lookupResult)) {
+                    throwUndefinedReference();
+                }
+
+                node->resolve(*lookupResult);
+
+                break;
+            }
+
             default: {
-                // TODO: Better error.
-                throw std::runtime_error("Unsupported construct kind to resolve");
+                // TODO: Better error/use diagnostics.
+                throw std::runtime_error("Unsupported resolvable kind");
             }
         }
 

@@ -95,7 +95,7 @@ namespace ionlang {
 
         AstPtrResult<StringLiteral> parseStringLiteral();
 
-        std::optional<std::string> parseId();
+        std::optional<std::string> parseName();
 
         AstPtrResult<Type> parseType();
 
@@ -152,6 +152,10 @@ namespace ionlang {
 
         AstPtrResult<CallExpr> parseCallExpr(const ionshared::Ptr<Block>& parent);
 
+        AstPtrResult<StructDefinition> parseStructDefinitionExpr(
+            const ionshared::Ptr<Block>& parent
+        );
+
         AstPtrResult<Block> parseBlock(const ionshared::Ptr<Construct>& parent);
 
         AstPtrResult<Module> parseModule();
@@ -174,12 +178,12 @@ namespace ionlang {
         AstPtrResult<Resolvable<T>> parseResolvable(ionshared::Ptr<Construct> owner) {
             this->beginSourceLocationMapping();
 
-            std::optional<std::string> id = this->parseId();
+            std::optional<std::string> name = this->parseName();
 
-            IONLANG_PARSER_ASSERT(id.has_value())
+            IONLANG_PARSER_ASSERT(name.has_value())
 
             // TODO: Parsing variable ref. only! Not taking in what kind in params!
-            return std::make_shared<Resolvable<T>>(ResolvableKind::Variable, *id, owner);
+            return std::make_shared<Resolvable<T>>(ResolvableKind::Variable, *name, owner);
         }
     };
 }

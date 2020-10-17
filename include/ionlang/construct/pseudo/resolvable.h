@@ -8,7 +8,7 @@
 
 namespace ionlang {
     // TODO: What if 'pass.h' is never included?
-    class Pass;
+    struct Pass;
 
     enum struct ResolvableKind {
         Variable,
@@ -18,7 +18,9 @@ namespace ionlang {
          */
         Prototype,
 
-        PrototypeReturnType
+        PrototypeReturnType,
+
+        Struct
     };
 
     /**

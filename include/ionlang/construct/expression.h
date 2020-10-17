@@ -22,7 +22,9 @@ namespace ionlang {
 
         IntegerLiteral,
 
-        StringLiteral
+        StringLiteral,
+
+        StructDefinition
     };
 
     template<typename T = Type>

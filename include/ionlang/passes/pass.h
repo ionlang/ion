@@ -33,6 +33,7 @@
 #include <ionlang/construct/global.h>
 #include <ionlang/construct/attribute.h>
 #include <ionlang/construct/struct.h>
+#include <ionlang/construct/struct_definition.h>
 
 namespace ionlang {
     struct Pass : ionshared::BasePass<Construct> {
@@ -97,6 +98,8 @@ namespace ionlang {
         virtual void visitAttribute(ionshared::Ptr<Attribute> node);
 
         virtual void visitStruct(ionshared::Ptr<Struct> node);
+
+        virtual void visitStructDefinition(ionshared::Ptr<StructDefinition> construct);
     };
 
     typedef ionshared::BasePassManager<Pass, Construct> PassManager;

@@ -115,6 +115,8 @@ namespace ionlang {
 
         void visitStruct(ionshared::Ptr<Struct> node) override;
 
+        void visitStructDefinition(ionshared::Ptr<StructDefinition> construct) override;
+
         // TODO: visitRef() if !isResolved() error, else this->visit(ref->getValue()); Is this a good idea? It may be required for example for if statement condition (if it's a ref). Investigate.
     };
 }

@@ -52,7 +52,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolAt))
 
-        std::optional<std::string> id = this->parseId();
+        std::optional<std::string> id = this->parseName();
 
         IONLANG_PARSER_ASSERT(id.has_value())
 
@@ -82,7 +82,7 @@ namespace ionlang {
     AstPtrResult<Prototype> Parser::parsePrototype(const ionshared::Ptr<Module> &parent) {
         this->beginSourceLocationMapping();
 
-        std::optional<std::string> id = this->parseId();
+        std::optional<std::string> id = this->parseName();
 
         IONLANG_PARSER_ASSERT(id.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))

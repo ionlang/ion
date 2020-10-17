@@ -1,16 +1,16 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    std::optional<std::string> Parser::parseId() {
+    std::optional<std::string> Parser::parseName() {
         if (!this->is(TokenKind::Identifier)) {
             return std::nullopt;
         }
 
-        std::string id = this->tokenStream.get().value;
+        std::string name = this->tokenStream.get().value;
 
         this->tokenStream.skip();
 
-        return id;
+        return name;
     }
 
     std::optional<Arg> Parser::parseArg() {
@@ -22,7 +22,7 @@ namespace ionlang {
             return std::nullopt;
         }
 
-        std::optional<std::string> id = this->parseId();
+        std::optional<std::string> id = this->parseName();
 
         // TODO: Function returns std::optional<>.-
         //        IONIR_PARSER_ASSERT(id.hasValue(), Arg)

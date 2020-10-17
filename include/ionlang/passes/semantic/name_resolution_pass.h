@@ -14,7 +14,7 @@ namespace ionlang {
     private:
         std::list<ionshared::PtrSymbolTable<Construct>> scope;
 
-        [[nodiscard]] static ionshared::OptPtr<Construct> findFunctionLikeTarget(
+        [[nodiscard]] static ionshared::OptPtr<Construct> findGlobalConstruct(
             std::string name,
             const ionshared::Ptr<Construct>& owner
         );

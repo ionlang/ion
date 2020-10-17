@@ -10,7 +10,7 @@ namespace ionlang {
             std::string name,
 
             ionshared::Ptr<TypeQualifiers> qualifiers =
-            std::make_shared<TypeQualifiers>()
+                std::make_shared<TypeQualifiers>()
         ) noexcept;
 
         void accept(Pass& pass) override;

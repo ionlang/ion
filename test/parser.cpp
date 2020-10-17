@@ -42,7 +42,7 @@ TEST(ParserTest, ParseIdentifier) {
         Token(TokenKind::Identifier, test::constant::foo)
     });
 
-    std::optional<std::string> identifier = parser.parseId();
+    std::optional<std::string> identifier = parser.parseName();
 
     EXPECT_TRUE(identifier.has_value());
     EXPECT_EQ(*identifier, test::constant::foo);

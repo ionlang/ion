@@ -129,7 +129,7 @@ namespace ionlang {
     AstPtrResult<AssignmentStatement> Parser::parseAssignmentStatement(const ionshared::Ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
-        std::optional<std::string> id = this->parseId();
+        std::optional<std::string> id = this->parseName();
 
         IONLANG_PARSER_ASSERT(id.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual))

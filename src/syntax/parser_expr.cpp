@@ -58,6 +58,9 @@ namespace ionlang {
         if (this->isNext(TokenKind::SymbolParenthesesL)) {
             return util::getResultValue(this->parseCallExpr(parent));
         }
+        else if (this->isNext(TokenKind::SymbolBraceL)) {
+            return util::getResultValue(this->parseStructDefinitionExpr(parent));
+        }
 
         // TODO: Is this the correct parent for the ref?
         PtrResolvable<VariableDeclStatement> variableDeclRef =
@@ -171,7 +174,7 @@ namespace ionlang {
     AstPtrResult<CallExpr> Parser::parseCallExpr(const ionshared::Ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
-        std::optional<std::string> calleeId = this->parseId();
+        std::optional<std::string> calleeId = this->parseName();
 
         IONLANG_PARSER_ASSERT(calleeId.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
@@ -205,5 +208,43 @@ namespace ionlang {
         this->finishSourceLocationMapping(callExpr);
 
         return callExpr;
+    }
+
+    AstPtrResult<StructDefinition> Parser::parseStructDefinitionExpr(
+        const ionshared::Ptr<Block>& parent
+    ) {
+        this->beginSourceLocationMapping();
+
+        std::optional<std::string> name = this->parseName();
+
+        IONLANG_PARSER_ASSERT(name.has_value())
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
+
+        std::vector<ionshared::Ptr<Expression<>>> values{};
+
+        while (!this->is(TokenKind::SymbolBraceR)) {
+            AstPtrResult<Expression<>> value = this->parseExpression(parent);
+
+            IONLANG_PARSER_ASSERT(util::hasValue(value))
+
+            values.push_back(util::getResultValue(value));
+        }
+
+        this->tokenStream.skip();
+
+        ionshared::Ptr<StructDefinition> structDefinition =
+            std::make_shared<StructDefinition>(
+                Resolvable<Struct>::make(
+                    ResolvableKind::Struct,
+                    *name,
+                    parent
+                ),
+
+                values
+            );
+
+        this->finishSourceLocationMapping(structDefinition);
+
+        return structDefinition;
     }
 }

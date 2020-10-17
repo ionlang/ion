@@ -8,6 +8,7 @@
 #include <ionir/construct/extern.h>
 #include <ionir/construct/identifier.h>
 #include <ionir/construct/struct.h>
+#include <ionir/construct/struct_definition.h>
 #include <ionir/misc/inst_builder.h>
 #include <ionir/const/const.h>
 #include <ionlang/construct/statement/return_statement.h>
@@ -197,7 +198,7 @@ namespace ionlang {
             return;
         }
 
-        ionshared::Ptr<ionir::Module> moduleBuffer = this->requireModule();
+        ionshared::Ptr<ionir::Module> ionIrModuleBuffer = this->requireModule();
 
         // TODO: Awaiting verification implementation.
 //        if (!node->verify()) {
@@ -209,7 +210,7 @@ namespace ionlang {
 
         std::string ionIrFunctionId = node->prototype->name;
 
-        if (moduleBuffer->context->getGlobalScope()->contains(ionIrFunctionId)) {
+        if (ionIrModuleBuffer->context->getGlobalScope()->contains(ionIrFunctionId)) {
             throw ionshared::util::quickError(
                 IONLANG_NOTICE_FUNCTION_ALREADY_DEFINED,
                 ionIrFunctionId
@@ -240,7 +241,7 @@ namespace ionlang {
         this->buffers.function = ionIrFunction;
 
         // Register the newly created function on the buffer module's symbol table.
-        moduleBuffer->insertFunction(ionIrFunction);
+        ionIrModuleBuffer->insertFunction(ionIrFunction);
 
         /**
          * Register the node and function on the local symbol table for later lookups,
@@ -821,5 +822,39 @@ namespace ionlang {
         );
 
         this->constructStack.push(ionIrStruct);
+    }
+
+    void IonIrLoweringPass::visitStructDefinition(ionshared::Ptr<StructDefinition> construct) {
+        if (!construct->declaration->isResolved()) {
+            // TODO: Use diagnostics.
+            throw std::runtime_error("Declaration must be resolved at this point");
+        }
+
+        this->visit(**construct->declaration);
+
+        ionshared::Ptr<ionir::Struct> ionIrStructDeclaration =
+            this->constructStack.pop()->dynamicCast<ionir::Struct>();
+
+        std::vector<ionshared::Ptr<ionir::Value<>>> ionIrValues{};
+
+        for (const auto& value : construct->values) {
+            this->visit(value);
+
+            ionIrValues.push_back(
+                this->constructStack.pop()->staticCast<ionir::Value<>>()
+            );
+        }
+
+        ionshared::Ptr<ionir::StructDefinition> ionIrStructDefinition =
+            std::make_shared<ionir::StructDefinition>(
+                ionIrStructDeclaration, ionIrValues
+            );
+
+        this->requireModule()->context->getGlobalScope()->set(
+            ionIrStructDefinition->declaration->name,
+            ionIrStructDefinition
+        );
+
+        this->constructStack.push(ionIrStructDefinition);
     }
 }

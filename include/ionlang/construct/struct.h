@@ -4,7 +4,7 @@
 #include "construct.h"
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     typedef ionshared::PtrSymbolTable<Type> Fields;
 

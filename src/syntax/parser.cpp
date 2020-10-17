@@ -160,7 +160,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(util::hasValue(typeResult))
 
-        std::optional<std::string> id = this->parseId();
+        std::optional<std::string> id = this->parseName();
 
         IONLANG_PARSER_ASSERT(id.has_value())
 
@@ -196,7 +196,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordStruct))
 
-        std::optional<std::string> structNameResult = this->parseId();
+        std::optional<std::string> structNameResult = this->parseName();
 
         IONLANG_PARSER_ASSERT(structNameResult.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
@@ -208,7 +208,7 @@ namespace ionlang {
 
             IONLANG_PARSER_ASSERT(util::hasValue(fieldTypeResult))
 
-            std::optional<std::string> fieldNameResult = this->parseId();
+            std::optional<std::string> fieldNameResult = this->parseName();
 
             IONLANG_PARSER_ASSERT(fieldNameResult.has_value())
             IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
@@ -261,7 +261,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordModule))
 
-        std::optional<std::string> id = this->parseId();
+        std::optional<std::string> id = this->parseName();
 
         IONLANG_PARSER_ASSERT(id.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
@@ -309,7 +309,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(util::hasValue(typeResult))
 
-        std::optional<std::string> id = this->parseId();
+        std::optional<std::string> id = this->parseName();
 
         IONLANG_PARSER_ASSERT(id.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual))
