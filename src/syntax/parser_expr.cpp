@@ -43,7 +43,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
-        AstPtrResult<Expression<>> expression = this->parsePrimaryExpr(parent);
+        AstPtrResult<Expression<>> expression = this->parseExpression(parent);
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
 

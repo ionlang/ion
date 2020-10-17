@@ -130,9 +130,15 @@ target_include_directories(
     #$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
 )
 
-# Find the libraries that correspond to the LLVM components
-# that we wish to use.
-llvm_map_components_to_libnames(llvm_libs all)
+# Determine whether to link against LLVM static libraries
+# or dynamic library (libLLVM.dll).
+if(BUILD_SHARED_LIBS)
+    # Find the libraries that correspond to the LLVM components
+    # that we wish to use.
+    llvm_map_components_to_libnames(llvm_libs all)
+else()
+    set(llvm_libs LLVM)
+endif()
 
 # Link against various libraries including LLVM, libionshared & libionir.
 target_link_libraries("${PROJECT_NAME}" PUBLIC ${llvm_libs} ionshared ionir)
@@ -154,7 +160,7 @@ install(
 
 install(
     EXPORT ${PROJECT_NAME}-config
-    NAMESPACE ${PROJECT_NAME}::
+#    NAMESPACE ${PROJECT_NAME}::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 

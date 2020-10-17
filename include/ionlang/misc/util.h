@@ -2,7 +2,7 @@
 
 #include <variant>
 #include <ionshared/misc/util.h>
-#include <ionir/construct/inst/operation.h>
+#include <ionir/construct/value/operation.h>
 #include <ionlang/syntax/ast_result.h>
 #include <ionlang/construct/expression/operation.h>
 #include <ionlang/construct/type/integer_type.h>

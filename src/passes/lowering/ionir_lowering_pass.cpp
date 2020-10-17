@@ -786,7 +786,7 @@ namespace ionlang {
                 this->constructStack.pop()->staticCast<ionir::Value<>>();
         }
 
-        this->constructStack.push(this->requireBuilder()->createOperation(
+        this->constructStack.push(std::make_shared<ionir::OperationValue>(
             *ionIrOperatorKindResult,
             ionIrLeftSideValue,
             ionIrRightSideValue
