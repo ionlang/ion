@@ -3,7 +3,7 @@
 namespace ionlang {
     MacroExpansionPass::MacroExpansionPass(
         ionshared::Ptr<ionshared::PassContext> context
-    ) :
+    ) noexcept :
         Pass(std::move(context)) {
         //
     }

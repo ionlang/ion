@@ -24,7 +24,7 @@ namespace ionlang {
         return Construct::convertChildren(this->statements);
     }
 
-    void Block::appendStatement(const ionshared::Ptr<Statement> &statement) {
+    void Block::appendStatement(const ionshared::Ptr<Statement>& statement) {
         this->statements.push_back(statement);
 
         /**
@@ -41,7 +41,7 @@ namespace ionlang {
         // TODO: What about other named statements? Currently there might be none -- but in the future this might be an edge case, it's really daunting to write checks for each named construct (also recall there's Identifier, so we can't just std::dynamic_pointer_cast<ionshared::Named>).
     }
 
-    bool Block::relocateStatement(size_t orderIndex, ionshared::Ptr<Block> target) {
+    bool Block::relocateStatement(size_t orderIndex, const ionshared::Ptr<Block>& target) {
         /**
          * The size of the local statements vector is less than
          * the provided index.

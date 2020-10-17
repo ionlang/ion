@@ -6,12 +6,11 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    class MacroExpansionPass : public Pass {
-    public:
+    struct MacroExpansionPass : Pass {
         IONSHARED_PASS_ID;
 
         explicit MacroExpansionPass(
             ionshared::Ptr<ionshared::PassContext> context
-        );
+        ) noexcept;
     };
 }

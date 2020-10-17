@@ -11,7 +11,7 @@
 #include "function.h"
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     class StatementBuilder;
 
@@ -25,11 +25,11 @@ namespace ionlang {
 
             std::vector<ionshared::Ptr<Statement>> statements = {},
 
-            const ionshared::PtrSymbolTable<VariableDeclStatement> &symbolTable =
+            const ionshared::PtrSymbolTable<VariableDeclStatement>& symbolTable =
                 ionshared::util::makePtrSymbolTable<VariableDeclStatement>()
         );
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
 
         [[nodiscard]] Ast getChildNodes() override;
 
@@ -39,17 +39,17 @@ namespace ionlang {
          * relocation is performed, and the statement's parent
          * is left intact.
          */
-        void appendStatement(const ionshared::Ptr<Statement> &statement);
+        void appendStatement(const ionshared::Ptr<Statement>& statement);
 
         /**
          * Move the statement at the provided order index from this block
          * to another. The statement will be removed from the local vector,
          * and registered on the target block's symbol table.
          */
-        bool relocateStatement(size_t orderIndex, ionshared::Ptr<Block> target);
+        bool relocateStatement(size_t orderIndex, const ionshared::Ptr<Block>& target);
 
         size_t relocateStatements(
-            const ionshared::Ptr<Block> &target,
+            const ionshared::Ptr<Block>& target,
             size_t from = 0,
             std::optional<size_t> to = std::nullopt
         );

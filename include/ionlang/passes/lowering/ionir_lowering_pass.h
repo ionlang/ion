@@ -25,10 +25,6 @@ namespace ionlang {
 
         ionshared::PtrSymbolTable<ionir::Module> modules;
 
-        ionshared::Stack<ionshared::Ptr<ionir::Construct>> constructStack;
-
-        ionshared::Stack<ionshared::Ptr<ionir::Type>> typeStack;
-
         Buffers buffers;
 
         IonIrEmittedEntities symbolTable;
@@ -49,9 +45,52 @@ namespace ionlang {
          */
         void setBuilder(ionshared::Ptr<ionir::BasicBlock> basicBlock);
 
-        void lockBuffers(const std::function<void()> &callback);
+        /**
+         * Backup current buffers, invoke the callback and restore the
+         * stashed buffers.
+         */
+        void stashBuffers(const std::function<void()>& callback);
 
         [[nodiscard]] uint32_t getNameCounter() noexcept;
+
+        /**
+         * Visit and emit a construct if it has not been already
+         * previously visited and emitted, and return the resulting
+         * lowered construct by looking it up on the local symbol table.
+         * By default, buffers are stashed during visitation of the
+         * construct and restored afterwards to avoid being overwritten.
+         */
+        template<typename T = ionir::Construct>
+            requires std::derived_from<T, ionir::Construct>
+        ionshared::Ptr<T> safeEarlyVisitOrLookup(
+            ionshared::Ptr<Construct> construct,
+            bool useDynamicCast = true,
+            bool stashBuffers = true
+        ) {
+            /**
+             * NOTE: If specified, buffers must be stashed and restored after
+             * visitation, as the construct could be anything, including a block
+             * or a function, which, among others, alter buffers when being lowered.
+             */
+            if (stashBuffers) {
+                this->stashBuffers([&, this] {
+                    /**
+                     * NOTE: Construct is protected from being emitted more
+                     * than once during this call.
+                     */
+                    this->visit(construct);
+                });
+            }
+            else {
+                this->visit(construct);
+            }
+
+            if (!this->symbolTable.contains(construct)) {
+                throw std::runtime_error("Visiting construct did not create an entry in the local symbol table");
+            }
+
+            return *this->symbolTable.find<T>(construct, useDynamicCast);
+        }
 
     public:
         explicit IonIrLoweringPass(
@@ -65,25 +104,29 @@ namespace ionlang {
 
         [[nodiscard]] ionshared::Ptr<ionshared::SymbolTable<ionshared::Ptr<ionir::Module>>> getModules() const;
 
-        [[nodiscard]] ionshared::Stack<ionshared::Ptr<ionir::Construct>> getConstructStack() const noexcept;
-
-        [[nodiscard]] ionshared::Stack<ionshared::Ptr<ionir::Type>> getTypeStack() const noexcept;
-
         [[nodiscard]] ionshared::OptPtr<ionir::Module> getModuleBuffer() const;
 
         bool setModuleBuffer(const std::string &id);
 
+        /**
+         * Visit a construct for lowering. Will not visit children,
+         * as they are already visited by the delegated visit methods.
+         * Must be used as the default visiting method for constructs,
+         * as it will prevent constructs from possibly being emitted more
+         * than once (for example, when a construct is used earlier than
+         * its official lowering point).
+         */
         void visit(ionshared::Ptr<Construct> node) override;
 
         void visitModule(ionshared::Ptr<Module> node) override;
 
         void visitFunction(ionshared::Ptr<Function> node) override;
 
-        void visitExtern(ionshared::Ptr<Extern> node) override;
+        void visitExtern(ionshared::Ptr<Extern> construct) override;
 
         void visitPrototype(ionshared::Ptr<Prototype> node) override;
 
-        void visitBlock(ionshared::Ptr<Block> node) override;
+        void visitBlock(ionshared::Ptr<Block> construct) override;
 
         void visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> node) override;
 
@@ -93,27 +136,27 @@ namespace ionlang {
 
         void visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> node) override;
 
-        void visitGlobal(ionshared::Ptr<Global> node) override;
+        void visitGlobal(ionshared::Ptr<Global> construct) override;
 
-        void visitIntegerType(ionshared::Ptr<IntegerType> node) override;
+        void visitIntegerType(ionshared::Ptr<IntegerType> construct) override;
 
-        void visitBooleanType(ionshared::Ptr<BooleanType> node) override;
+        void visitBooleanType(ionshared::Ptr<BooleanType> construct) override;
 
-        void visitVoidType(ionshared::Ptr<VoidType> node) override;
+        void visitVoidType(ionshared::Ptr<VoidType> construct) override;
 
-        void visitIfStatement(ionshared::Ptr<IfStatement> node) override;
+        void visitIfStatement(ionshared::Ptr<IfStatement> construct) override;
 
-        void visitReturnStatement(ionshared::Ptr<ReturnStatement> node) override;
+        void visitReturnStatement(ionshared::Ptr<ReturnStatement> construct) override;
 
-        void visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> node) override;
+        void visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> construct) override;
 
-        void visitVariableDecl(ionshared::Ptr<VariableDeclStatement> node) override;
+        void visitVariableDecl(ionshared::Ptr<VariableDeclStatement> construct) override;
 
-        void visitCallExpr(ionshared::Ptr<CallExpr> node) override;
+        void visitCallExpr(ionshared::Ptr<CallExpr> construct) override;
 
-        void visitOperationExpr(ionshared::Ptr<OperationExpr> node) override;
+        void visitOperationExpr(ionshared::Ptr<OperationExpr> construct) override;
 
-        void visitStruct(ionshared::Ptr<Struct> node) override;
+        void visitStruct(ionshared::Ptr<Struct> construct) override;
 
         void visitStructDefinition(ionshared::Ptr<StructDefinition> construct) override;
 

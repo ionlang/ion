@@ -22,17 +22,22 @@ namespace ionlang {
         [[nodiscard]] bool contains(ionshared::Ptr<Construct> key) const;
 
         template<typename T = ionir::Construct>
+            requires std::derived_from<T, ionir::Construct>
         [[nodiscard]] std::optional<ionshared::Ptr<T>> find(
-            const ionshared::Ptr<Construct> &construct
+            const ionshared::Ptr<Construct> &construct,
+            bool useDynamicCast = true
         ) {
             if (this->contains(construct)) {
-                ionshared::Ptr<T> castResult = this->entities.lookup(construct)->get()->dynamicCast<T>();
+                ionshared::Ptr<ionir::Construct> lookupResult =
+                    *this->entities.lookup(construct);
 
-                if (castResult != nullptr) {
-                    return castResult;
-                }
-
-                throw std::runtime_error("LLVM value cast failed");
+                /**
+                 * NOTE: Casting methods already check that casting
+                 * result isn't nullptr.
+                 */
+                return useDynamicCast
+                    ? lookupResult->dynamicCast<T>()
+                    : lookupResult->staticCast<T>();
             }
 
             return std::nullopt;
