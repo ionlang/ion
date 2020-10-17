@@ -151,9 +151,9 @@ namespace ionlang {
         return false;
     }
 
-    void IonIrLoweringPass::visit(ionshared::Ptr<Construct> node) {
+    void IonIrLoweringPass::visit(ionshared::Ptr<Construct> construct) {
         // Prevent construct from being emitted more than once.
-        if (this->symbolTable.contains(node)) {
+        if (this->symbolTable.contains(construct)) {
             return;
         }
 
@@ -162,38 +162,29 @@ namespace ionlang {
          * not its children, since they're already visited by
          * the other member methods.
          */
-        node->accept(*this);
+        construct->accept(*this);
     }
 
-    void IonIrLoweringPass::visitModule(ionshared::Ptr<Module> node) {
+    void IonIrLoweringPass::visitModule(ionshared::Ptr<Module> construct) {
         this->buffers.module = std::make_shared<ionir::Module>(
-            std::make_shared<ionir::Identifier>(node->name)
+            std::make_shared<ionir::Identifier>(construct->name)
         );
 
         // Set the module on the modules symbol table.
-        this->modules->set(node->name, *this->buffers.module);
+        this->modules->set(construct->name, *this->buffers.module);
 
         // Proceed to visit all the module's children (top-level constructs).
         std::map<std::string, ionshared::Ptr<Construct>> moduleSymbolTable =
-            node->context->getGlobalScope()->unwrap();
+            construct->context->getGlobalScope()->unwrap();
 
         for (const auto &[id, topLevelConstruct] : moduleSymbolTable) {
             this->visit(topLevelConstruct);
         }
     }
 
-    void IonIrLoweringPass::visitFunction(ionshared::Ptr<Function> node) {
+    void IonIrLoweringPass::visitFunction(ionshared::Ptr<Function> construct) {
         ionshared::Ptr<ionir::Module> ionIrModuleBuffer = this->requireModule();
-
-        // TODO: Awaiting verification implementation.
-//        if (!node->verify()) {
-//            throw ionshared::util::quickError(
-//                IONLANG_NOTICE_MISC_VERIFICATION_FAILED,
-//                "Function" // TODO: Hard-coded, should be using Util::getConstructName().
-//            );
-//        }
-
-        std::string ionIrFunctionId = node->prototype->name;
+        std::string ionIrFunctionId = construct->prototype->name;
 
         if (ionIrModuleBuffer->context->getGlobalScope()->contains(ionIrFunctionId)) {
             throw ionshared::util::quickError(
@@ -202,10 +193,8 @@ namespace ionlang {
             );
         }
 
-        this->visit(node->prototype);
-
         ionshared::Ptr<ionir::Prototype> ionIrPrototype =
-            this->safeEarlyVisitOrLookup<ionir::Prototype>(node->prototype);
+            this->safeEarlyVisitOrLookup<ionir::Prototype>(construct->prototype);
 
         /**
          * The function's body will be filled when visiting the body. The
@@ -219,7 +208,7 @@ namespace ionlang {
         // Set the function buffer. This is required when visiting the function body.
         this->buffers.function = ionIrFunction;
 
-        this->visit(node->body);
+        this->visit(construct->body);
 
         // TODO: Redundant Repetitive assignment?
         // Set the function buffer.
@@ -227,12 +216,8 @@ namespace ionlang {
 
         // Register the newly created function on the buffer module's symbol table.
         ionIrModuleBuffer->insertFunction(ionIrFunction);
-
-        /**
-         * Register the node and function on the local symbol table for later lookups,
-         * ex. when visiting a call expression.
-         */
-        this->symbolTable.set(node, ionIrFunction);
+        
+        this->symbolTable.set(construct, ionIrFunction);
     }
 
     void IonIrLoweringPass::visitExtern(ionshared::Ptr<Extern> construct) {
@@ -266,14 +251,14 @@ namespace ionlang {
         this->symbolTable.set(construct, ionIrExtern);
     }
 
-    void IonIrLoweringPass::visitPrototype(ionshared::Ptr<Prototype> node) {
+    void IonIrLoweringPass::visitPrototype(ionshared::Ptr<Prototype> construct) {
         this->requireModule();
 
         ionshared::Ptr<ionir::Type> ionIrReturnType =
-            this->safeEarlyVisitOrLookup<ionir::Type>(node->returnType);
+            this->safeEarlyVisitOrLookup<ionir::Type>(construct->returnType);
 
         ionshared::Ptr<ionir::Args> ionIrArguments = std::make_shared<ionir::Args>();
-        ionshared::Ptr<Args> arguments = node->args;
+        ionshared::Ptr<Args> arguments = construct->args;
         auto nativeArguments = arguments->items->unwrap();
 
         ionIrArguments->isVariable = arguments->isVariable;
@@ -290,8 +275,8 @@ namespace ionlang {
             );
         }
 
-        this->symbolTable.set(node, std::make_shared<ionir::Prototype>(
-            node->name,
+        this->symbolTable.set(construct, std::make_shared<ionir::Prototype>(
+            construct->name,
             ionIrArguments,
             ionIrReturnType,
             *this->buffers.module
@@ -369,14 +354,14 @@ namespace ionlang {
         }
     }
 
-    void IonIrLoweringPass::visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> node) {
-        PtrResolvable<IntegerType> integerTypeResolvable = node->type;
+    void IonIrLoweringPass::visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> construct) {
+        PtrResolvable<IntegerType> integerTypeResolvable = construct->type;
 
         if (!integerTypeResolvable->isResolved()) {
             throw std::runtime_error("Type is unresolved");
         }
 
-        ionshared::Ptr<Type> integerType = *node->type->getValue();
+        ionshared::Ptr<Type> integerType = *construct->type->getValue();
 
         if (integerType->typeKind != TypeKind::Integer) {
             throw std::runtime_error("Integer value's type must be integer type");
@@ -385,30 +370,30 @@ namespace ionlang {
         ionshared::Ptr<ionir::IntegerType> ionIrIntegerType =
             this->safeEarlyVisitOrLookup<ionir::IntegerType>(integerType);
 
-        this->symbolTable.set(node, std::make_shared<ionir::IntegerLiteral>(
+        this->symbolTable.set(construct, std::make_shared<ionir::IntegerLiteral>(
             ionIrIntegerType,
-            node->value
+            construct->value
         ));
     }
 
-    void IonIrLoweringPass::visitCharLiteral(ionshared::Ptr<CharLiteral> node) {
+    void IonIrLoweringPass::visitCharLiteral(ionshared::Ptr<CharLiteral> construct) {
         this->symbolTable.set(
-            node,
-            std::make_shared<ionir::CharLiteral>(node->value)
+            construct,
+            std::make_shared<ionir::CharLiteral>(construct->value)
         );
     }
 
-    void IonIrLoweringPass::visitStringLiteral(ionshared::Ptr<StringLiteral> node) {
+    void IonIrLoweringPass::visitStringLiteral(ionshared::Ptr<StringLiteral> construct) {
         this->symbolTable.set(
-            node,
-            std::make_shared<ionir::StringLiteral>(node->value)
+            construct,
+            std::make_shared<ionir::StringLiteral>(construct->value)
         );
     }
 
-    void IonIrLoweringPass::visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> node) {
+    void IonIrLoweringPass::visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> construct) {
         this->symbolTable.set(
-            node,
-            std::make_shared<ionir::BooleanLiteral>(node->value)
+            construct,
+            std::make_shared<ionir::BooleanLiteral>(construct->value)
         );
     }
 

@@ -106,7 +106,7 @@ namespace ionlang {
 
         [[nodiscard]] ionshared::OptPtr<ionir::Module> getModuleBuffer() const;
 
-        bool setModuleBuffer(const std::string &id);
+        bool setModuleBuffer(const std::string& id);
 
         /**
          * Visit a construct for lowering. Will not visit children,
@@ -116,25 +116,25 @@ namespace ionlang {
          * than once (for example, when a construct is used earlier than
          * its official lowering point).
          */
-        void visit(ionshared::Ptr<Construct> node) override;
+        void visit(ionshared::Ptr<Construct> construct) override;
 
-        void visitModule(ionshared::Ptr<Module> node) override;
+        void visitModule(ionshared::Ptr<Module> construct) override;
 
-        void visitFunction(ionshared::Ptr<Function> node) override;
+        void visitFunction(ionshared::Ptr<Function> construct) override;
 
         void visitExtern(ionshared::Ptr<Extern> construct) override;
 
-        void visitPrototype(ionshared::Ptr<Prototype> node) override;
+        void visitPrototype(ionshared::Ptr<Prototype> construct) override;
 
         void visitBlock(ionshared::Ptr<Block> construct) override;
 
-        void visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> node) override;
+        void visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> construct) override;
 
-        void visitCharLiteral(ionshared::Ptr<CharLiteral> node) override;
+        void visitCharLiteral(ionshared::Ptr<CharLiteral> construct) override;
 
-        void visitStringLiteral(ionshared::Ptr<StringLiteral> node) override;
+        void visitStringLiteral(ionshared::Ptr<StringLiteral> construct) override;
 
-        void visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> node) override;
+        void visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> construct) override;
 
         void visitGlobal(ionshared::Ptr<Global> construct) override;
 
