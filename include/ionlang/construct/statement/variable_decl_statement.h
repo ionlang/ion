@@ -24,5 +24,7 @@ namespace ionlang {
         explicit VariableDeclStatement(const VariableDeclStatementOpts& opts) noexcept;
 
         void accept(Pass& visitor) override;
+
+        [[nodiscard]] Ast getChildNodes() override;
     };
 }

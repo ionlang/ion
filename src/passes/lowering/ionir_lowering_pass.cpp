@@ -850,11 +850,6 @@ namespace ionlang {
                 ionIrStructDeclaration, ionIrValues
             );
 
-        this->requireModule()->context->getGlobalScope()->set(
-            ionIrStructDefinition->declaration->name,
-            ionIrStructDefinition
-        );
-
         this->constructStack.push(ionIrStructDefinition);
     }
 }

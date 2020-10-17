@@ -50,6 +50,9 @@ namespace ionlang {
             return;
         }
 
+        std::cout << "Resolving: "
+            << *node->name;
+
         /**
          * NOTE: If the resolvable is not resolved, it's guaranteed
          * to have its kind, name and context defined.

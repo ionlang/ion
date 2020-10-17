@@ -12,4 +12,11 @@ namespace ionlang {
     void VariableDeclStatement::accept(Pass& visitor) {
         visitor.visitVariableDecl(this->dynamicCast<VariableDeclStatement>());
     }
+
+    Ast VariableDeclStatement::getChildNodes() {
+        return {
+            this->type,
+            this->value
+        };
+    }
 }
