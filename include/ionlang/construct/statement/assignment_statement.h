@@ -12,13 +12,13 @@ namespace ionlang {
     struct AssignmentStatementOpts : StatementOpts {
         PtrResolvable<VariableDeclStatement> variableDeclStatementRef;
 
-        ionshared::Ptr<Expression<>> value;
+        std::shared_ptr<Expression<>> value;
     };
 
     struct AssignmentStatement : Statement {
         PtrResolvable<VariableDeclStatement> variableDeclStatementRef;
 
-        ionshared::Ptr<Expression<>> value;
+        std::shared_ptr<Expression<>> value;
 
         explicit AssignmentStatement(const AssignmentStatementOpts &opts);
 

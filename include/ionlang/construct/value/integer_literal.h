@@ -10,7 +10,7 @@ namespace ionlang {
     struct IntegerLiteral : Expression<IntegerType> {
         int64_t value;
 
-        IntegerLiteral(ionshared::Ptr<IntegerType> type, int64_t value);
+        IntegerLiteral(std::shared_ptr<IntegerType> type, int64_t value);
 
         void accept(Pass &visitor) override;
     };

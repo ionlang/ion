@@ -19,10 +19,10 @@ namespace ionlang::util {
     [[nodiscard]] std::optional<IntegerKind> calculateIntegerKindFromBitLength(uint32_t bitLength) noexcept;
 
     // TODO: Should this be somewhere else?
-    [[nodiscard]] std::optional<std::string> findConstructId(const ionshared::Ptr<Construct> &construct);
+    [[nodiscard]] std::optional<std::string> findConstructId(const std::shared_ptr<Construct> &construct);
 
     // TODO: Should this be somewhere else?
-    [[nodiscard]] std::optional<std::string> findStatementId(const ionshared::Ptr<Statement> &statement) noexcept;
+    [[nodiscard]] std::optional<std::string> findStatementId(const std::shared_ptr<Statement> &statement) noexcept;
 
     // TODO: Should this be somewhere else?
     [[nodiscard]] std::optional<IntrinsicOperatorKind> findIntrinsicOperatorKind(TokenKind tokenKind);
@@ -52,8 +52,8 @@ namespace ionlang::util {
 
     template<typename T>
     [[nodiscard]] bool hasValue(AstPtrResult<T> result) {
-        return std::holds_alternative<ionshared::Ptr<T>>(result)
-            && std::get<ionshared::Ptr<T>>(result) != nullptr;
+        return std::holds_alternative<std::shared_ptr<T>>(result)
+            && std::get<std::shared_ptr<T>>(result) != nullptr;
     }
 
     template<typename T = Construct>
@@ -66,8 +66,8 @@ namespace ionlang::util {
     }
 
     template<typename T = Construct>
-    [[nodiscard]] ionshared::Ptr<T> getResultValue(AstPtrResult<T> result) {
-        ionshared::Ptr<T> value = util::getResultValue<ionshared::Ptr<T>>(result);
+    [[nodiscard]] std::shared_ptr<T> getResultValue(AstPtrResult<T> result) {
+        std::shared_ptr<T> value = util::getResultValue<std::shared_ptr<T>>(result);
 
         if (value == nullptr) {
             throw std::runtime_error("Pointer value of result is nullptr");
@@ -79,8 +79,8 @@ namespace ionlang::util {
     template<typename TFrom, typename TTo = Construct>
     [[nodiscard]] AstPtrResult<TTo> castAstPtrResult(AstPtrResult<TFrom> fromResult, bool useDynamicPointerCast = true) {
         if (util::hasValue(fromResult)) {
-            ionshared::Ptr<TFrom> fromValue = util::getResultValue<TFrom>(fromResult);
-            ionshared::Ptr<TTo> toValue;
+            std::shared_ptr<TFrom> fromValue = util::getResultValue<TFrom>(fromResult);
+            std::shared_ptr<TTo> toValue;
 
             /**
              * Certain cases require use of static pointer cast instead of dynamic,
@@ -104,6 +104,6 @@ namespace ionlang::util {
             return toValue;
         }
 
-        return std::get<ionshared::Ptr<ErrorMarker>>(fromResult);
+        return std::get<std::shared_ptr<ErrorMarker>>(fromResult);
     }
 }

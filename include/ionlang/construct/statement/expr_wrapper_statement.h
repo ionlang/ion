@@ -7,11 +7,11 @@ namespace ionlang {
     class Pass;
 
     struct ExprWrapperStatementOpts : StatementOpts {
-        ionshared::Ptr<Expression<>> expression;
+        std::shared_ptr<Expression<>> expression;
     };
 
     struct ExprWrapperStatement : Statement {
-        ionshared::Ptr<Expression<>> expression;
+        std::shared_ptr<Expression<>> expression;
 
         explicit ExprWrapperStatement(const ExprWrapperStatementOpts& opts);
 

@@ -49,7 +49,7 @@ namespace ionlang {
 
     struct Construct : ionshared::BaseConstruct<Construct, ConstructKind> {
         template<class T>
-        static Ast convertChildren(std::vector<ionshared::Ptr<T>> vector) {
+        static Ast convertChildren(std::vector<std::shared_ptr<T>> vector) {
             // TODO: Ensure T is child of AstNode.
             Ast children = {};
 

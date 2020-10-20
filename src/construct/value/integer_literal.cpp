@@ -1,7 +1,7 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    IntegerLiteral::IntegerLiteral(ionshared::Ptr<IntegerType> type, int64_t value) :
+    IntegerLiteral::IntegerLiteral(std::shared_ptr<IntegerType> type, int64_t value) :
         Expression<IntegerType>(ExpressionKind::IntegerLiteral, std::move(type)),
         value(value) {
         //

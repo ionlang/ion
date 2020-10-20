@@ -5,7 +5,7 @@
 namespace ionlang {
     // TODO: Consider using Ref<> to register pending type reference if user-defined type is parsed?
     AstPtrResult<Type> Parser::parseType() {
-        ionshared::Ptr<TypeQualifiers> qualifiers =
+        std::shared_ptr<TypeQualifiers> qualifiers =
             std::make_shared<TypeQualifiers>();
 
         // TODO: Simplify to support const mut &*type.
@@ -90,7 +90,7 @@ namespace ionlang {
     }
 
     AstPtrResult<BooleanType> Parser::parseBooleanType(
-        const ionshared::Ptr<TypeQualifiers>& qualifiers
+        const std::shared_ptr<TypeQualifiers>& qualifiers
     ) {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::TypeBool))
 
@@ -98,7 +98,7 @@ namespace ionlang {
     }
 
     AstPtrResult<IntegerType> Parser::parseIntegerType(
-        const ionshared::Ptr<TypeQualifiers>& qualifiers
+        const std::shared_ptr<TypeQualifiers>& qualifiers
     ) {
         TokenKind currentTokenKind = this->tokenStream.get().kind;
 
@@ -131,7 +131,7 @@ namespace ionlang {
     }
 
     AstPtrResult<UserDefinedType> Parser::parseUserDefinedType(
-        const ionshared::Ptr<TypeQualifiers>& qualifiers
+        const std::shared_ptr<TypeQualifiers>& qualifiers
     ) {
         IONLANG_PARSER_ASSERT(this->expect(TokenKind::Identifier))
 

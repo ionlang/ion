@@ -17,8 +17,5 @@ namespace ionlang::const_regex {
 
     static const std::regex whitespace{"^([\\s]+)"};
 
-    static const std::regex singleLineComment{R"(^\/\/[^\n]{0,})"};
-
-    // TODO: Improve it. Certain test cases fail.
-    static const std::regex multiLineComment{R"(\/\*[^*\\]{0,}\*\/)"};
+    static const std::regex comment{R"(^`([^\n]{0,}))"};
 }

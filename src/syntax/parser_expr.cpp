@@ -3,7 +3,7 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    AstPtrResult<Expression<>> Parser::parseExpression(const ionshared::Ptr<Block>& parent) {
+    AstPtrResult<Expression<>> Parser::parseExpression(const std::shared_ptr<Block>& parent) {
         AstPtrResult<Expression<>> primaryExpression = this->parsePrimaryExpr(parent);
 
         IONLANG_PARSER_ASSERT(util::hasValue(primaryExpression))
@@ -20,7 +20,7 @@ namespace ionlang {
         ));
     }
 
-    AstPtrResult<Expression<>> Parser::parsePrimaryExpr(const ionshared::Ptr<Block>& parent) {
+    AstPtrResult<Expression<>> Parser::parsePrimaryExpr(const std::shared_ptr<Block>& parent) {
         if (this->is(TokenKind::SymbolParenthesesL)) {
             return this->parseParenthesesExpr(parent);
         }
@@ -38,7 +38,7 @@ namespace ionlang {
         return util::getResultValue(literal);
     }
 
-    AstPtrResult<Expression<>> Parser::parseParenthesesExpr(const ionshared::Ptr<Block>& parent) {
+    AstPtrResult<Expression<>> Parser::parseParenthesesExpr(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
@@ -52,7 +52,7 @@ namespace ionlang {
         return expression;
     }
 
-    AstPtrResult<Expression<>> Parser::parseIdExpr(const ionshared::Ptr<Block>& parent) {
+    AstPtrResult<Expression<>> Parser::parseIdExpr(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         if (this->isNext(TokenKind::SymbolParenthesesL)) {
@@ -73,8 +73,8 @@ namespace ionlang {
 
     AstPtrResult<Expression<>> Parser::parseOperationExpr(
         uint32_t minimumOperatorPrecedence,
-        ionshared::Ptr<Expression<>> leftSideExpression,
-        const ionshared::Ptr<Block>& parent
+        std::shared_ptr<Expression<>> leftSideExpression,
+        const std::shared_ptr<Block>& parent
     ) {
         auto isOperatorAndPrecedenceGraterThan = [](TokenKind tokenKind, uint32_t precedence) -> bool {
             return Classifier::isIntrinsicOperator(tokenKind)
@@ -171,7 +171,7 @@ namespace ionlang {
 //        }
     }
 
-    AstPtrResult<CallExpr> Parser::parseCallExpr(const ionshared::Ptr<Block>& parent) {
+    AstPtrResult<CallExpr> Parser::parseCallExpr(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         std::optional<std::string> calleeId = this->parseName();
@@ -199,7 +199,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
 
-        ionshared::Ptr<CallExpr> callExpr = std::make_shared<CallExpr>(
+        std::shared_ptr<CallExpr> callExpr = std::make_shared<CallExpr>(
             Resolvable<>::make(ResolvableKind::Prototype, *calleeId, parent),
             callArgs,
             Resolvable<Type>::make(ResolvableKind::PrototypeReturnType, *calleeId, parent)
@@ -211,7 +211,7 @@ namespace ionlang {
     }
 
     AstPtrResult<StructDefinition> Parser::parseStructDefinitionExpr(
-        const ionshared::Ptr<Block>& parent
+        const std::shared_ptr<Block>& parent
     ) {
         this->beginSourceLocationMapping();
 
@@ -220,7 +220,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(name.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
-        std::vector<ionshared::Ptr<Expression<>>> values{};
+        std::vector<std::shared_ptr<Expression<>>> values{};
 
         while (!this->is(TokenKind::SymbolBraceR)) {
             AstPtrResult<Expression<>> value = this->parseExpression(parent);
@@ -232,7 +232,7 @@ namespace ionlang {
 
         this->tokenStream.skip();
 
-        ionshared::Ptr<StructDefinition> structDefinition =
+        std::shared_ptr<StructDefinition> structDefinition =
             std::make_shared<StructDefinition>(
                 Resolvable<Struct>::make(
                     ResolvableKind::Struct,

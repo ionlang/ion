@@ -16,19 +16,19 @@ namespace ionlang {
 
         [[nodiscard]] static ionshared::OptPtr<Construct> findGlobalConstruct(
             std::string name,
-            const ionshared::Ptr<Construct>& owner
+            const std::shared_ptr<Construct>& owner
         );
 
     public:
         IONSHARED_PASS_ID;
 
         explicit NameResolutionPass(
-            ionshared::Ptr<ionshared::PassContext> context
-        );
+            std::shared_ptr<ionshared::PassContext> context
+        ) noexcept;
 
-        void visitModule(ionshared::Ptr<Module> node) override;
+        void visitModule(std::shared_ptr<Module> node) override;
 
-        void visitScopeAnchor(ionshared::Ptr<ionshared::Scoped<Construct>> node) override;
+        void visitScopeAnchor(std::shared_ptr<ionshared::Scoped<Construct>> node) override;
 
         void visitResolvable(PtrResolvable<> node) override;
 

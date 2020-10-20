@@ -9,7 +9,7 @@ namespace ionlang {
         explicit UserDefinedType(
             std::string name,
 
-            ionshared::Ptr<TypeQualifiers> qualifiers =
+            std::shared_ptr<TypeQualifiers> qualifiers =
                 std::make_shared<TypeQualifiers>()
         ) noexcept;
 

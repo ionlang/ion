@@ -16,8 +16,7 @@ namespace ionlang {
         {const_regex::boolean, TokenKind::LiteralBoolean},
         {const_regex::character, TokenKind::LiteralCharacter},
         {const_regex::whitespace, TokenKind::Whitespace},
-        {const_regex::singleLineComment, TokenKind::SingleLineComment},
-        {const_regex::multiLineComment, TokenKind::MultiLineComment},
+        {const_regex::comment, TokenKind::Comment},
 
         /**
          * NOTE: Identifier regex MUST be placed last, otherwise it will gain
@@ -148,6 +147,17 @@ namespace ionlang {
 
     bool Grammar::getIsInitialized() {
         return Grammar::isInitialized;
+    }
+
+    std::string Grammar::findTokenKindNameOr(
+        TokenKind tokenKind,
+        std::string alternative
+    ) {
+        if (Grammar::tokenKindNames.contains(tokenKind)) {
+            return Grammar::tokenKindNames.at(tokenKind);
+        }
+
+        return alternative;
     }
 
     void Grammar::init() {

@@ -3,7 +3,7 @@
 namespace ionlang {
     StructDefinition::StructDefinition(
         const PtrResolvable<Struct>& declaration,
-        std::vector<ionshared::Ptr<Expression<>>> values
+        std::vector<std::shared_ptr<Expression<>>> values
     ) noexcept :
         Expression<>(
             ExpressionKind::StructDefinition,

@@ -32,12 +32,12 @@ namespace ionlang {
     struct Type : Construct, ionshared::Named {
         const TypeKind typeKind;
 
-        ionshared::Ptr<TypeQualifiers> qualifiers;
+        std::shared_ptr<TypeQualifiers> qualifiers;
 
         explicit Type(
             std::string name,
             TypeKind kind = TypeKind::UserDefined,
-            ionshared::Ptr<TypeQualifiers> qualifiers = std::make_shared<TypeQualifiers>()
+            std::shared_ptr<TypeQualifiers> qualifiers = std::make_shared<TypeQualifiers>()
         ) noexcept;
     };
 }

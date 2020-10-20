@@ -24,7 +24,7 @@ namespace ionlang::test::compare {
         return util::trim(std::move(output)) == util::trim(*contents);
     }
 
-    bool ir(const ionshared::Ptr<ionir::LlvmLoweringPass>& llvmLoweringPass, const std::string &fileName) {
+    bool ir(const std::shared_ptr<ionir::LlvmLoweringPass>& llvmLoweringPass, const std::string &fileName) {
         std::optional<llvm::Module*> llvmModuleBuffer = llvmLoweringPass->getModuleBuffer();
 
         if (!ionshared::util::hasValue(llvmModuleBuffer)) {

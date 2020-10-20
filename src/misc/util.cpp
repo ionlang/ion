@@ -75,7 +75,7 @@ namespace ionlang::util {
         return std::nullopt;
     }
 
-    std::optional<std::string> findConstructId(const ionshared::Ptr<Construct>& construct) {
+    std::optional<std::string> findConstructId(const std::shared_ptr<Construct>& construct) {
         ConstructKind constructKind = construct->constructKind;
 
         /**
@@ -112,7 +112,7 @@ namespace ionlang::util {
         }
     }
 
-    std::optional<std::string> findStatementId(const ionshared::Ptr<Statement>& statement) noexcept {
+    std::optional<std::string> findStatementId(const std::shared_ptr<Statement>& statement) noexcept {
         // TODO: Implement. Check for derivations from ionshared::Named first, then specific cases (similar to util::findConstructId()).
         // TODO: VariableDecl can easily be implemented as derived.
         switch (statement->statementKind) {

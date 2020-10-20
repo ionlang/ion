@@ -156,7 +156,7 @@ namespace ionlang {
             return std::nullopt;
         }
 
-        // Set the initial token buffer as Unknown.
+        // Set the initial token buffer as unknown.
         Token token = Token(TokenKind::Unknown, this->getCharAsString(), this->index);
 
         // TODO: getSimpleRules() is an expression (being evaluated N times).
@@ -164,7 +164,7 @@ namespace ionlang {
          * Begin by testing against all simple rules until a
          * possible match is found.
          */
-        for (const auto &pair : Grammar::getSimpleRules()) {
+        for (const auto& pair : Grammar::getSimpleRules()) {
             // Test the first letter of the subject to continue.
             if (token.value[0] == pair.first[0]) {
                 /**

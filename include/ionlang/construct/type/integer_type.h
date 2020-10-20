@@ -26,7 +26,7 @@ namespace ionlang {
             IntegerKind kind,
             bool isSigned = true,
 
-            ionshared::Ptr<TypeQualifiers> qualifiers =
+            std::shared_ptr<TypeQualifiers> qualifiers =
                 std::make_shared<TypeQualifiers>()
         );
 

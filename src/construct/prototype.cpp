@@ -5,9 +5,9 @@
 namespace ionlang {
     Prototype::Prototype(
         std::string id,
-        ionshared::Ptr<Args> args,
-        ionshared::Ptr<Type> returnType,
-        ionshared::Ptr<Construct> parent
+        std::shared_ptr<Args> args,
+        std::shared_ptr<Type> returnType,
+        std::shared_ptr<Construct> parent
     ) :
         ConstructWithParent<>(std::move(parent), ConstructKind::Prototype),
         Named{std::move(id)},
@@ -21,14 +21,14 @@ namespace ionlang {
     }
 
     std::optional<std::string> Prototype::getMangledId() {
-        ionshared::Ptr<Construct> localParent = this->getUnboxedParent();
+        std::shared_ptr<Construct> localParent = this->getUnboxedParent();
         ConstructKind parentConstructKind = localParent->constructKind;
 
         if (parentConstructKind != ConstructKind::Extern && parentConstructKind != ConstructKind::Function) {
             return std::nullopt;
         }
 
-        ionshared::Ptr<ConstructWithParent<Module>> localParentAsChild =
+        std::shared_ptr<ConstructWithParent<Module>> localParentAsChild =
             localParent->dynamicCast<ConstructWithParent<Module>>();
 
         // TODO: Need to make sure that mangled id is compatible with LLVM IR ids.

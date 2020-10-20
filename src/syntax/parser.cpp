@@ -13,29 +13,20 @@ namespace ionlang {
     }
 
     bool Parser::expect(TokenKind tokenKind) {
-        if (!this->is(tokenKind)) {
-            std::string expectedTokenKindName = const_name::unknown;
-            std::string actualTokenKindName = const_name::unknown;
-            TokenKind currentTokenKind = this->tokenStream.get().kind;
-
-            if (Grammar::tokenKindNames.contains(tokenKind)) {
-                expectedTokenKindName = Grammar::tokenKindNames.at(tokenKind);
-            }
-
-            if (Grammar::tokenKindNames.contains(currentTokenKind)) {
-                expectedTokenKindName = Grammar::tokenKindNames.at(currentTokenKind);
-            }
-
-            this->diagnosticBuilder
-                ->bootstrap(diagnostic::syntaxExpectedToken)
-                ->setSourceLocation(this->makeSourceLocation())
-                ->formatMessage(expectedTokenKindName, actualTokenKindName)
-                ->finish();
-
-            return false;
+        if (this->is(tokenKind)) {
+            return true;
         }
 
-        return true;
+        this->diagnosticBuilder
+            ->bootstrap(diagnostic::syntaxUnexpectedToken)
+            ->setSourceLocation(this->makeSourceLocation())
+            ->formatMessage(
+                Grammar::findTokenKindNameOr(tokenKind),
+                Grammar::findTokenKindNameOr(this->tokenStream.get().kind)
+            )
+            ->finish();
+
+        return false;
     }
 
     bool Parser::skipOver(TokenKind tokenKind) {
@@ -86,8 +77,8 @@ namespace ionlang {
         return sourceLocation;
     }
 
-    ionshared::Ptr<ErrorMarker> Parser::makeErrorMarker() {
-        ionshared::Ptr<ErrorMarker> errorMarker = std::make_shared<ErrorMarker>();
+    std::shared_ptr<ErrorMarker> Parser::makeErrorMarker() {
+        std::shared_ptr<ErrorMarker> errorMarker = std::make_shared<ErrorMarker>();
 
         errorMarker->sourceLocation = this->makeSourceLocation();
 
@@ -102,13 +93,13 @@ namespace ionlang {
 //        );
     }
 
-    void Parser::finishSourceLocationMapping(const ionshared::Ptr<Construct>& construct) {
+    void Parser::finishSourceLocationMapping(const std::shared_ptr<Construct>& construct) {
         construct->sourceLocation = this->finishSourceLocation();
     }
 
     Parser::Parser(
         TokenStream stream,
-        ionshared::Ptr<ionshared::DiagnosticBuilder> diagnosticBuilder
+        std::shared_ptr<ionshared::DiagnosticBuilder> diagnosticBuilder
     ) noexcept :
         tokenStream(std::move(stream)),
         diagnosticBuilder(std::move(diagnosticBuilder)),
@@ -116,11 +107,11 @@ namespace ionlang {
         //
     }
 
-    ionshared::Ptr<ionshared::DiagnosticBuilder> Parser::getDiagnosticBuilder() const noexcept {
+    std::shared_ptr<ionshared::DiagnosticBuilder> Parser::getDiagnosticBuilder() const noexcept {
         return this->diagnosticBuilder;
     }
 
-    AstPtrResult<> Parser::parseTopLevelFork(const ionshared::Ptr<Module>& parent) {
+    AstPtrResult<> Parser::parseTopLevelFork(const std::shared_ptr<Module>& parent) {
         this->beginSourceLocationMapping();
 
         switch (this->tokenStream.get().kind) {
@@ -151,7 +142,7 @@ namespace ionlang {
         }
     }
 
-    AstPtrResult<Global> Parser::parseGlobal(const ionshared::Ptr<Module>& parent) {
+    AstPtrResult<Global> Parser::parseGlobal(const std::shared_ptr<Module>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordGlobal))
@@ -179,7 +170,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
-        ionshared::Ptr<Global> global = std::make_shared<Global>(
+        std::shared_ptr<Global> global = std::make_shared<Global>(
             parent,
             util::getResultValue(typeResult),
             *id,
@@ -191,7 +182,7 @@ namespace ionlang {
         return global;
     }
 
-    AstPtrResult<Struct> Parser::parseStruct(const ionshared::Ptr<Module>& parent) {
+    AstPtrResult<Struct> Parser::parseStruct(const std::shared_ptr<Module>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordStruct))
@@ -235,12 +226,12 @@ namespace ionlang {
         return std::make_shared<Struct>(parent, *structNameResult, fields);
     }
 
-    AstPtrResult<Block> Parser::parseBlock(const ionshared::Ptr<Construct>& parent) {
+    AstPtrResult<Block> Parser::parseBlock(const std::shared_ptr<Construct>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
-        ionshared::Ptr<Block> block = std::make_shared<Block>(parent);
+        std::shared_ptr<Block> block = std::make_shared<Block>(parent);
 
         while (!this->is(TokenKind::SymbolBraceR)) {
             AstPtrResult<Statement> statement = this->parseStatement(block);
@@ -267,21 +258,19 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
         Scope globalScope =
-            std::make_shared<ionshared::SymbolTable<ionshared::Ptr<Construct>>>();
+            std::make_shared<ionshared::SymbolTable<std::shared_ptr<Construct>>>();
 
-        ionshared::Ptr<Module> module = std::make_shared<Module>(*id, std::make_shared<Context>(globalScope));
+        std::shared_ptr<Module> module = std::make_shared<Module>(*id, std::make_shared<Context>(globalScope));
 
         while (!this->is(TokenKind::SymbolBraceR)) {
             AstPtrResult<> topLevelConstructResult = this->parseTopLevelFork(module);
 
             // TODO: Make notice if it has no value? Or is it enough with the notice under 'parseTopLevel()'?
             if (util::hasValue(topLevelConstructResult)) {
-                ionshared::Ptr<Construct> topLevelConstruct = util::getResultValue(topLevelConstructResult);
+                std::shared_ptr<Construct> topLevelConstruct = util::getResultValue(topLevelConstructResult);
                 std::optional<std::string> name = util::findConstructId(topLevelConstruct);
 
-                if (!name.has_value()) {
-                    throw std::runtime_error("Unexpected construct name to be null");
-                }
+                IONLANG_PARSER_ASSERT(name.has_value())
 
                 // TODO: Ensure we're not re-defining something, issue a notice otherwise.
                 globalScope->set(*name, topLevelConstruct);
@@ -289,9 +278,18 @@ namespace ionlang {
 
             // No more tokens to process.
             if (!this->tokenStream.hasNext() && !this->is(TokenKind::SymbolBraceR)) {
-                // TODO: Use Ast(Ptr)Result<>.
-                throw ionshared::util::quickError(IONLANG_NOTICE_MISC_UNEXPECTED_EOF);
-                //                return this->noticeSentinel->makeError<Module>(IONIR_NOTICE_MISC_UNEXPECTED_EOF);
+                this->getDiagnosticBuilder()
+                    ->bootstrap(diagnostic::syntaxUnexpectedToken)
+
+                    ->formatMessage(
+                        Grammar::findTokenKindNameOr(TokenKind::SymbolBraceR),
+                        Grammar::findTokenKindNameOr(this->tokenStream.get().kind)
+                    )
+
+                    ->setSourceLocation(this->makeSourceLocation())
+                    ->finish();
+
+                return this->makeErrorMarker();
             }
         }
 
@@ -302,7 +300,7 @@ namespace ionlang {
         return module;
     }
 
-    AstPtrResult<VariableDeclStatement> Parser::parseVariableDecl(const ionshared::Ptr<Block>& parent) {
+    AstPtrResult<VariableDeclStatement> Parser::parseVariableDecl(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         AstPtrResult<Type> typeResult = this->parseType();
@@ -318,7 +316,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
 
-        ionshared::Ptr<VariableDeclStatement> variableDecl = std::make_shared<VariableDeclStatement>(VariableDeclStatementOpts{
+        std::shared_ptr<VariableDeclStatement> variableDecl = std::make_shared<VariableDeclStatement>(VariableDeclStatementOpts{
             parent,
             util::getResultValue(typeResult),
             *id,

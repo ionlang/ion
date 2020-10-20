@@ -19,13 +19,13 @@ namespace ionlang {
         struct MatchResult {
             bool success;
 
-            std::optional<std::string> matchedValue = std::nullopt;
+            std::optional<std::string> matchedValue{std::nullopt};
 
-            std::optional<std::string> capturedValue = std::nullopt;
+            std::optional<std::string> capturedValue{std::nullopt};
         };
 
         struct MatchOpts {
-            Token &token;
+            Token& token;
 
             const TokenKind tokenKind;
 
@@ -55,7 +55,7 @@ namespace ionlang {
     public:
         const std::string input;
 
-        explicit Lexer(const std::string &input);
+        explicit Lexer(const std::string& input);
 
         [[nodiscard]] size_t getIndex() const noexcept;
 

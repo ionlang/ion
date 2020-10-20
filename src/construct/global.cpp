@@ -2,8 +2,8 @@
 
 namespace ionlang {
     Global::Global(
-        ionshared::Ptr<Module> parent,
-        ionshared::Ptr<Type> type,
+        std::shared_ptr<Module> parent,
+        std::shared_ptr<Type> type,
         std::string name,
         ionshared::OptPtr<Expression<>> value
     ) :

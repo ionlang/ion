@@ -3,7 +3,7 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    AstPtrResult<Statement> Parser::parseStatement(const ionshared::Ptr<Block>& parent) {
+    AstPtrResult<Statement> Parser::parseStatement(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         AstPtrResult<Statement> statement;
@@ -46,7 +46,7 @@ namespace ionlang {
         return statement;
     }
 
-    AstPtrResult<IfStatement> Parser::parseIfStatement(const ionshared::Ptr<Block>& parent) {
+    AstPtrResult<IfStatement> Parser::parseIfStatement(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIf))
@@ -62,7 +62,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(util::hasValue(consequentBlockResult))
 
-        ionshared::Ptr<Block> consequentBlock = util::getResultValue(consequentBlockResult);
+        std::shared_ptr<Block> consequentBlock = util::getResultValue(consequentBlockResult);
 
         // Parse the alternative block if the else keyword is present.
         AstPtrResult<Block> alternativeBlockResult;
@@ -81,7 +81,7 @@ namespace ionlang {
         }
 
         // Make the if statement construct.
-        ionshared::Ptr<IfStatement> ifStatement = std::make_shared<IfStatement>(IfStatementOpts{
+        std::shared_ptr<IfStatement> ifStatement = std::make_shared<IfStatement>(IfStatementOpts{
             parent,
             util::getResultValue(condition),
             consequentBlock,
@@ -98,7 +98,7 @@ namespace ionlang {
         return ifStatement;
     }
 
-    AstPtrResult<ReturnStatement> Parser::parseReturnStatement(const ionshared::Ptr<Block>& parent) {
+    AstPtrResult<ReturnStatement> Parser::parseReturnStatement(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordReturn))
@@ -126,7 +126,7 @@ namespace ionlang {
         });
     }
 
-    AstPtrResult<AssignmentStatement> Parser::parseAssignmentStatement(const ionshared::Ptr<Block>& parent) {
+    AstPtrResult<AssignmentStatement> Parser::parseAssignmentStatement(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         std::optional<std::string> id = this->parseName();

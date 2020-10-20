@@ -12,17 +12,17 @@ namespace ionlang {
      * Prototype's parent is either a function or extern construct.
      */
     struct Prototype : ConstructWithParent<>, ionshared::Named {
-        ionshared::Ptr<Args> args;
+        std::shared_ptr<Args> args;
 
-        ionshared::Ptr<Type> returnType;
+        std::shared_ptr<Type> returnType;
 
         Prototype(
             std::string id,
-            ionshared::Ptr<Args> args,
-            ionshared::Ptr<Type> returnType,
+            std::shared_ptr<Args> args,
+            std::shared_ptr<Type> returnType,
 
             // TODO: Make parent first arg.
-            ionshared::Ptr<Construct> parent
+            std::shared_ptr<Construct> parent
         );
 
         void accept(Pass &visitor) override;

@@ -6,17 +6,17 @@ namespace ionlang {
     class Pass;
 
     struct IfStatementOpts : StatementOpts {
-        ionshared::Ptr<Construct> condition;
+        std::shared_ptr<Construct> condition;
 
-        ionshared::Ptr<Block> consequentBlock;
+        std::shared_ptr<Block> consequentBlock;
 
         ionshared::OptPtr<Block> alternativeBlock;
     };
 
     struct IfStatement : Statement {
-        ionshared::Ptr<Construct> condition;
+        std::shared_ptr<Construct> condition;
 
-        ionshared::Ptr<Block> consequentBlock;
+        std::shared_ptr<Block> consequentBlock;
 
         ionshared::OptPtr<Block> alternativeBlock;
 

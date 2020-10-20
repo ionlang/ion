@@ -10,13 +10,13 @@ namespace ionlang {
     class Pass;
 
     struct Global : ConstructWithParent<Module>, ionshared::Named {
-        ionshared::Ptr<Type> type;
+        std::shared_ptr<Type> type;
 
         ionshared::OptPtr<Expression<>> value;
 
         Global(
-            ionshared::Ptr<Module> parent,
-            ionshared::Ptr<Type> type,
+            std::shared_ptr<Module> parent,
+            std::shared_ptr<Type> type,
             std::string name,
             ionshared::OptPtr<Expression<>> value = std::nullopt
         );

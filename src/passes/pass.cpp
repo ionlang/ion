@@ -1,12 +1,12 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    Pass::Pass(ionshared::Ptr<ionshared::PassContext> context) :
+    Pass::Pass(std::shared_ptr<ionshared::PassContext> context) :
         ionshared::BasePass<Construct>(std::move(context)) {
         //
     }
 
-    void Pass::visit(ionshared::Ptr<Construct> node) {
+    void Pass::visit(std::shared_ptr<Construct> node) {
         // TODO: Hotfix for circular dep.
         if (node->constructKind == ConstructKind::Resolvable) {
             this->visitResolvable(node->staticCast<Resolvable<>>());
@@ -19,7 +19,7 @@ namespace ionlang {
         this->visitChildren(node);
     }
 
-    void Pass::visitChildren(ionshared::Ptr<Construct> node) {
+    void Pass::visitChildren(std::shared_ptr<Construct> node) {
         // TODO: Will it cause StackOverflow error with large ASTs?
         Ast children = node->getChildNodes();
 
@@ -32,79 +32,79 @@ namespace ionlang {
         }
     }
 
-    void Pass::visitModule(ionshared::Ptr<Module> node) {
+    void Pass::visitModule(std::shared_ptr<Module> node) {
         //
     }
 
-    void Pass::visitPrototype(ionshared::Ptr<Prototype> node) {
+    void Pass::visitPrototype(std::shared_ptr<Prototype> node) {
         //
     }
 
-    void Pass::visitExtern(ionshared::Ptr<Extern> node) {
+    void Pass::visitExtern(std::shared_ptr<Extern> node) {
         //
     }
 
-    void Pass::visitBlock(ionshared::Ptr<Block> node) {
+    void Pass::visitBlock(std::shared_ptr<Block> node) {
         //
     }
 
-    void Pass::visitIfStatement(ionshared::Ptr<IfStatement> node) {
+    void Pass::visitIfStatement(std::shared_ptr<IfStatement> node) {
         //
     }
 
-    void Pass::visitReturnStatement(ionshared::Ptr<ReturnStatement> node) {
+    void Pass::visitReturnStatement(std::shared_ptr<ReturnStatement> node) {
         //
     }
 
-    void Pass::visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> node) {
+    void Pass::visitAssignmentStatement(std::shared_ptr<AssignmentStatement> node) {
         //
     }
 
-    void Pass::visitExprWrapperStatement(ionshared::Ptr<ExprWrapperStatement> node) {
+    void Pass::visitExprWrapperStatement(std::shared_ptr<ExprWrapperStatement> node) {
         //
     }
 
-    void Pass::visitBlockWrapperStatement(ionshared::Ptr<BlockWrapperStatement> node) {
+    void Pass::visitBlockWrapperStatement(std::shared_ptr<BlockWrapperStatement> node) {
         //
     }
 
-    void Pass::visitOperationExpr(ionshared::Ptr<OperationExpr> node) {
+    void Pass::visitOperationExpr(std::shared_ptr<OperationExpr> node) {
         //
     }
 
-    void Pass::visitCallExpr(ionshared::Ptr<CallExpr> node) {
+    void Pass::visitCallExpr(std::shared_ptr<CallExpr> node) {
         //
     }
 
-    void Pass::visitVariableRefExpr(ionshared::Ptr<VariableRefExpr> node) {
+    void Pass::visitVariableRefExpr(std::shared_ptr<VariableRefExpr> node) {
         //
     }
 
-    void Pass::visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> node) {
+    void Pass::visitBooleanLiteral(std::shared_ptr<BooleanLiteral> node) {
         //
     }
 
-    void Pass::visitCharLiteral(ionshared::Ptr<CharLiteral> node) {
+    void Pass::visitCharLiteral(std::shared_ptr<CharLiteral> node) {
         //
     }
 
-    void Pass::visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> node) {
+    void Pass::visitIntegerLiteral(std::shared_ptr<IntegerLiteral> node) {
         //
     }
 
-    void Pass::visitStringLiteral(ionshared::Ptr<StringLiteral> node) {
+    void Pass::visitStringLiteral(std::shared_ptr<StringLiteral> node) {
         //
     }
 
-    void Pass::visitVoidType(ionshared::Ptr<VoidType> node) {
+    void Pass::visitVoidType(std::shared_ptr<VoidType> node) {
         //
     }
 
-    void Pass::visitBooleanType(ionshared::Ptr<BooleanType> node) {
+    void Pass::visitBooleanType(std::shared_ptr<BooleanType> node) {
         //
     }
 
-    void Pass::visitUserDefinedType(ionshared::Ptr<UserDefinedType> node) {
+    void Pass::visitUserDefinedType(std::shared_ptr<UserDefinedType> node) {
         //
     }
 
@@ -112,19 +112,19 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitFunction(ionshared::Ptr<Function> node) {
+    void Pass::visitFunction(std::shared_ptr<Function> node) {
         //
     }
 
-    void Pass::visitVariableDecl(ionshared::Ptr<VariableDeclStatement> node) {
+    void Pass::visitVariableDecl(std::shared_ptr<VariableDeclStatement> node) {
         //
     }
 
-    void Pass::visitScopeAnchor(ionshared::Ptr<ionshared::Scoped<Construct>> node) {
+    void Pass::visitScopeAnchor(std::shared_ptr<ionshared::Scoped<Construct>> node) {
         //
     }
 
-    void Pass::visitIntegerType(ionshared::Ptr<IntegerType> node) {
+    void Pass::visitIntegerType(std::shared_ptr<IntegerType> node) {
         //
     }
 
@@ -132,19 +132,19 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitErrorMarker(ionshared::Ptr<ErrorMarker> node) {
+    void Pass::visitErrorMarker(std::shared_ptr<ErrorMarker> node) {
         //
     }
 
-    void Pass::visitAttribute(ionshared::Ptr<Attribute> node) {
+    void Pass::visitAttribute(std::shared_ptr<Attribute> node) {
         //
     }
 
-    void Pass::visitStruct(ionshared::Ptr<Struct> node) {
+    void Pass::visitStruct(std::shared_ptr<Struct> node) {
         //
     }
 
-    void Pass::visitStructDefinition(ionshared::Ptr<StructDefinition> construct) {
+    void Pass::visitStructDefinition(std::shared_ptr<StructDefinition> construct) {
         //
     }
 }

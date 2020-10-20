@@ -4,7 +4,7 @@
 namespace ionlang {
     ionshared::OptPtr<Construct> NameResolutionPass::findGlobalConstruct(
         std::string name,
-        const ionshared::Ptr<Construct>& owner
+        const std::shared_ptr<Construct>& owner
     ) {
         if (owner->constructKind != ConstructKind::Block) {
             // TODO: Better error.
@@ -32,14 +32,14 @@ namespace ionlang {
     }
 
     NameResolutionPass::NameResolutionPass(
-        ionshared::Ptr<ionshared::PassContext> context
-    ) :
+        std::shared_ptr<ionshared::PassContext> context
+    ) noexcept :
         Pass(std::move(context)),
         scope() {
         //
     }
 
-    void NameResolutionPass::visitModule(ionshared::Ptr<Module> node) {
+    void NameResolutionPass::visitModule(std::shared_ptr<Module> node) {
         // TODO: Is it push_back() or push_front()?
         this->scope.push_back(node->context->getGlobalScope());
     }
@@ -50,14 +50,11 @@ namespace ionlang {
             return;
         }
 
-        std::cout << "Resolving: "
-            << *node->name;
-
         /**
          * NOTE: If the resolvable is not resolved, it's guaranteed
          * to have its kind, name and context defined.
          */
-        ionshared::Ptr<Construct> owner = *node->context;
+        std::shared_ptr<Construct> owner = *node->context;
         std::string name = *node->name;
 
         auto throwUndefinedReference = [name]{
@@ -107,7 +104,7 @@ namespace ionlang {
             }
 
             case ResolvableKind::PrototypeReturnType: {
-                ionshared::Ptr<Prototype> prototype;
+                std::shared_ptr<Prototype> prototype;
 
                 ionshared::OptPtr<Construct> functionLikeTargetResult =
                     NameResolutionPass::findGlobalConstruct(name, owner);
@@ -116,7 +113,7 @@ namespace ionlang {
                     throwUndefinedReference();
                 }
 
-                ionshared::Ptr<Construct> functionLikeTarget =
+                std::shared_ptr<Construct> functionLikeTarget =
                     *functionLikeTargetResult;
 
                 ensureFunctionLikeConstructKind(functionLikeTarget->constructKind);
@@ -147,7 +144,7 @@ namespace ionlang {
             }
 
             default: {
-                // TODO: Better error/use diagnostics.
+                // TODO: Better error/use diagnostics (internal error).
                 throw std::runtime_error("Unsupported resolvable kind");
             }
         }
@@ -157,12 +154,12 @@ namespace ionlang {
         // TODO: Commented out as migrated from IonIR.
 //        switch (owner->getConstructKind()) {
 //            case ConstructKind::Inst: {
-//                ionshared::Ptr<Inst> inst = owner->dynamicCast<Inst>();
-//                ionshared::Ptr<BasicBlock> basicBlock = inst->getParent();
+//                std::shared_ptr<Inst> inst = owner->dynamicCast<Inst>();
+//                std::shared_ptr<BasicBlock> basicBlock = inst->getParent();
 //                ionshared::PtrSymbolTable<Inst> basicBlockSymbolTable = basicBlock->getSymbolTable();
-//                ionshared::Ptr<FunctionBody> functionBody = basicBlock->getParent();
+//                std::shared_ptr<FunctionBody> functionBody = basicBlock->getParent();
 //                PtrSymbolTable<BasicBlock> functionSymbolTable = functionBody->getSymbolTable();
-//                ionshared::Ptr<Module> module = functionBody->getParent()->getPrototype()->getParent();
+//                std::shared_ptr<Module> module = functionBody->getParent()->getPrototype()->getParent();
 //                ionshared::PtrSymbolTable<Construct> moduleSymbolTable = module->getContext()->getGlobalScope();
 //
 //                /**
@@ -205,7 +202,7 @@ namespace ionlang {
 //        }
     }
 
-    void NameResolutionPass::visitScopeAnchor(ionshared::Ptr<ionshared::Scoped<Construct>> node) {
+    void NameResolutionPass::visitScopeAnchor(std::shared_ptr<ionshared::Scoped<Construct>> node) {
         // TODO: ScopeStack should be pushed & popped, but its never popped.
         // TODO: CRITICAL: Throwing SEGFAULT because node is NULL (casting fails).
         //        this->scopeStack.add(node->getSymbolTable());

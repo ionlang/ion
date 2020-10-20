@@ -22,9 +22,9 @@ namespace ionlang {
     private:
         TokenStream tokenStream;
 
-        ionshared::Ptr<ionshared::DiagnosticBuilder> diagnosticBuilder;
+        std::shared_ptr<ionshared::DiagnosticBuilder> diagnosticBuilder;
 
-        ionshared::Ptr<ionshared::SourceMap<ionshared::Ptr<Construct>>> sourceMap;
+        std::shared_ptr<ionshared::SourceMap<std::shared_ptr<Construct>>> sourceMap;
 
         /**
          * A stack of source location mapping beginnings, containing a
@@ -50,11 +50,11 @@ namespace ionlang {
 
         ionshared::SourceLocation finishSourceLocation();
 
-        ionshared::Ptr<ErrorMarker> makeErrorMarker();
+        std::shared_ptr<ErrorMarker> makeErrorMarker();
 
         void mapSourceLocation(const AstPtrResult<>& construct);
 
-        void finishSourceLocationMapping(const ionshared::Ptr<Construct>& construct);
+        void finishSourceLocationMapping(const std::shared_ptr<Construct>& construct);
 
         template<typename T = Construct>
         AstPtrResult<T> sourceMapCallback(const std::function<AstPtrResult<>()>& callback) {
@@ -76,13 +76,13 @@ namespace ionlang {
         explicit Parser(
             TokenStream stream,
 
-            ionshared::Ptr<ionshared::DiagnosticBuilder> diagnosticBuilder =
-                ionshared::Ptr<ionshared::DiagnosticBuilder>()
+            std::shared_ptr<ionshared::DiagnosticBuilder> diagnosticBuilder =
+                std::shared_ptr<ionshared::DiagnosticBuilder>()
         ) noexcept;
 
-        [[nodiscard]] ionshared::Ptr<ionshared::DiagnosticBuilder> getDiagnosticBuilder() const noexcept;
+        [[nodiscard]] std::shared_ptr<ionshared::DiagnosticBuilder> getDiagnosticBuilder() const noexcept;
 
-        AstPtrResult<> parseTopLevelFork(const ionshared::Ptr<Module>& parent);
+        AstPtrResult<> parseTopLevelFork(const std::shared_ptr<Module>& parent);
 
         /**
          * Parses a integer literal in the form of long (or integer 64).
@@ -102,17 +102,17 @@ namespace ionlang {
         AstPtrResult<VoidType> parseVoidType();
 
         AstPtrResult<BooleanType> parseBooleanType(
-            const ionshared::Ptr<TypeQualifiers>& qualifiers =
+            const std::shared_ptr<TypeQualifiers>& qualifiers =
                 std::make_shared<TypeQualifiers>()
         );
 
         AstPtrResult<IntegerType> parseIntegerType(
-            const ionshared::Ptr<TypeQualifiers>& qualifiers =
+            const std::shared_ptr<TypeQualifiers>& qualifiers =
                 std::make_shared<TypeQualifiers>()
         );
 
         AstPtrResult<UserDefinedType> parseUserDefinedType(
-            const ionshared::Ptr<TypeQualifiers>& qualifiers =
+            const std::shared_ptr<TypeQualifiers>& qualifiers =
                 std::make_shared<TypeQualifiers>()
         );
 
@@ -120,62 +120,62 @@ namespace ionlang {
 
         AstPtrResult<Args> parseArgs();
 
-        AstPtrResult<Attribute> parseAttribute(const ionshared::Ptr<Construct>& parent);
+        AstPtrResult<Attribute> parseAttribute(const std::shared_ptr<Construct>& parent);
 
-        AstResult<Attributes> parseAttributes(const ionshared::Ptr<Construct>& parent);
+        AstResult<Attributes> parseAttributes(const std::shared_ptr<Construct>& parent);
 
-        AstPtrResult<Prototype> parsePrototype(const ionshared::Ptr<Module>& parent);
+        AstPtrResult<Prototype> parsePrototype(const std::shared_ptr<Module>& parent);
 
-        AstPtrResult<Extern> parseExtern(const ionshared::Ptr<Module>& parent);
+        AstPtrResult<Extern> parseExtern(const std::shared_ptr<Module>& parent);
 
-        AstPtrResult<Function> parseFunction(const ionshared::Ptr<Module>& parent);
+        AstPtrResult<Function> parseFunction(const std::shared_ptr<Module>& parent);
 
-        AstPtrResult<Global> parseGlobal(const ionshared::Ptr<Module>& parent);
+        AstPtrResult<Global> parseGlobal(const std::shared_ptr<Module>& parent);
 
-        AstPtrResult<Struct> parseStruct(const ionshared::Ptr<Module>& parent);
+        AstPtrResult<Struct> parseStruct(const std::shared_ptr<Module>& parent);
 
         AstPtrResult<Expression<>> parseLiteral();
 
-        AstPtrResult<Expression<>> parseExpression(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<Expression<>> parseExpression(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<Expression<>> parsePrimaryExpr(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<Expression<>> parsePrimaryExpr(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<Expression<>> parseParenthesesExpr(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<Expression<>> parseParenthesesExpr(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<Expression<>> parseIdExpr(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<Expression<>> parseIdExpr(const std::shared_ptr<Block>& parent);
 
         AstPtrResult<Expression<>> parseOperationExpr(
             uint32_t expressionPrecedence,
-            ionshared::Ptr<Expression<>> leftSideExpression,
-            const ionshared::Ptr<Block>& parent
+            std::shared_ptr<Expression<>> leftSideExpression,
+            const std::shared_ptr<Block>& parent
         );
 
-        AstPtrResult<CallExpr> parseCallExpr(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<CallExpr> parseCallExpr(const std::shared_ptr<Block>& parent);
 
         AstPtrResult<StructDefinition> parseStructDefinitionExpr(
-            const ionshared::Ptr<Block>& parent
+            const std::shared_ptr<Block>& parent
         );
 
-        AstPtrResult<Block> parseBlock(const ionshared::Ptr<Construct>& parent);
+        AstPtrResult<Block> parseBlock(const std::shared_ptr<Construct>& parent);
 
         AstPtrResult<Module> parseModule();
 
-        AstPtrResult<Statement> parseStatement(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<Statement> parseStatement(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<VariableDeclStatement> parseVariableDecl(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<VariableDeclStatement> parseVariableDecl(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<IfStatement> parseIfStatement(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<IfStatement> parseIfStatement(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<ReturnStatement> parseReturnStatement(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<ReturnStatement> parseReturnStatement(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<AssignmentStatement> parseAssignmentStatement(const ionshared::Ptr<Block>& parent);
+        AstPtrResult<AssignmentStatement> parseAssignmentStatement(const std::shared_ptr<Block>& parent);
 
         std::optional<std::string> parseLine();
 
         // TODO: Add comment-parsing support.
 
         template<typename T = Construct>
-        AstPtrResult<Resolvable<T>> parseResolvable(ionshared::Ptr<Construct> owner) {
+        AstPtrResult<Resolvable<T>> parseResolvable(std::shared_ptr<Construct> owner) {
             this->beginSourceLocationMapping();
 
             std::optional<std::string> name = this->parseName();

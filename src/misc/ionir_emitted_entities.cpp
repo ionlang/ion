@@ -7,13 +7,13 @@ namespace ionlang {
     }
 
     void IonIrEmittedEntities::set(
-        const ionshared::Ptr<Construct> &key,
-        const ionshared::Ptr<ionir::Construct> &value
+        const std::shared_ptr<Construct> &key,
+        const std::shared_ptr<ionir::Construct> &value
     ) {
         this->entities.set(key, value, true);
     }
 
-    bool IonIrEmittedEntities::contains(ionshared::Ptr<Construct> key) const {
+    bool IonIrEmittedEntities::contains(std::shared_ptr<Construct> key) const {
         return this->entities.contains(std::move(key));
     }
 }

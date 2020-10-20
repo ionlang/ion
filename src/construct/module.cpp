@@ -1,7 +1,7 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    Module::Module(std::string id, ionshared::Ptr<Context> context) :
+    Module::Module(std::string id, std::shared_ptr<Context> context) :
         Construct(ConstructKind::Module),
         ionshared::Named{std::move(id)},
         context(std::move(context)) {

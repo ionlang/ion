@@ -11,6 +11,7 @@
 #include <ionlang/lexical/token_kind.h>
 #include <ionlang/misc/regex.h>
 #include <ionlang/misc/helpers.h>
+#include <ionlang/const/const_name.h>
 
 namespace ionlang {
     typedef std::vector<std::pair<std::string, TokenKind>> SimplePairVector;
@@ -50,6 +51,11 @@ namespace ionlang {
         [[nodiscard]] static const TokenKindVector& getBuiltInTypes();
 
         [[nodiscard]] static bool getIsInitialized();
+
+        [[nodiscard]] static std::string findTokenKindNameOr(
+            TokenKind tokenKind,
+            std::string alternative = const_name::unknown
+        );
 
         static void init();
     };

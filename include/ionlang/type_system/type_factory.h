@@ -5,37 +5,37 @@
 #include <ionlang/construct/type/void_type.h>
 
 namespace ionlang::type_factory {
-    [[nodiscard]] ionshared::Ptr<IntegerType> typeInteger(
+    [[nodiscard]] std::shared_ptr<IntegerType> typeInteger(
         IntegerKind integerKind,
         bool isSigned = true
     );
 
-    [[nodiscard]] ionshared::Ptr<IntegerType> typeInteger8(
+    [[nodiscard]] std::shared_ptr<IntegerType> typeInteger8(
         bool isSigned = true
     );
 
-    [[nodiscard]] ionshared::Ptr<IntegerType> typeInteger16(
+    [[nodiscard]] std::shared_ptr<IntegerType> typeInteger16(
         bool isSigned = true
     );
 
-    [[nodiscard]] ionshared::Ptr<IntegerType> typeInteger32(
+    [[nodiscard]] std::shared_ptr<IntegerType> typeInteger32(
         bool isSigned = true
     );
 
-    [[nodiscard]] ionshared::Ptr<IntegerType> typeInteger64(
+    [[nodiscard]] std::shared_ptr<IntegerType> typeInteger64(
         bool isSigned = true
     );
 
-    [[nodiscard]] ionshared::Ptr<IntegerType> typeInteger128(
+    [[nodiscard]] std::shared_ptr<IntegerType> typeInteger128(
         bool isSigned = true
     );
 
-    [[nodiscard]] ionshared::Ptr<BooleanType> typeBoolean();
+    [[nodiscard]] std::shared_ptr<BooleanType> typeBoolean();
 
-    [[nodiscard]] ionshared::Ptr<IntegerType> typeChar();
+    [[nodiscard]] std::shared_ptr<IntegerType> typeChar();
 
     // TODO: return type.
-    [[nodiscard]] ionshared::Ptr<IntegerType> typeString();
+    [[nodiscard]] std::shared_ptr<IntegerType> typeString();
 
-    [[nodiscard]] ionshared::Ptr<VoidType> typeVoid();
+    [[nodiscard]] std::shared_ptr<VoidType> typeVoid();
 }

@@ -1,7 +1,7 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    Attribute::Attribute(ionshared::Ptr<Construct> parent, std::string id) :
+    Attribute::Attribute(std::shared_ptr<Construct> parent, std::string id) :
         ConstructWithParent<>(std::move(parent), ConstructKind::Attribute),
         ionshared::Named{std::move(id)} {
         //

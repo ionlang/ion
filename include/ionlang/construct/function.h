@@ -10,16 +10,16 @@ namespace ionlang {
     class Pass;
 
     struct Function : ConstructWithParent<Module> {
-        ionshared::Ptr<Prototype> prototype;
+        std::shared_ptr<Prototype> prototype;
 
-        ionshared::Ptr<Block> body;
+        std::shared_ptr<Block> body;
 
         ionshared::PtrSymbolTable<LocalVariableDescriptor> localVariables;
 
         Function(
-            ionshared::Ptr<Module> parent,
-            ionshared::Ptr<Prototype> prototype,
-            ionshared::Ptr<Block> body
+            std::shared_ptr<Module> parent,
+            std::shared_ptr<Prototype> prototype,
+            std::shared_ptr<Block> body
         );
 
         void accept(Pass &visitor) override;

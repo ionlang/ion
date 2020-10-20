@@ -17,7 +17,7 @@ namespace ionlang::diagnostic {
 
     IONLANG_NOTICE_DEFINE(
         internalUnexpectedToken,
-        ionshared::DiagnosticKind::Error,
+        ionshared::DiagnosticKind::InternalError,
         "Unexpected token",
         std::nullopt
     );
@@ -51,9 +51,16 @@ namespace ionlang::diagnostic {
     );
 
     IONLANG_NOTICE_DEFINE(
-        syntaxExpectedToken,
+        syntaxUnexpectedToken,
         ionshared::DiagnosticKind::Error,
         "Expected token '%s' but got '%s'",
+        std::nullopt
+    );
+
+    IONLANG_NOTICE_DEFINE(
+        syntaxUnexpectedEof,
+        ionshared::DiagnosticKind::Error,
+        "Expected token '%s' but got end of file",
         std::nullopt
     );
 

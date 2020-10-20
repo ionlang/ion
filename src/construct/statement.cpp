@@ -2,7 +2,7 @@
 
 namespace ionlang {
     Statement::Statement(
-        ionshared::Ptr<Block> parent,
+        std::shared_ptr<Block> parent,
         StatementKind kind,
         ionshared::OptPtr<Statement> yields
     ) :

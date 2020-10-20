@@ -9,17 +9,17 @@ namespace ionlang {
     class Pass;
 
     struct VariableDeclStatementOpts : StatementOpts {
-        ionshared::Ptr<Type> type;
+        std::shared_ptr<Type> type;
 
         std::string id;
 
-        ionshared::Ptr<Expression<>> value;
+        std::shared_ptr<Expression<>> value;
     };
 
     struct VariableDeclStatement : Statement, ionshared::Named {
-        ionshared::Ptr<Type> type;
+        std::shared_ptr<Type> type;
 
-        ionshared::Ptr<Expression<>> value;
+        std::shared_ptr<Expression<>> value;
 
         explicit VariableDeclStatement(const VariableDeclStatementOpts& opts) noexcept;
 

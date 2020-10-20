@@ -18,12 +18,12 @@ namespace ionlang {
     // TODO: Must be verified to contain a single terminal instruction at the end?
     struct Block : ConstructWithParent<>, ionshared::Scoped<VariableDeclStatement> {
         // TODO: When statements are mutated, the symbol table must be cleared and re-populated.
-        std::vector<ionshared::Ptr<Statement>> statements;
+        std::vector<std::shared_ptr<Statement>> statements;
 
         explicit Block(
-            ionshared::Ptr<Construct> parent,
+            std::shared_ptr<Construct> parent,
 
-            std::vector<ionshared::Ptr<Statement>> statements = {},
+            std::vector<std::shared_ptr<Statement>> statements = {},
 
             const ionshared::PtrSymbolTable<VariableDeclStatement>& symbolTable =
                 ionshared::util::makePtrSymbolTable<VariableDeclStatement>()
@@ -39,17 +39,17 @@ namespace ionlang {
          * relocation is performed, and the statement's parent
          * is left intact.
          */
-        void appendStatement(const ionshared::Ptr<Statement>& statement);
+        void appendStatement(const std::shared_ptr<Statement>& statement);
 
         /**
          * Move the statement at the provided order index from this block
          * to another. The statement will be removed from the local vector,
          * and registered on the target block's symbol table.
          */
-        bool relocateStatement(size_t orderIndex, const ionshared::Ptr<Block>& target);
+        bool relocateStatement(size_t orderIndex, const std::shared_ptr<Block>& target);
 
         size_t relocateStatements(
-            const ionshared::Ptr<Block>& target,
+            const std::shared_ptr<Block>& target,
             size_t from = 0,
             std::optional<size_t> to = std::nullopt
         );
@@ -60,7 +60,7 @@ namespace ionlang {
          * no end index was provided) to a new basic block with the same
          * parent as this local block.
          */
-        [[nodiscard]] ionshared::Ptr<Block> slice(
+        [[nodiscard]] std::shared_ptr<Block> slice(
             size_t from,
             std::optional<size_t> to = std::nullopt
         );
@@ -69,9 +69,9 @@ namespace ionlang {
          * Attempt to find the index location of a statement. Returns null
          * if not found.
          */
-        [[nodiscard]] std::optional<size_t> locate(ionshared::Ptr<Statement> statement) const;
+        [[nodiscard]] std::optional<size_t> locate(std::shared_ptr<Statement> statement) const;
 
-        [[nodiscard]] ionshared::Ptr<StatementBuilder> createBuilder();
+        [[nodiscard]] std::shared_ptr<StatementBuilder> createBuilder();
 
         /**
          * Loops through all statements collecting terminal statements
@@ -79,7 +79,7 @@ namespace ionlang {
          * Search will be performed only on the local symbol table, so
          * nested blocks will be ignored.
          */
-        [[nodiscard]] std::vector<ionshared::Ptr<Statement>> findTerminals() const;
+        [[nodiscard]] std::vector<std::shared_ptr<Statement>> findTerminals() const;
 
         [[nodiscard]] ionshared::OptPtr<Statement> findFirstStatement() noexcept;
 

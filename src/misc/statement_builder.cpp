@@ -1,23 +1,23 @@
 #include <ionlang/misc/statement_builder.h>
 
 namespace ionlang {
-    StatementBuilder::StatementBuilder(ionshared::Ptr<Block> block) :
+    StatementBuilder::StatementBuilder(std::shared_ptr<Block> block) :
         block(std::move(block)) {
         //
     }
 
-    ionshared::Ptr<Block> StatementBuilder::getBlock() const noexcept {
+    std::shared_ptr<Block> StatementBuilder::getBlock() const noexcept {
         return this->block;
     }
 
-    void StatementBuilder::appendStatement(const ionshared::Ptr<Statement> &statement) {
+    void StatementBuilder::appendStatement(const std::shared_ptr<Statement> &statement) {
         this->block->appendStatement(statement);
     }
 
-    ionshared::Ptr<VariableDeclStatement> StatementBuilder::createVariableDecl(
-        ionshared::Ptr<Type> type,
+    std::shared_ptr<VariableDeclStatement> StatementBuilder::createVariableDecl(
+        std::shared_ptr<Type> type,
         std::string id,
-        ionshared::Ptr<Expression<>> value
+        std::shared_ptr<Expression<>> value
     ) {
         return this->make<VariableDeclStatement, VariableDeclStatementOpts>(VariableDeclStatementOpts{
             this->block,
@@ -27,9 +27,9 @@ namespace ionlang {
         });
     }
 
-    ionshared::Ptr<AssignmentStatement> StatementBuilder::createAssignment(
-        ionshared::Ptr<VariableDeclStatement> variableDeclStatement,
-        ionshared::Ptr<Expression<>> value
+    std::shared_ptr<AssignmentStatement> StatementBuilder::createAssignment(
+        std::shared_ptr<VariableDeclStatement> variableDeclStatement,
+        std::shared_ptr<Expression<>> value
     ) {
         return this->make<AssignmentStatement, AssignmentStatementOpts>(AssignmentStatementOpts{
             this->block,
@@ -38,9 +38,9 @@ namespace ionlang {
         });
     }
 
-    ionshared::Ptr<IfStatement> StatementBuilder::createIf(
-        ionshared::Ptr<Construct> condition,
-        ionshared::Ptr<Block> consequentBlock,
+    std::shared_ptr<IfStatement> StatementBuilder::createIf(
+        std::shared_ptr<Construct> condition,
+        std::shared_ptr<Block> consequentBlock,
         ionshared::OptPtr<Block> alternativeBlock
     ) {
         return this->make<IfStatement, IfStatementOpts>(IfStatementOpts{
@@ -51,7 +51,7 @@ namespace ionlang {
         });
     }
 
-    ionshared::Ptr<ReturnStatement> StatementBuilder::createReturn(ionshared::OptPtr<Expression<>> value) {
+    std::shared_ptr<ReturnStatement> StatementBuilder::createReturn(ionshared::OptPtr<Expression<>> value) {
         return this->make<ReturnStatement, ReturnStatementOpts>(ReturnStatementOpts{
             this->block,
             std::move(value)

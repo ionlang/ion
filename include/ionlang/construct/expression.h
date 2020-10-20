@@ -41,12 +41,12 @@ namespace ionlang {
             //
         }
 
-        Expression(ExpressionKind kind, ionshared::Ptr<T> type) noexcept :
+        Expression(ExpressionKind kind, std::shared_ptr<T> type) noexcept :
             Expression(kind, Resolvable<T>::make(std::move(type))) {
             //
         }
 
-        ionshared::Ptr<Expression<>> flatten() {
+        std::shared_ptr<Expression<>> flatten() {
             return this->staticCast<Expression<>>();
         }
     };

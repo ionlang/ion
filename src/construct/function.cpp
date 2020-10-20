@@ -2,9 +2,9 @@
 
 namespace ionlang {
     Function::Function(
-        ionshared::Ptr<Module> parent,
-        ionshared::Ptr<Prototype> prototype,
-        ionshared::Ptr<Block> body
+        std::shared_ptr<Module> parent,
+        std::shared_ptr<Prototype> prototype,
+        std::shared_ptr<Block> body
     ) :
         ConstructWithParent<Module>(std::move(parent), ConstructKind::Function),
         prototype(std::move(prototype)),

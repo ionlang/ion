@@ -5,7 +5,7 @@
 namespace ionlang {
     UserDefinedType::UserDefinedType(
         std::string name,
-        ionshared::Ptr<TypeQualifiers> qualifiers
+        std::shared_ptr<TypeQualifiers> qualifiers
     ) noexcept :
         Type(name, TypeKind::UserDefined, std::move(qualifiers)) {
         //

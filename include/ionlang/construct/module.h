@@ -13,11 +13,11 @@ namespace ionlang {
     typedef ionshared::Context<Construct> Context;
 
     struct Module : Construct, ionshared::Named {
-        ionshared::Ptr<Context> context;
+        std::shared_ptr<Context> context;
 
         explicit Module(
             std::string id,
-            ionshared::Ptr<Context> context = std::make_shared<Context>()
+            std::shared_ptr<Context> context = std::make_shared<Context>()
         );
 
         void accept(Pass &visitor) override;

@@ -108,9 +108,7 @@ namespace ionlang {
 
         OperatorLessThan,
 
-        SingleLineComment,
-
-        MultiLineComment
+        Comment
     };
 
     std::ostream &operator<<(std::ostream &stream, const TokenKind &tokenKind);

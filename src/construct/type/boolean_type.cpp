@@ -3,7 +3,7 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    BooleanType::BooleanType(ionshared::Ptr<TypeQualifiers> qualifiers) :
+    BooleanType::BooleanType(std::shared_ptr<TypeQualifiers> qualifiers) :
         Type(const_name::typeBool, TypeKind::Boolean, std::move(qualifiers)) {
         //
     }

@@ -57,7 +57,7 @@ TEST(ParserTest, ParseUserDefinedType) {
 
     EXPECT_TRUE(util::hasValue(typeResult));
 
-    ionshared::Ptr<Type> type = util::getResultValue(typeResult);
+    std::shared_ptr<Type> type = util::getResultValue(typeResult);
 
     EXPECT_EQ(type->typeKind, TypeKind::UserDefined);
     EXPECT_EQ(type->name, test::constant::foo);
@@ -72,7 +72,7 @@ TEST(ParserTest, ParseVoidType) {
 
     EXPECT_TRUE(util::hasValue(typeResult));
 
-    ionshared::Ptr<Type> type = util::getResultValue(typeResult);
+    std::shared_ptr<Type> type = util::getResultValue(typeResult);
 
     EXPECT_EQ(type->name, const_name::typeVoid);
     EXPECT_EQ(type->typeKind, TypeKind::Void);
@@ -87,14 +87,14 @@ TEST(ParserTest, ParseInteger32Type) {
 
     EXPECT_TRUE(util::hasValue(typeResult));
 
-    ionshared::Ptr<Type> type = util::getResultValue(typeResult);
+    std::shared_ptr<Type> type = util::getResultValue(typeResult);
 
     EXPECT_EQ(type->name, const_name::typeInt32);
     EXPECT_EQ(type->typeKind, TypeKind::Integer);
 
     // Convert to integer type and inspect.
     // TODO: Is static cast correct here, or should it be a dynamic pointer cast?
-    ionshared::Ptr<IntegerType> integerType = type->staticCast<IntegerType>();
+    std::shared_ptr<IntegerType> integerType = type->staticCast<IntegerType>();
 
     EXPECT_EQ(integerType->integerKind, IntegerKind::Int32);
     EXPECT_TRUE(integerType->isSigned);
@@ -145,7 +145,7 @@ TEST(ParserTest, ParseEmptyPrototype) {
 
     EXPECT_TRUE(util::hasValue(prototypeResult));
 
-    ionshared::Ptr<Prototype> prototype = util::getResultValue(prototypeResult);
+    std::shared_ptr<Prototype> prototype = util::getResultValue(prototypeResult);
 
     // Verify return type.
     EXPECT_EQ(prototype->returnType->name, "type");
@@ -174,7 +174,7 @@ TEST(ParserTest, ParseEmptyFunction) {
 
     EXPECT_TRUE(util::hasValue(functionResult));
 
-    ionshared::Ptr<Function> function = util::getResultValue(functionResult);
+    std::shared_ptr<Function> function = util::getResultValue(functionResult);
 
     EXPECT_TRUE(function->verify());
     EXPECT_TRUE(function->body->symbolTable->isEmpty());
@@ -196,7 +196,7 @@ TEST(ParserTest, ParseFunction) {
 
     EXPECT_TRUE(util::hasValue(functionResult));
 
-    ionshared::Ptr<Function> function = util::getResultValue(functionResult);
+    std::shared_ptr<Function> function = util::getResultValue(functionResult);
 
     /**
      * Function should be able to be verified successfully,
@@ -222,7 +222,7 @@ TEST(ParserTest, ParseExtern) {
 
     EXPECT_TRUE(util::hasValue(externResult));
 
-    ionshared::Ptr<Prototype> prototype = util::getResultValue(externResult)->prototype;
+    std::shared_ptr<Prototype> prototype = util::getResultValue(externResult)->prototype;
 
     EXPECT_EQ(prototype->name, test::constant::foobar);
     EXPECT_TRUE(prototype->args->items->isEmpty());
@@ -249,21 +249,21 @@ TEST(ParserTest, ParseBinaryOperationExpr) {
         ExpressionKind::Operation
     );
 
-    ionshared::Ptr<OperationExpr> binaryOperationExpr =
+    std::shared_ptr<OperationExpr> binaryOperationExpr =
         util::getResultValue(operationExprResult)->dynamicCast<OperationExpr>();
 
     EXPECT_EQ(binaryOperationExpr->operation, IntrinsicOperatorKind::Addition);
     EXPECT_EQ(binaryOperationExpr->leftSideValue->expressionKind, ExpressionKind::IntegerLiteral);
     EXPECT_TRUE(ionshared::util::hasValue(binaryOperationExpr->rightSideValue));
 
-    ionshared::Ptr<Expression<>> rightSide = *binaryOperationExpr->rightSideValue;
+    std::shared_ptr<Expression<>> rightSide = *binaryOperationExpr->rightSideValue;
 
     EXPECT_EQ(rightSide->expressionKind, ExpressionKind::IntegerLiteral);
 
-    ionshared::Ptr<IntegerLiteral> leftSideIntegerLiteral =
+    std::shared_ptr<IntegerLiteral> leftSideIntegerLiteral =
         binaryOperationExpr->leftSideValue->dynamicCast<IntegerLiteral>();
 
-    ionshared::Ptr<IntegerLiteral> rightSideIntegerLiteral =
+    std::shared_ptr<IntegerLiteral> rightSideIntegerLiteral =
         rightSide->dynamicCast<IntegerLiteral>();
 
     // TODO: Consider checking value types as well?

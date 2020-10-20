@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ionshared/container/stack.h>
+#include <ionshared/container/lowering_symbol_table.h>
 #include <ionir/construct/basic_block.h>
 #include <ionlang/misc/ionir_emitted_entities.h>
 #include <ionlang/passes/pass.h>
@@ -8,42 +8,28 @@
 namespace ionlang {
     class IonIrLoweringPass : public Pass {
     private:
-        struct Buffers {
-            ionshared::OptPtr<ionir::Module> module = std::nullopt;
+        struct IonIrBuffers {
+            ionshared::Stack<std::shared_ptr<ionir::Module>> modules{};
 
-            ionshared::OptPtr<ionir::Function> function = std::nullopt;
+            ionshared::Stack<std::shared_ptr<ionir::Function>> functions{};
 
-            ionshared::OptPtr<ionir::BasicBlock> basicBlock = std::nullopt;
+            ionshared::Stack<std::shared_ptr<ionir::BasicBlock>> basicBlocks{};
 
-            ionshared::OptPtr<ionir::InstBuilder> builder = std::nullopt;
+            std::shared_ptr<ionir::InstBuilder> makeBuilder();
         };
 
-        [[nodiscard]] static ionshared::Ptr<ionir::Type> processTypeQualifiers(
-            ionshared::Ptr<ionir::Type> type,
-            const ionshared::Ptr<TypeQualifiers> &qualifiers
+        [[nodiscard]] static std::shared_ptr<ionir::Type> processTypeQualifiers(
+            std::shared_ptr<ionir::Type> type,
+            const std::shared_ptr<TypeQualifiers> &qualifiers
         );
 
         ionshared::PtrSymbolTable<ionir::Module> modules;
 
-        Buffers buffers;
+        IonIrBuffers ionIrBuffers;
 
-        IonIrEmittedEntities symbolTable;
+        ionshared::LoweringSymbolTable<std::shared_ptr<Construct>, std::shared_ptr<ionir::Construct>> symbolTable;
 
         uint32_t nameCounter;
-
-        ionshared::Ptr<ionir::Module> requireModule();
-
-        ionshared::Ptr<ionir::Function> requireFunction();
-
-        ionshared::Ptr<ionir::BasicBlock> requireBasicBlock();
-
-        ionshared::Ptr<ionir::InstBuilder> requireBuilder();
-
-        /**
-         * Set the currently active builder if any. Modifying the builder
-         * will also set/update the active IonIR basic block buffer.
-         */
-        void setBuilder(ionshared::Ptr<ionir::BasicBlock> basicBlock);
 
         /**
          * Backup current buffers, invoke the callback and restore the
@@ -62,8 +48,8 @@ namespace ionlang {
          */
         template<typename T = ionir::Construct>
             requires std::derived_from<T, ionir::Construct>
-        ionshared::Ptr<T> safeEarlyVisitOrLookup(
-            ionshared::Ptr<Construct> construct,
+        std::shared_ptr<T> safeEarlyVisitOrLookup(
+            std::shared_ptr<Construct> construct,
             bool useDynamicCast = true,
             bool stashBuffers = true
         ) {
@@ -94,19 +80,15 @@ namespace ionlang {
 
     public:
         explicit IonIrLoweringPass(
-            ionshared::Ptr<ionshared::PassContext> context,
+            std::shared_ptr<ionshared::PassContext> context,
 
             ionshared::PtrSymbolTable<ionir::Module> modules =
-                std::make_shared<ionshared::SymbolTable<ionshared::Ptr<ionir::Module>>>()
+                std::make_shared<ionshared::SymbolTable<std::shared_ptr<ionir::Module>>>()
         );
 
         ~IonIrLoweringPass();
 
-        [[nodiscard]] ionshared::Ptr<ionshared::SymbolTable<ionshared::Ptr<ionir::Module>>> getModules() const;
-
-        [[nodiscard]] ionshared::OptPtr<ionir::Module> getModuleBuffer() const;
-
-        bool setModuleBuffer(const std::string& id);
+        [[nodiscard]] std::shared_ptr<ionshared::SymbolTable<std::shared_ptr<ionir::Module>>> getModules() const;
 
         /**
          * Visit a construct for lowering. Will not visit children,
@@ -116,49 +98,49 @@ namespace ionlang {
          * than once (for example, when a construct is used earlier than
          * its official lowering point).
          */
-        void visit(ionshared::Ptr<Construct> construct) override;
+        void visit(std::shared_ptr<Construct> construct) override;
 
-        void visitModule(ionshared::Ptr<Module> construct) override;
+        void visitModule(std::shared_ptr<Module> construct) override;
 
-        void visitFunction(ionshared::Ptr<Function> construct) override;
+        void visitFunction(std::shared_ptr<Function> construct) override;
 
-        void visitExtern(ionshared::Ptr<Extern> construct) override;
+        void visitExtern(std::shared_ptr<Extern> construct) override;
 
-        void visitPrototype(ionshared::Ptr<Prototype> construct) override;
+        void visitPrototype(std::shared_ptr<Prototype> construct) override;
 
-        void visitBlock(ionshared::Ptr<Block> construct) override;
+        void visitBlock(std::shared_ptr<Block> construct) override;
 
-        void visitIntegerLiteral(ionshared::Ptr<IntegerLiteral> construct) override;
+        void visitIntegerLiteral(std::shared_ptr<IntegerLiteral> construct) override;
 
-        void visitCharLiteral(ionshared::Ptr<CharLiteral> construct) override;
+        void visitCharLiteral(std::shared_ptr<CharLiteral> construct) override;
 
-        void visitStringLiteral(ionshared::Ptr<StringLiteral> construct) override;
+        void visitStringLiteral(std::shared_ptr<StringLiteral> construct) override;
 
-        void visitBooleanLiteral(ionshared::Ptr<BooleanLiteral> construct) override;
+        void visitBooleanLiteral(std::shared_ptr<BooleanLiteral> construct) override;
 
-        void visitGlobal(ionshared::Ptr<Global> construct) override;
+        void visitGlobal(std::shared_ptr<Global> construct) override;
 
-        void visitIntegerType(ionshared::Ptr<IntegerType> construct) override;
+        void visitIntegerType(std::shared_ptr<IntegerType> construct) override;
 
-        void visitBooleanType(ionshared::Ptr<BooleanType> construct) override;
+        void visitBooleanType(std::shared_ptr<BooleanType> construct) override;
 
-        void visitVoidType(ionshared::Ptr<VoidType> construct) override;
+        void visitVoidType(std::shared_ptr<VoidType> construct) override;
 
-        void visitIfStatement(ionshared::Ptr<IfStatement> construct) override;
+        void visitIfStatement(std::shared_ptr<IfStatement> construct) override;
 
-        void visitReturnStatement(ionshared::Ptr<ReturnStatement> construct) override;
+        void visitReturnStatement(std::shared_ptr<ReturnStatement> construct) override;
 
-        void visitAssignmentStatement(ionshared::Ptr<AssignmentStatement> construct) override;
+        void visitAssignmentStatement(std::shared_ptr<AssignmentStatement> construct) override;
 
-        void visitVariableDecl(ionshared::Ptr<VariableDeclStatement> construct) override;
+        void visitVariableDecl(std::shared_ptr<VariableDeclStatement> construct) override;
 
-        void visitCallExpr(ionshared::Ptr<CallExpr> construct) override;
+        void visitCallExpr(std::shared_ptr<CallExpr> construct) override;
 
-        void visitOperationExpr(ionshared::Ptr<OperationExpr> construct) override;
+        void visitOperationExpr(std::shared_ptr<OperationExpr> construct) override;
 
-        void visitStruct(ionshared::Ptr<Struct> construct) override;
+        void visitStruct(std::shared_ptr<Struct> construct) override;
 
-        void visitStructDefinition(ionshared::Ptr<StructDefinition> construct) override;
+        void visitStructDefinition(std::shared_ptr<StructDefinition> construct) override;
 
         // TODO: visitRef() if !isResolved() error, else this->visit(ref->getValue()); Is this a good idea? It may be required for example for if statement condition (if it's a ref). Investigate.
     };

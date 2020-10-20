@@ -6,7 +6,7 @@ namespace ionlang {
     AstPtrResult<Args> Parser::parseArgs() {
         this->beginSourceLocationMapping();
 
-        ionshared::Ptr<ionshared::SymbolTable<Arg>> args =
+        std::shared_ptr<ionshared::SymbolTable<Arg>> args =
             std::make_shared<ionshared::SymbolTable<Arg>>();
 
         bool isVariable = false;
@@ -47,7 +47,7 @@ namespace ionlang {
         return std::make_shared<Args>(args, isVariable);
     }
 
-    AstPtrResult<Attribute> Parser::parseAttribute(const ionshared::Ptr<Construct> &parent) {
+    AstPtrResult<Attribute> Parser::parseAttribute(const std::shared_ptr<Construct> &parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolAt))
@@ -56,17 +56,17 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(id.has_value())
 
-        ionshared::Ptr<Attribute> attribute = std::make_shared<Attribute>(parent, *id);
+        std::shared_ptr<Attribute> attribute = std::make_shared<Attribute>(parent, *id);
 
         this->finishSourceLocationMapping(attribute);
 
         return attribute;
     }
 
-    AstResult<Attributes> Parser::parseAttributes(const ionshared::Ptr<Construct> &parent) {
+    AstResult<Attributes> Parser::parseAttributes(const std::shared_ptr<Construct> &parent) {
         this->beginSourceLocationMapping();
 
-        std::vector<ionshared::Ptr<Attribute>> attributes = {};
+        std::vector<std::shared_ptr<Attribute>> attributes = {};
 
         while (this->is(TokenKind::SymbolAt)) {
             AstPtrResult<Attribute> attributeResult = this->parseAttribute(parent);
@@ -79,7 +79,7 @@ namespace ionlang {
         return attributes;
     }
 
-    AstPtrResult<Prototype> Parser::parsePrototype(const ionshared::Ptr<Module> &parent) {
+    AstPtrResult<Prototype> Parser::parsePrototype(const std::shared_ptr<Module> &parent) {
         this->beginSourceLocationMapping();
 
         std::optional<std::string> id = this->parseName();
@@ -87,7 +87,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(id.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
-        ionshared::Ptr<Args> args = std::make_shared<Args>();
+        std::shared_ptr<Args> args = std::make_shared<Args>();
 
         // Parse arguments if applicable.
         if (!this->is(TokenKind::SymbolParenthesesR)) {
@@ -106,7 +106,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(util::hasValue(returnType))
 
-        ionshared::Ptr<Prototype> prototype =
+        std::shared_ptr<Prototype> prototype =
             std::make_shared<Prototype>(*id, args, util::getResultValue(returnType), parent);
 
         this->finishSourceLocationMapping(prototype);
@@ -114,7 +114,7 @@ namespace ionlang {
         return prototype;
     }
 
-    AstPtrResult<Extern> Parser::parseExtern(const ionshared::Ptr<Module> &parent) {
+    AstPtrResult<Extern> Parser::parseExtern(const std::shared_ptr<Module> &parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordExtern))
@@ -124,7 +124,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(util::hasValue(prototype))
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
-        ionshared::Ptr<Extern> externConstruct =
+        std::shared_ptr<Extern> externConstruct =
             std::make_shared<Extern>(parent, util::getResultValue(prototype));
 
         this->finishSourceLocationMapping(externConstruct);
@@ -132,7 +132,7 @@ namespace ionlang {
         return externConstruct;
     }
 
-    AstPtrResult<Function> Parser::parseFunction(const ionshared::Ptr<Module> &parent) {
+    AstPtrResult<Function> Parser::parseFunction(const std::shared_ptr<Module> &parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordFunction))
@@ -145,7 +145,7 @@ namespace ionlang {
          * Create the resulting function construct here, to be provided
          * as the parent when parsing the body block.
          */
-        ionshared::Ptr<Function> function = std::make_shared<Function>(
+        std::shared_ptr<Function> function = std::make_shared<Function>(
             parent,
             util::getResultValue(prototypeResult),
 

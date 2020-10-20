@@ -7,7 +7,7 @@ namespace ionlang {
 
     struct BooleanType : Type {
         explicit BooleanType(
-            ionshared::Ptr<TypeQualifiers> qualifiers =
+            std::shared_ptr<TypeQualifiers> qualifiers =
                 std::make_shared<TypeQualifiers>()
         );
 

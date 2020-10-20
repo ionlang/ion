@@ -40,7 +40,7 @@ namespace ionlang {
 
         IntrinsicOperatorKind operation;
 
-        ionshared::Ptr<Expression<>> leftSideValue;
+        std::shared_ptr<Expression<>> leftSideValue;
 
         ionshared::OptPtr<Expression<>> rightSideValue;
     };
@@ -48,7 +48,7 @@ namespace ionlang {
     struct OperationExpr : Expression<> {
         const IntrinsicOperatorKind operation;
 
-        ionshared::Ptr<Expression<>> leftSideValue;
+        std::shared_ptr<Expression<>> leftSideValue;
 
         ionshared::OptPtr<Expression<>> rightSideValue;
 

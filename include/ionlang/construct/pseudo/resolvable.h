@@ -35,16 +35,16 @@ namespace ionlang {
         ionshared::OptPtr<T> value;
 
     public:
-        [[nodiscard]] static ionshared::Ptr<Resolvable<T>> make(
-            ionshared::Ptr<T> value
+        [[nodiscard]] static std::shared_ptr<Resolvable<T>> make(
+            std::shared_ptr<T> value
         ) noexcept {
             return std::make_shared<Resolvable<T>>(value);
         }
 
-        [[nodiscard]] static ionshared::Ptr<Resolvable<T>> make(
+        [[nodiscard]] static std::shared_ptr<Resolvable<T>> make(
             ResolvableKind kind,
             std::string name,
-            ionshared::Ptr<Construct> context
+            std::shared_ptr<Construct> context
         ) noexcept {
             return std::make_shared<Resolvable<T>>(kind, name, context);
         }
@@ -58,7 +58,7 @@ namespace ionlang {
         Resolvable(
             ResolvableKind kind,
             std::string name,
-            ionshared::Ptr<Construct> context // TODO: Change type to Scope (or Context for deeper lookup?).
+            std::shared_ptr<Construct> context // TODO: Change type to Scope (or Context for deeper lookup?).
         ) noexcept :
             Construct(ConstructKind::Resolvable),
             resolvableKind(kind),
@@ -68,7 +68,7 @@ namespace ionlang {
             //
         }
 
-        explicit Resolvable(ionshared::Ptr<T> value) noexcept :
+        explicit Resolvable(std::shared_ptr<T> value) noexcept :
             Construct(ConstructKind::Resolvable),
             resolvableKind(std::nullopt),
             name(std::nullopt),
@@ -82,7 +82,7 @@ namespace ionlang {
             // visitor.visitRef(this->dynamicCast<Ref<T>>());
         }
 
-        [[nodiscard]] ionshared::Ptr<T> operator*() {
+        [[nodiscard]] std::shared_ptr<T> operator*() {
             if (!this->isResolved()) {
                 throw std::runtime_error("Value is not resolved but being accessed");
             }
@@ -90,7 +90,7 @@ namespace ionlang {
             return *this->value;
         }
 
-        Resolvable<T>& operator=(ionshared::Ptr<T> value) {
+        Resolvable<T>& operator=(std::shared_ptr<T> value) {
             this->resolve(value);
         }
 
@@ -115,7 +115,7 @@ namespace ionlang {
          * and was now resolved, false otherwise. Resolution can only
          * occur once.
          */
-        bool resolve(ionshared::Ptr<T> value) noexcept {
+        bool resolve(std::shared_ptr<T> value) noexcept {
             if (this->isResolved()) {
                 return false;
             }
@@ -127,7 +127,7 @@ namespace ionlang {
     };
 
     template<typename T = Construct>
-    using PtrResolvable = ionshared::Ptr<Resolvable<T>>;
+    using PtrResolvable = std::shared_ptr<Resolvable<T>>;
 
     template<typename T = Construct>
     using OptPtrRef = std::optional<PtrResolvable<T>>;

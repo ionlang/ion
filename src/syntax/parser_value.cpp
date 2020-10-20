@@ -120,10 +120,10 @@ namespace ionlang {
             valueIntegerKind = IntegerKind::Int32;
         }
 
-        ionshared::Ptr<IntegerType> integerType =
+        std::shared_ptr<IntegerType> integerType =
             std::make_shared<IntegerType>(*valueIntegerKind);
 
-        ionshared::Ptr<IntegerLiteral> integerLiteral =
+        std::shared_ptr<IntegerLiteral> integerLiteral =
             std::make_shared<IntegerLiteral>(integerType, value);
 
         this->finishSourceLocationMapping(integerLiteral);
@@ -157,7 +157,7 @@ namespace ionlang {
             return this->makeErrorMarker();
         }
 
-        ionshared::Ptr<BooleanLiteral> booleanLiteral =
+        std::shared_ptr<BooleanLiteral> booleanLiteral =
             std::make_shared<BooleanLiteral>(boolValue);
 
         this->finishSourceLocationMapping(booleanLiteral);
@@ -187,7 +187,7 @@ namespace ionlang {
         }
 
         // Create the character construct with the first and only character of the captured value.
-        ionshared::Ptr<CharLiteral> charLiteral =
+        std::shared_ptr<CharLiteral> charLiteral =
             std::make_shared<CharLiteral>(stringValue[0]);
 
         this->finishSourceLocationMapping(charLiteral);
@@ -206,7 +206,7 @@ namespace ionlang {
         // Skip over string token.
         this->tokenStream.skip();
 
-        ionshared::Ptr<StringLiteral> stringLiteral =
+        std::shared_ptr<StringLiteral> stringLiteral =
             std::make_shared<StringLiteral>(value);
 
         this->finishSourceLocationMapping(stringLiteral);

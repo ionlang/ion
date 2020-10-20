@@ -6,7 +6,7 @@
 using namespace ionlang;
 
 TEST(NameResolutionPassTest, Run) {
-    ionshared::Ptr<PassManager> passManager = std::make_shared<PassManager>();
+    std::shared_ptr<PassManager> passManager = std::make_shared<PassManager>();
 
     passManager->registerPass(std::make_shared<NameResolutionPass>(
         std::make_shared<ionshared::PassContext>()
@@ -19,10 +19,10 @@ TEST(NameResolutionPassTest, Run) {
 
     // Locate the function and retrieve it's entry block.
     ionshared::OptPtr<Function> function = ast[0]->dynamicCast<Function>();
-    ionshared::Ptr<Block> functionBody = function->get()->body;
+    std::shared_ptr<Block> functionBody = function->get()->body;
 
     // Create an statement builder instance and the branch instruction's condition.
-    ionshared::Ptr<StatementBuilder> statementBuilder = std::make_shared<StatementBuilder>(functionBody);
+    std::shared_ptr<StatementBuilder> statementBuilder = std::make_shared<StatementBuilder>(functionBody);
 
     std::string id = test::constant::foo;
 
@@ -57,7 +57,7 @@ TEST(NameResolutionPassTest, Run) {
 
 // TODO: Implement.
 //TEST(NameresolutionPassTest, ResolveCallExprCallee) {
-//    ionshared::Ptr<PassManager> passManager = std::make_shared<PassManager>();
+//    std::shared_ptr<PassManager> passManager = std::make_shared<PassManager>();
 //
 //    passManager->registerPass(std::make_shared<NameResolutionPass>(
 //        std::make_shared<ionshared::PassContext>()
@@ -70,10 +70,10 @@ TEST(NameResolutionPassTest, Run) {
 //
 //    // Locate the function and retrieve it's entry block.
 //    ionshared::OptPtr<Function> function = ast[0]->dynamicCast<Function>();
-//    ionshared::Ptr<Block> functionBody = function->get()->getBody();
+//    std::shared_ptr<Block> functionBody = function->get()->getBody();
 //
 //    // Create an statement builder instance and the branch instruction's condition.
-//    ionshared::Ptr<StatementBuilder> statementBuilder = std::make_shared<StatementBuilder>(functionBody);
+//    std::shared_ptr<StatementBuilder> statementBuilder = std::make_shared<StatementBuilder>(functionBody);
 //
 //    std::string id = test::constant::foo;
 //

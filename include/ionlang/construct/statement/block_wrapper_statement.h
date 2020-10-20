@@ -7,11 +7,11 @@ namespace ionlang {
     class Pass;
 
     struct BlockWrapperStatementOpts : StatementOpts {
-        ionshared::Ptr<Block> block;
+        std::shared_ptr<Block> block;
     };
 
     struct BlockWrapperStatement : Statement {
-        ionshared::Ptr<Block> block;
+        std::shared_ptr<Block> block;
 
         explicit BlockWrapperStatement(const BlockWrapperStatementOpts &opts);
 

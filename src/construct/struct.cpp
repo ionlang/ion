@@ -1,7 +1,7 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    Struct::Struct(ionshared::Ptr<Module> parent, std::string name, Fields fields) :
+    Struct::Struct(std::shared_ptr<Module> parent, std::string name, Fields fields) :
         ConstructWithParent<Module>(std::move(parent), ConstructKind::Struct),
         ionshared::Named{std::move(name)},
         fields(std::move(fields)) {
@@ -32,7 +32,7 @@ namespace ionlang {
         return this->fields->lookup(std::move(name));
     }
 
-    void Struct::setField(std::string name, ionshared::Ptr<Type> field) {
+    void Struct::setField(std::string name, std::shared_ptr<Type> field) {
         this->fields->set(std::move(name), std::move(field));
     }
 }

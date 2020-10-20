@@ -12,7 +12,7 @@ namespace ionlang {
         Fields fields;
 
         Struct(
-            ionshared::Ptr<Module> parent,
+            std::shared_ptr<Module> parent,
             std::string name,
             Fields fields
         );
@@ -25,6 +25,6 @@ namespace ionlang {
 
         [[nodiscard]] ionshared::OptPtr<Type> lookupField(std::string name);
 
-        void setField(std::string name, ionshared::Ptr<Type> field);
+        void setField(std::string name, std::shared_ptr<Type> field);
     };
 }

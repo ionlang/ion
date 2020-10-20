@@ -8,10 +8,10 @@ namespace ionlang {
     class Pass;
 
     struct Attribute : ConstructWithParent<>, ionshared::Named {
-        Attribute(ionshared::Ptr<Construct> parent, std::string id);
+        Attribute(std::shared_ptr<Construct> parent, std::string id);
 
         void accept(Pass &visitor) override;
     };
 
-    typedef std::vector<ionshared::Ptr<Attribute>> Attributes;
+    typedef std::vector<std::shared_ptr<Attribute>> Attributes;
 }

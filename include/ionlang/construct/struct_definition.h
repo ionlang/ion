@@ -8,11 +8,11 @@ namespace ionlang {
     struct StructDefinition : Expression<> {
         PtrResolvable<Struct> declaration;
 
-        std::vector<ionshared::Ptr<Expression<>>> values;
+        std::vector<std::shared_ptr<Expression<>>> values;
 
         explicit StructDefinition(
             const PtrResolvable<Struct>& declaration,
-            std::vector<ionshared::Ptr<Expression<>>> values = {}
+            std::vector<std::shared_ptr<Expression<>>> values = {}
         ) noexcept;
 
         void accept(Pass& visitor) override;
