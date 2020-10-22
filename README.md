@@ -6,6 +6,8 @@
 
 Ion is a general purpose programming language, currently undergoing active development.
 
+[Join our Discord server](https://discord.gg/H3eMUXp)
+
 #### Syntax
 
 ```rust
@@ -45,5 +47,3 @@ fn main(i32 argc) -> i32 {
   return 0;
 }
 ```
-
-[Join our Discord server](https://discord.gg/H3eMUXp)
