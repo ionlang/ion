@@ -16,13 +16,13 @@ namespace ionlang {
 
     std::shared_ptr<VariableDeclStatement> StatementBuilder::createVariableDecl(
         std::shared_ptr<Type> type,
-        std::string id,
+        std::string name,
         std::shared_ptr<Expression<>> value
     ) {
         return this->make<VariableDeclStatement, VariableDeclStatementOpts>(VariableDeclStatementOpts{
             this->block,
-            std::move(type),
-            std::move(id),
+            std::move(Resolvable<Type>::make(std::move(type))),
+            std::move(name),
             std::move(value)
         });
     }

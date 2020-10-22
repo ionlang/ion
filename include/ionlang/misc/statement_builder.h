@@ -33,7 +33,7 @@ namespace ionlang {
 
         std::shared_ptr<VariableDeclStatement> createVariableDecl(
             std::shared_ptr<Type> type,
-            std::string id,
+            std::string name,
             std::shared_ptr<Expression<>> value
         );
 

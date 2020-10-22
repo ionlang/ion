@@ -35,6 +35,7 @@ namespace ionlang {
         {"else", TokenKind::KeywordElse},
         {"unsafe", TokenKind::KeywordUnsafe},
         {"struct", TokenKind::KeywordStruct},
+        {"let", TokenKind::KeywordLet},
 
         // Statement keywords.
         {const_name::statementReturn, TokenKind::KeywordReturn},

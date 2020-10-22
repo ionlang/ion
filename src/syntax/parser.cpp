@@ -303,23 +303,36 @@ namespace ionlang {
     AstPtrResult<VariableDeclStatement> Parser::parseVariableDecl(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
-        AstPtrResult<Type> typeResult = this->parseType();
+        bool isTypeInferred = false;
+        AstPtrResult<Type> typeResult{};
 
-        IONLANG_PARSER_ASSERT(util::hasValue(typeResult))
+        if (this->is(TokenKind::KeywordLet)) {
+            isTypeInferred = true;
+            this->tokenStream.skip();
+        }
+        else {
+            typeResult = this->parseType();
 
-        std::optional<std::string> id = this->parseName();
+            IONLANG_PARSER_ASSERT(util::hasValue(typeResult))
+        }
 
-        IONLANG_PARSER_ASSERT(id.has_value())
+        std::optional<std::string> name = this->parseName();
+
+        IONLANG_PARSER_ASSERT(name.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual))
 
         AstPtrResult<Expression<>> valueResult = this->parseExpression(parent);
 
         IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
 
+        PtrResolvable<Type> finalType = isTypeInferred
+            ? util::getResultValue(valueResult)->type
+            : Resolvable<Type>::make(util::getResultValue(typeResult));
+
         std::shared_ptr<VariableDeclStatement> variableDecl = std::make_shared<VariableDeclStatement>(VariableDeclStatementOpts{
             parent,
-            util::getResultValue(typeResult),
-            *id,
+            finalType,
+            *name,
             util::getResultValue(valueResult)
         });
 

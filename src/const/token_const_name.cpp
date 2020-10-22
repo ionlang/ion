@@ -32,6 +32,7 @@ namespace ionlang {
         {TokenKind::KeywordUnsafe, "unsafe keyword"},
         {TokenKind::KeywordStruct, "struct keyword"},
         {TokenKind::KeywordReturn, "return keyword"},
+        {TokenKind::KeywordLet, "let keyword"},
         {TokenKind::TypeVoid, "void type"},
         {TokenKind::TypeString, "string type"},
         {TokenKind::TypeInt16, "integer 16 type"},

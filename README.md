@@ -6,4 +6,44 @@
 
 Ion is a general purpose programming language, currently undergoing active development.
 
+#### Syntax
+
+```rust
+module global;
+
+extern puts(i8* msg) -> i32;
+
+extern printf(i8* format, ...) -> i32;
+
+struct Animal {
+  i8* name;
+
+  ui8 age;
+
+  fn sayName() { puts(this.name); }
+}
+
+struct Dog extends Animal {
+  fn bark() -> void { printf("%s barks woof woof!", this.name); }
+
+  fn computeAgeInHumanYears() -> ui8 { return this.age * 7; }
+}
+
+fn main(i32 argc) -> i32 {
+  let mikewazowski = Dog{
+    "Mikewazowski",
+    7
+  };
+
+  mikewazowski.bark();
+
+  printf("%s's age is %s (%s in human years).",
+    mikewazowski.name,
+    mikewazowski.age,
+    mikewazowski.computeAgeInHumanYears());
+
+  return 0;
+}
+```
+
 [Join our Discord server](https://discord.gg/H3eMUXp)

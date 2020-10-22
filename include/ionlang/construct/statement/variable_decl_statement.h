@@ -6,10 +6,10 @@
 #include "ionlang/construct/statement.h"
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     struct VariableDeclStatementOpts : StatementOpts {
-        std::shared_ptr<Type> type;
+        PtrResolvable<Type> type;
 
         std::string id;
 
@@ -17,7 +17,7 @@ namespace ionlang {
     };
 
     struct VariableDeclStatement : Statement, ionshared::Named {
-        std::shared_ptr<Type> type;
+        PtrResolvable<Type> type;
 
         std::shared_ptr<Expression<>> value;
 

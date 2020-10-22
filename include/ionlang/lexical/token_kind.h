@@ -68,6 +68,8 @@ namespace ionlang {
 
         KeywordStruct,
 
+        KeywordLet,
+
         TypeVoid,
 
         TypeBool,
@@ -111,5 +113,5 @@ namespace ionlang {
         Comment
     };
 
-    std::ostream &operator<<(std::ostream &stream, const TokenKind &tokenKind);
+    std::ostream &operator<<(std::ostream& stream, const TokenKind& tokenKind);
 }
