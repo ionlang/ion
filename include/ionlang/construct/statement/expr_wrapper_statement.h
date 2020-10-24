@@ -4,16 +4,16 @@
 #include <ionlang/construct/statement.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
-    struct ExprWrapperStatementOpts : StatementOpts {
+    struct ExprWrapperStmt : Statement {
+        static std::shared_ptr<ExprWrapperStmt> make(
+            const std::shared_ptr<Expression<>>& expression
+        ) noexcept;
+
         std::shared_ptr<Expression<>> expression;
-    };
 
-    struct ExprWrapperStatement : Statement {
-        std::shared_ptr<Expression<>> expression;
-
-        explicit ExprWrapperStatement(const ExprWrapperStatementOpts& opts);
+        explicit ExprWrapperStmt(std::shared_ptr<Expression<>> expression);
 
         void accept(Pass& visitor) override;
 

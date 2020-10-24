@@ -18,11 +18,12 @@ TEST(NameResolutionPassTest, Run) {
     };
 
     // Locate the function and retrieve it's entry block.
-    ionshared::OptPtr<Function> function = ast[0]->dynamicCast<Function>();
+    ionshared::OptPtr<Function> function = ast.front()->dynamicCast<Function>();
     std::shared_ptr<Block> functionBody = function->get()->body;
 
     // Create an statement builder instance and the branch instruction's condition.
-    std::shared_ptr<StatementBuilder> statementBuilder = std::make_shared<StatementBuilder>(functionBody);
+    std::shared_ptr<StatementBuilder> statementBuilder =
+        std::make_shared<StatementBuilder>(functionBody);
 
     std::string id = test::constant::foo;
 
@@ -37,13 +38,12 @@ TEST(NameResolutionPassTest, Run) {
         )->flatten()
     );
 
-    auto assignmentStatement = std::make_shared<AssignmentStatement>(AssignmentStatementOpts{
-        functionBody,
-        Resolvable<VariableDeclStatement>::make(ResolvableKind::Variable, id, functionBody),
+    auto assignmentStmt = AssignmentStmt::make(
+        Resolvable<VariableDeclStmt>::make(ResolvableKind::Variable, id, functionBody),
         nullptr
-    });
+    );
 
-    statementBuilder->appendStatement(assignmentStatement);
+    statementBuilder->appendStatement(assignmentStmt);
 
     // TODO: CRITICAL: Recently solved the problem which was that it was using the section's own symbol table instead of the function's to find the section (Dummy mistake). Verify that this is actually how it should be.
 
@@ -51,7 +51,7 @@ TEST(NameResolutionPassTest, Run) {
 
     // TODO: Add more tests.
 
-    EXPECT_TRUE(assignmentStatement->variableDeclStatementRef->isResolved());
+    EXPECT_TRUE(assignmentStmt->variableDeclStmtRef->isResolved());
 //    EXPECT_EQ(assignmentStatement->getValue(), functionBody);
 }
 
@@ -69,7 +69,7 @@ TEST(NameResolutionPassTest, Run) {
 //    };
 //
 //    // Locate the function and retrieve it's entry block.
-//    ionshared::OptPtr<Function> function = ast[0]->dynamicCast<Function>();
+//    ionshared::OptPtr<Function> function = ast->front()->dynamicCast<Function>();
 //    std::shared_ptr<Block> functionBody = function->get()->getBody();
 //
 //    // Create an statement builder instance and the branch instruction's condition.

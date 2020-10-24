@@ -8,7 +8,7 @@ namespace ionlang {
         //
     }
 
-    void Module::accept(Pass &visitor) {
+    void Module::accept(Pass& visitor) {
         visitor.visitModule(this->dynamicCast<Module>());
     }
 

@@ -6,15 +6,20 @@
 using namespace ionlang;
 
 TEST(CodeGenTest, VisitExtern) {
-    std::shared_ptr<IonIrLoweringPass> ionIrCodegenPass = test::bootstrap::ionIrLoweringPass();
+    std::shared_ptr<IonIrLoweringPass> ionIrCodegenPass =
+        test::bootstrap::ionIrLoweringPass();
+
     std::shared_ptr<VoidType> returnType = std::make_shared<VoidType>();
     std::shared_ptr<Args> args = std::make_shared<Args>();
 
-    std::shared_ptr<Prototype> prototype =
-        std::make_shared<Prototype>(test::constant::foobar, args, returnType, nullptr);
+    std::shared_ptr<Prototype> prototype = Prototype::make(
+        test::constant::foobar,
+        args,
+        returnType
+    );
 
     // TODO: No parent module.
-    std::shared_ptr<Extern> externConstruct = std::make_shared<Extern>(nullptr, prototype);
+    std::shared_ptr<Extern> externConstruct = Extern::make(prototype);
 
     ionIrCodegenPass->visitExtern(externConstruct);
 
@@ -37,18 +42,16 @@ TEST(CodeGenTest, VisitExtern) {
 }
 
 TEST(CodeGenTest, VisitIfStatement) {
-    std::shared_ptr<IonIrLoweringPass> ionIrLoweringPass = test::bootstrap::ionIrLoweringPass();
+    std::shared_ptr<IonIrLoweringPass> ionIrLoweringPass =
+        test::bootstrap::ionIrLoweringPass();
 
     // The parent will be filled in below.
-    std::shared_ptr<Block> consequentBlock = std::make_shared<Block>(nullptr);
+    std::shared_ptr<Block> consequentBlock = Block::make();
 
-    std::shared_ptr<IfStatement> ifStatement = std::make_shared<IfStatement>(IfStatementOpts{
-        // The parent will be filled in below.
-        nullptr,
-
+    std::shared_ptr<IfStmt> ifStatement = IfStmt::make(
         std::make_shared<BooleanLiteral>(true),
         consequentBlock
-    });
+    );
 
     std::shared_ptr<Function> function = test::bootstrap::emptyFunction({
         ifStatement
@@ -76,24 +79,21 @@ TEST(CodeGenTest, VisitIfStatement) {
 //    ionIrLlvmLoweringPass->visitModule(*ionIrModuleBuffer);
 
     // TODO: Debugging. It messes up with statements on original and successor/consequent blocks. Fix that, then remove this.
-    ionshared::LlvmModule(*ionIrLlvmLoweringPass->getModuleBuffer()).printIr();
+//    ionshared::LlvmModule(*ionIrLlvmLoweringPass->getModuleBuffer()).printIr();
 
     // Then proceed to compare, as LLVM entities will have been emitted inside the ionir::LlvmCodegenPass.
     EXPECT_TRUE(test::compare::ir(ionIrLlvmLoweringPass, "statement_if"));
 }
 
 TEST(CodeGenTest, VisitVariableDecl) {
-    std::shared_ptr<IonIrLoweringPass> ionIrLoweringPass = test::bootstrap::ionIrLoweringPass();
+    std::shared_ptr<IonIrLoweringPass> ionIrLoweringPass =
+        test::bootstrap::ionIrLoweringPass();
 
-    std::shared_ptr<VariableDeclStatement> variableDecl =
-        std::make_shared<VariableDeclStatement>(VariableDeclStatementOpts{
-            // The parent will be filled in below.
-            nullptr,
-
-            std::make_shared<BooleanType>(),
-            test::constant::foo,
-            std::make_shared<BooleanLiteral>(true)->flatten()
-        });
+    std::shared_ptr<VariableDeclStmt> variableDecl = VariableDeclStmt::make(
+        Resolvable<Type>::make(std::make_shared<BooleanType>()),
+        test::constant::foo,
+        std::make_shared<BooleanLiteral>(true)->flatten()
+    );
 
     std::shared_ptr<Function> function = test::bootstrap::emptyFunction({
         variableDecl

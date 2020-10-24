@@ -2,7 +2,7 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    VariableRefExpr::VariableRefExpr(PtrResolvable<VariableDeclStatement> variableDecl) :
+    VariableRefExpr::VariableRefExpr(PtrResolvable<VariableDeclStmt> variableDecl) :
         Expression<>(
             ExpressionKind::VariableReference,
 

@@ -1,17 +1,30 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    ReturnStatement::ReturnStatement(const ReturnStatementOpts& opts) :
-        Statement(opts.parent, StatementKind::Return),
-        value(opts.value) {
+    std::shared_ptr<ReturnStmt> ReturnStmt::make(
+        ionshared::OptPtr<Expression<>> value
+    ) noexcept {
+        std::shared_ptr<ReturnStmt> result =
+            std::make_shared<ReturnStmt>(value);
+
+        if (ionshared::util::hasValue(value)) {
+            value->get()->parent = result;
+        }
+
+        return result;
+    }
+
+    ReturnStmt::ReturnStmt(ionshared::OptPtr<Expression<>> value) noexcept :
+        Statement(StatementKind::Return),
+        value(std::move(value)) {
         //
     }
 
-    void ReturnStatement::accept(Pass& visitor) {
-        visitor.visitReturnStatement(this->dynamicCast<ReturnStatement>());
+    void ReturnStmt::accept(Pass& visitor) {
+        visitor.visitReturnStatement(this->dynamicCast<ReturnStmt>());
     }
 
-    Ast ReturnStatement::getChildNodes() {
+    Ast ReturnStmt::getChildNodes() {
         if (!this->hasValue()) {
             return Construct::getChildNodes();
         }
@@ -21,7 +34,7 @@ namespace ionlang {
         };
     }
 
-    bool ReturnStatement::hasValue() const noexcept {
+    bool ReturnStmt::hasValue() const noexcept {
         return ionshared::util::hasValue(this->value);
     }
 }

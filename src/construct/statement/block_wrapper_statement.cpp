@@ -1,19 +1,28 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    BlockWrapperStatement::BlockWrapperStatement(const BlockWrapperStatementOpts &opts) :
-        Statement(opts.parent, StatementKind::BlockWrapper),
-        block(opts.block) {
+    std::shared_ptr<BlockWrapperStmt> BlockWrapperStmt::make(
+        const std::shared_ptr<Block>& block
+    ) noexcept {
+        std::shared_ptr<BlockWrapperStmt> result =
+            std::make_shared<BlockWrapperStmt>(block);
+
+        block->parent = result;
+
+        return result;
+    }
+
+    BlockWrapperStmt::BlockWrapperStmt(std::shared_ptr<Block> block) :
+        Statement(StatementKind::BlockWrapper),
+        block(std::move(block)) {
         //
     }
 
-    void BlockWrapperStatement::accept(Pass &visitor) {
-        visitor.visitBlockWrapperStatement(this->dynamicCast<BlockWrapperStatement>());
+    void BlockWrapperStmt::accept(Pass& visitor) {
+        visitor.visitBlockWrapperStatement(this->dynamicCast<BlockWrapperStmt>());
     }
 
-    Ast BlockWrapperStatement::getChildNodes() {
-        return {
-            this->block
-        };
+    Ast BlockWrapperStmt::getChildNodes() {
+        return {this->block};
     }
 }

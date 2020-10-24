@@ -13,8 +13,8 @@ namespace ionlang {
         return name;
     }
 
-    std::optional<Arg> Parser::parseArg() {
-        AstPtrResult<Type> type = this->parseType();
+    std::optional<Arg> Parser::parseArg(std::shared_ptr<Construct> parent) {
+        AstPtrResult<Type> type = this->parseType(std::move(parent));
 
         // TODO: Function returns std::optional<>.
 //        IONIR_PARSER_ASSERT(type.hasValue(), Arg)

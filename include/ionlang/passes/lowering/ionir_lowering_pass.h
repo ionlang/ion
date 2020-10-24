@@ -75,7 +75,18 @@ namespace ionlang {
                 throw std::runtime_error("Visiting construct did not create an entry in the local symbol table");
             }
 
-            return *this->symbolTable.find<T>(construct, useDynamicCast);
+            // TODO: Fix.
+//            return *this->symbolTable.find<T>(construct, useDynamicCast);
+            std::optional<std::shared_ptr<ionir::Construct>> lookupResult =
+                this->symbolTable.unwrap().lookup(construct);
+
+            if (!ionshared::util::hasValue(lookupResult)) {
+                throw std::runtime_error("Value lookup failed");
+            }
+
+            return useDynamicCast
+                ? lookupResult->get()->dynamicCast<T>()
+                : lookupResult->get()->staticCast<T>();
         }
 
     public:
@@ -85,8 +96,6 @@ namespace ionlang {
             ionshared::PtrSymbolTable<ionir::Module> modules =
                 std::make_shared<ionshared::SymbolTable<std::shared_ptr<ionir::Module>>>()
         );
-
-        ~IonIrLoweringPass();
 
         [[nodiscard]] std::shared_ptr<ionshared::SymbolTable<std::shared_ptr<ionir::Module>>> getModules() const;
 
@@ -126,13 +135,13 @@ namespace ionlang {
 
         void visitVoidType(std::shared_ptr<VoidType> construct) override;
 
-        void visitIfStatement(std::shared_ptr<IfStatement> construct) override;
+        void visitIfStatement(std::shared_ptr<IfStmt> construct) override;
 
-        void visitReturnStatement(std::shared_ptr<ReturnStatement> construct) override;
+        void visitReturnStatement(std::shared_ptr<ReturnStmt> construct) override;
 
-        void visitAssignmentStatement(std::shared_ptr<AssignmentStatement> construct) override;
+        void visitAssignmentStatement(std::shared_ptr<AssignmentStmt> construct) override;
 
-        void visitVariableDecl(std::shared_ptr<VariableDeclStatement> construct) override;
+        void visitVariableDecl(std::shared_ptr<VariableDeclStmt> construct) override;
 
         void visitCallExpr(std::shared_ptr<CallExpr> construct) override;
 

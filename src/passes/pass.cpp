@@ -48,23 +48,23 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitIfStatement(std::shared_ptr<IfStatement> node) {
+    void Pass::visitIfStatement(std::shared_ptr<IfStmt> node) {
         //
     }
 
-    void Pass::visitReturnStatement(std::shared_ptr<ReturnStatement> node) {
+    void Pass::visitReturnStatement(std::shared_ptr<ReturnStmt> node) {
         //
     }
 
-    void Pass::visitAssignmentStatement(std::shared_ptr<AssignmentStatement> node) {
+    void Pass::visitAssignmentStatement(std::shared_ptr<AssignmentStmt> node) {
         //
     }
 
-    void Pass::visitExprWrapperStatement(std::shared_ptr<ExprWrapperStatement> node) {
+    void Pass::visitExprWrapperStatement(std::shared_ptr<ExprWrapperStmt> node) {
         //
     }
 
-    void Pass::visitBlockWrapperStatement(std::shared_ptr<BlockWrapperStatement> node) {
+    void Pass::visitBlockWrapperStatement(std::shared_ptr<BlockWrapperStmt> node) {
         //
     }
 
@@ -116,7 +116,7 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitVariableDecl(std::shared_ptr<VariableDeclStatement> node) {
+    void Pass::visitVariableDecl(std::shared_ptr<VariableDeclStmt> node) {
         //
     }
 

@@ -4,7 +4,7 @@
 
 namespace ionlang {
     // TODO: Consider using Ref<> to register pending type reference if user-defined type is parsed?
-    AstPtrResult<Type> Parser::parseType() {
+    AstPtrResult<Type> Parser::parseType(const std::shared_ptr<Construct>& parent) {
         std::shared_ptr<TypeQualifiers> qualifiers =
             std::make_shared<TypeQualifiers>();
 
@@ -49,55 +49,64 @@ namespace ionlang {
         // Retrieve the current token.
         Token token = this->tokenStream.get();
 
-        // Abstract the token's properties
-        std::string tokenValue = token.value;
-        TokenKind tokenKind = token.kind;
-
         IONLANG_PARSER_ASSERT((
-            Classifier::isBuiltInType(tokenKind)
-                || tokenKind == TokenKind::Identifier
+            Classifier::isBuiltInType(token.kind)
+                || token.kind == TokenKind::Identifier
         ))
 
         AstPtrResult<Type> type;
 
-        if (tokenKind == TokenKind::TypeVoid) {
-            type = util::getResultValue(this->parseVoidType());
+        if (token.kind == TokenKind::TypeVoid) {
+            type = util::getResultValue(this->parseVoidType(parent));
         }
-        else if (tokenKind == TokenKind::TypeBool) {
-            type = util::getResultValue(this->parseBooleanType(qualifiers));
+        else if (token.kind == TokenKind::TypeBool) {
+            type = util::getResultValue(this->parseBooleanType(parent, qualifiers));
         }
-        else if (Classifier::isIntegerType(tokenKind)) {
-            type = util::getResultValue(this->parseIntegerType(qualifiers));
+        else if (Classifier::isIntegerType(token.kind)) {
+            type = util::getResultValue(this->parseIntegerType(parent, qualifiers));
         }
-        else if (tokenKind == TokenKind::Identifier) {
-            type = util::getResultValue(this->parseUserDefinedType(qualifiers));
+        else if (token.kind == TokenKind::Identifier) {
+            type = util::getResultValue(this->parseUserDefinedType(parent, qualifiers));
         }
 
         // TODO: Add support for missing types.
+
+        // TODO: Review. What if type wasn't assigned to? Default to AstPtrResult<Type>?
 
         // Create and return the resulting type construct.
         return type;
     }
 
-    AstPtrResult<VoidType> Parser::parseVoidType() {
+    AstPtrResult<VoidType> Parser::parseVoidType(std::shared_ptr<Construct> parent) {
         /**
          * Void type does not accept references nor pointer
          * specifiers, so just simply skip over its token.
          */
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::TypeVoid))
 
-        return std::make_shared<VoidType>();
+        std::shared_ptr<VoidType> voidType = std::make_shared<VoidType>();
+
+        voidType->parent = parent;
+
+        return voidType;
     }
 
     AstPtrResult<BooleanType> Parser::parseBooleanType(
+        std::shared_ptr<Construct> parent,
         const std::shared_ptr<TypeQualifiers>& qualifiers
     ) {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::TypeBool))
 
-        return std::make_shared<BooleanType>(qualifiers);
+        std::shared_ptr<BooleanType> booleanType =
+            std::make_shared<BooleanType>(qualifiers);
+
+        booleanType->parent = parent;
+
+        return booleanType;
     }
 
     AstPtrResult<IntegerType> Parser::parseIntegerType(
+        std::shared_ptr<Construct> parent,
         const std::shared_ptr<TypeQualifiers>& qualifiers
     ) {
         TokenKind currentTokenKind = this->tokenStream.get().kind;
@@ -120,7 +129,7 @@ namespace ionlang {
         // Skip over the type token.
         this->tokenStream.skip();
 
-        return std::make_shared<IntegerType>(
+        std::shared_ptr<IntegerType> integerType = std::make_shared<IntegerType>(
             *integerKind,
 
             // TODO: Determine if signed or not.
@@ -128,9 +137,14 @@ namespace ionlang {
 
             qualifiers
         );
+
+        integerType->parent = parent;
+
+        return integerType;
     }
 
     AstPtrResult<UserDefinedType> Parser::parseUserDefinedType(
+        std::shared_ptr<Construct> parent,
         const std::shared_ptr<TypeQualifiers>& qualifiers
     ) {
         IONLANG_PARSER_ASSERT(this->expect(TokenKind::Identifier))
@@ -139,9 +153,14 @@ namespace ionlang {
 
         this->tokenStream.skip();
 
-        return std::make_shared<UserDefinedType>(
-            name,
-            qualifiers
-        );
+        std::shared_ptr<UserDefinedType> userDefinedType =
+            std::make_shared<UserDefinedType>(
+                name,
+                qualifiers
+            );
+
+        userDefinedType->parent = parent;
+
+        return userDefinedType;
     }
 }

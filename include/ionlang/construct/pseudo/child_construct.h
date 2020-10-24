@@ -4,21 +4,15 @@
 #include <ionlang/construct/construct.h>
 
 namespace ionlang {
-    template<typename T>
-        // TODO: Require T : Construct;
-    struct ChildConstructOpts {
-        std::shared_ptr<T> parent;
-    };
-
     template<class T = Construct>
         // TODO: Require T : Construct.
     struct ConstructWithParent : Construct {
-        ConstructWithParent(std::shared_ptr<T> parent, ConstructKind kind) :
-            Construct(kind, std::nullopt, parent) {
+        explicit ConstructWithParent(ConstructKind kind) :
+            Construct(kind) {
             //
         }
 
-        [[nodiscard]] std::shared_ptr<T> getUnboxedParent() {
+        [[nodiscard]] std::shared_ptr<T> forceGetUnboxedParent() {
             if (!ionshared::util::hasValue(this->parent)) {
                 throw std::runtime_error("Parent is nullptr");
             }

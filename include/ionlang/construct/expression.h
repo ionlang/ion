@@ -8,8 +8,6 @@ namespace ionlang {
     struct Type;
 
     enum struct ExpressionKind {
-        Value,
-
         Call,
 
         Operation,

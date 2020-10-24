@@ -6,6 +6,11 @@ namespace ionlang {
     struct Pass;
 
     struct StructDefinition : Expression<> {
+        static std::shared_ptr<StructDefinition> make(
+            const PtrResolvable<Struct>& declaration,
+            std::vector<std::shared_ptr<Expression<>>> values = {}
+        ) noexcept;
+
         PtrResolvable<Struct> declaration;
 
         std::vector<std::shared_ptr<Expression<>>> values;

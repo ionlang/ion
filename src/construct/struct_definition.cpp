@@ -1,6 +1,20 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
+    std::shared_ptr<StructDefinition> StructDefinition::make(
+        const PtrResolvable<Struct>& declaration,
+        std::vector<std::shared_ptr<Expression<>>> values
+    ) noexcept {
+        std::shared_ptr<StructDefinition> result =
+            std::make_shared<StructDefinition>(declaration, values);
+
+        for (const auto& value : values) {
+            value->parent = result;
+        }
+
+        return result;
+    }
+
     StructDefinition::StructDefinition(
         const PtrResolvable<Struct>& declaration,
         std::vector<std::shared_ptr<Expression<>>> values

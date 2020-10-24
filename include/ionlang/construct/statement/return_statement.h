@@ -4,16 +4,18 @@
 #include <ionlang/construct/expression.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
-    struct ReturnStatementOpts : StatementOpts {
-        ionshared::OptPtr<Expression<>> value = std::nullopt;
-    };
+    struct ReturnStmt : Statement {
+        static std::shared_ptr<ReturnStmt> make(
+            ionshared::OptPtr<Expression<>> value
+        ) noexcept;
 
-    struct ReturnStatement : Statement {
         ionshared::OptPtr<Expression<>> value;
 
-        explicit ReturnStatement(const ReturnStatementOpts& opts);
+        explicit ReturnStmt(
+            ionshared::OptPtr<Expression<>> value = std::nullopt
+        ) noexcept;
 
         void accept(Pass& visitor) override;
 

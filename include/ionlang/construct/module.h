@@ -6,7 +6,7 @@
 #include "construct.h"
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     typedef ionshared::Scope<Construct> Scope;
 
@@ -20,7 +20,7 @@ namespace ionlang {
             std::shared_ptr<Context> context = std::make_shared<Context>()
         );
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
 
         [[nodiscard]] Ast getChildNodes() override;
     };

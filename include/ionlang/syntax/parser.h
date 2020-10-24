@@ -24,17 +24,12 @@ namespace ionlang {
 
         std::shared_ptr<ionshared::DiagnosticBuilder> diagnosticBuilder;
 
-        std::shared_ptr<ionshared::SourceMap<std::shared_ptr<Construct>>> sourceMap;
-
         /**
          * A stack of source location mapping beginnings, containing a
          * pair with the first item denoting the line number and the second
          * the column.
          */
         std::stack<std::pair<uint32_t, uint32_t>> sourceLocationMappingStartStack;
-
-        // TODO
-//        Classifier classifier;
 
         [[nodiscard]] bool is(TokenKind tokenKind) noexcept;
 
@@ -51,8 +46,6 @@ namespace ionlang {
         ionshared::SourceLocation finishSourceLocation();
 
         std::shared_ptr<ErrorMarker> makeErrorMarker();
-
-        void mapSourceLocation(const AstPtrResult<>& construct);
 
         void finishSourceLocationMapping(const std::shared_ptr<Construct>& construct);
 
@@ -87,38 +80,44 @@ namespace ionlang {
         /**
          * Parses a integer literal in the form of long (or integer 64).
          */
-        AstPtrResult<IntegerLiteral> parseIntegerLiteral();
+        AstPtrResult<IntegerLiteral> parseIntegerLiteral(std::shared_ptr<Construct> parent);
 
-        AstPtrResult<BooleanLiteral> parseBooleanLiteral();
+        AstPtrResult<BooleanLiteral> parseBooleanLiteral(std::shared_ptr<Construct> parent);
 
-        AstPtrResult<CharLiteral> parseCharLiteral();
+        AstPtrResult<CharLiteral> parseCharLiteral(std::shared_ptr<Construct> parent);
 
-        AstPtrResult<StringLiteral> parseStringLiteral();
+        AstPtrResult<StringLiteral> parseStringLiteral(std::shared_ptr<Construct> parent);
 
         std::optional<std::string> parseName();
 
-        AstPtrResult<Type> parseType();
+        AstPtrResult<Type> parseType(const std::shared_ptr<Construct>& parent);
 
-        AstPtrResult<VoidType> parseVoidType();
+        AstPtrResult<VoidType> parseVoidType(std::shared_ptr<Construct> parent);
 
         AstPtrResult<BooleanType> parseBooleanType(
+            std::shared_ptr<Construct> parent,
+
             const std::shared_ptr<TypeQualifiers>& qualifiers =
                 std::make_shared<TypeQualifiers>()
         );
 
         AstPtrResult<IntegerType> parseIntegerType(
+            std::shared_ptr<Construct> parent,
+
             const std::shared_ptr<TypeQualifiers>& qualifiers =
                 std::make_shared<TypeQualifiers>()
         );
 
         AstPtrResult<UserDefinedType> parseUserDefinedType(
+            std::shared_ptr<Construct> parent,
+
             const std::shared_ptr<TypeQualifiers>& qualifiers =
                 std::make_shared<TypeQualifiers>()
         );
 
-        std::optional<Arg> parseArg();
+        std::optional<Arg> parseArg(std::shared_ptr<Construct> parent);
 
-        AstPtrResult<Args> parseArgs();
+        AstPtrResult<Args> parseArgs(std::shared_ptr<Construct> parent);
 
         AstPtrResult<Attribute> parseAttribute(const std::shared_ptr<Construct>& parent);
 
@@ -134,7 +133,7 @@ namespace ionlang {
 
         AstPtrResult<Struct> parseStruct(const std::shared_ptr<Module>& parent);
 
-        AstPtrResult<Expression<>> parseLiteral();
+        AstPtrResult<Expression<>> parseLiteral(const std::shared_ptr<Construct>& parent);
 
         AstPtrResult<Expression<>> parseExpression(const std::shared_ptr<Block>& parent);
 
@@ -162,13 +161,13 @@ namespace ionlang {
 
         AstPtrResult<Statement> parseStatement(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<VariableDeclStatement> parseVariableDecl(const std::shared_ptr<Block>& parent);
+        AstPtrResult<VariableDeclStmt> parseVariableDecl(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<IfStatement> parseIfStatement(const std::shared_ptr<Block>& parent);
+        AstPtrResult<IfStmt> parseIfStatement(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<ReturnStatement> parseReturnStatement(const std::shared_ptr<Block>& parent);
+        AstPtrResult<ReturnStmt> parseReturnStatement(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<AssignmentStatement> parseAssignmentStatement(const std::shared_ptr<Block>& parent);
+        AstPtrResult<AssignmentStmt> parseAssignmentStatement(const std::shared_ptr<Block>& parent);
 
         std::optional<std::string> parseLine();
 

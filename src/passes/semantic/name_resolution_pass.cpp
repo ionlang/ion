@@ -20,7 +20,7 @@ namespace ionlang {
         }
 
         auto rootModuleSymbolTable =
-            parentFunction->get()->getUnboxedParent()->context->getGlobalScope();
+            parentFunction->get()->forceGetUnboxedParent()->context->getGlobalScope();
 
         auto lookupResult = rootModuleSymbolTable->lookup(std::move(name));
 

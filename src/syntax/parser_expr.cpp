@@ -30,8 +30,9 @@ namespace ionlang {
 
         // TODO: Support unary and binary operation parsing.
 
+        // TODO: Not proper parent.
         // Otherwise, it must be a literal value.
-        AstPtrResult<Expression<>> literal = this->parseLiteral();
+        AstPtrResult<Expression<>> literal = this->parseLiteral(parent);
 
         IONLANG_PARSER_ASSERT(util::hasValue(literal))
 
@@ -63,8 +64,8 @@ namespace ionlang {
         }
 
         // TODO: Is this the correct parent for the ref?
-        PtrResolvable<VariableDeclStatement> variableDeclRef =
-            util::getResultValue(this->parseResolvable<VariableDeclStatement>(parent));
+        PtrResolvable<VariableDeclStmt> variableDeclRef =
+            util::getResultValue(this->parseResolvable<VariableDeclStmt>(parent));
 
         this->finishSourceLocationMapping(variableDeclRef);
 
@@ -117,12 +118,14 @@ namespace ionlang {
             }
 
             // TODO: Make sure both side's type are the same? Or leave it up to type-checking?
-            leftSideExpression = std::make_shared<OperationExpr>(OperationExprOpts{
+            leftSideExpression = OperationExpr::make(
+                // TODO: Should copy the type, not use it, because it will be linked.
                 leftSideExpression->type,
+
                 *operatorKind,
                 leftSideExpression,
                 util::getResultValue(rightSidePrimaryExpressionResult)
-            });
+            );
         }
 
         return leftSideExpression;
@@ -199,7 +202,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
 
-        std::shared_ptr<CallExpr> callExpr = std::make_shared<CallExpr>(
+        std::shared_ptr<CallExpr> callExpr = CallExpr::make(
             Resolvable<>::make(ResolvableKind::Prototype, *calleeId, parent),
             callArgs,
             Resolvable<Type>::make(ResolvableKind::PrototypeReturnType, *calleeId, parent)
@@ -232,16 +235,15 @@ namespace ionlang {
 
         this->tokenStream.skip();
 
-        std::shared_ptr<StructDefinition> structDefinition =
-            std::make_shared<StructDefinition>(
-                Resolvable<Struct>::make(
-                    ResolvableKind::Struct,
-                    *name,
-                    parent
-                ),
+        std::shared_ptr<StructDefinition> structDefinition = StructDefinition::make(
+            Resolvable<Struct>::make(
+                ResolvableKind::Struct,
+                *name,
+                parent
+            ),
 
-                values
-            );
+            values
+        );
 
         this->finishSourceLocationMapping(structDefinition);
 

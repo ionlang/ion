@@ -11,7 +11,7 @@ TEST(ParserTest, ParseInt) {
         Token(TokenKind::LiteralInteger, "5")
     });
 
-    AstPtrResult<IntegerLiteral> integer = parser.parseIntegerLiteral();
+    AstPtrResult<IntegerLiteral> integer = parser.parseIntegerLiteral(nullptr);
 
     // TODO: Verify integer type?
 
@@ -31,7 +31,7 @@ TEST(ParserTest, ParseChar) {
         Token(TokenKind::LiteralCharacter, "a")
     });
 
-    AstPtrResult<CharLiteral> character = parser.parseCharLiteral();
+    AstPtrResult<CharLiteral> character = parser.parseCharLiteral(nullptr);
 
     EXPECT_TRUE(util::hasValue(character));
     EXPECT_EQ(util::getResultValue(character)->value, 'a');
@@ -53,7 +53,7 @@ TEST(ParserTest, ParseUserDefinedType) {
         Token(TokenKind::Identifier, test::constant::foo)
     });
 
-    AstPtrResult<Type> typeResult = parser.parseType();
+    AstPtrResult<Type> typeResult = parser.parseType(nullptr);
 
     EXPECT_TRUE(util::hasValue(typeResult));
 
@@ -68,7 +68,7 @@ TEST(ParserTest, ParseVoidType) {
         Token(TokenKind::TypeVoid, const_name::typeVoid)
     });
 
-    AstPtrResult<Type> typeResult = parser.parseType();
+    AstPtrResult<Type> typeResult = parser.parseType(nullptr);
 
     EXPECT_TRUE(util::hasValue(typeResult));
 
@@ -83,7 +83,7 @@ TEST(ParserTest, ParseInteger32Type) {
         Token(TokenKind::TypeInt32, const_name::typeInt32)
     });
 
-    AstPtrResult<Type> typeResult = parser.parseType();
+    AstPtrResult<Type> typeResult = parser.parseType(nullptr);
 
     EXPECT_TRUE(util::hasValue(typeResult));
 
@@ -110,7 +110,7 @@ TEST(ParserTest, ParseArg) {
         Token(TokenKind::Identifier, "test")
     });
 
-    std::optional<Arg> argResult = parser.parseArg();
+    std::optional<Arg> argResult = parser.parseArg(nullptr);
 
     EXPECT_TRUE(argResult.has_value());
 

@@ -12,6 +12,6 @@ namespace ionlang {
 
         IntegerLiteral(std::shared_ptr<IntegerType> type, int64_t value);
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
     };
 }

@@ -4,18 +4,18 @@
 #include <ionlang/construct/statement.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
-    struct BlockWrapperStatementOpts : StatementOpts {
+    struct BlockWrapperStmt : Statement {
+        static std::shared_ptr<BlockWrapperStmt> make(
+            const std::shared_ptr<Block>& block
+        ) noexcept;
+
         std::shared_ptr<Block> block;
-    };
 
-    struct BlockWrapperStatement : Statement {
-        std::shared_ptr<Block> block;
+        explicit BlockWrapperStmt(std::shared_ptr<Block> block);
 
-        explicit BlockWrapperStatement(const BlockWrapperStatementOpts &opts);
-
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
 
         [[nodiscard]] Ast getChildNodes() override;
     };

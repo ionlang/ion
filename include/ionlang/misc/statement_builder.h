@@ -9,14 +9,10 @@
 #include <ionlang/construct/type.h>
 
 namespace ionlang {
-    class StatementBuilder {
-    private:
+    struct StatementBuilder {
         std::shared_ptr<Block> block;
 
-    public:
         explicit StatementBuilder(std::shared_ptr<Block> block);
-
-        [[nodiscard]] std::shared_ptr<Block> getBlock() const noexcept;
 
         void appendStatement(const std::shared_ptr<Statement>& statement);
 
@@ -24,31 +20,32 @@ namespace ionlang {
         std::shared_ptr<TStatement> make(TArgs... args) {
             // TODO: Ensure T inherits from Inst or derived.
 
-            std::shared_ptr<TStatement> statement = std::make_shared<TStatement>(args...);
+            std::shared_ptr<TStatement> statement =
+                Construct::makeChild<TStatement>(this->block, args...);
 
             this->appendStatement(statement);
 
             return statement;
         }
 
-        std::shared_ptr<VariableDeclStatement> createVariableDecl(
+        std::shared_ptr<VariableDeclStmt> createVariableDecl(
             std::shared_ptr<Type> type,
             std::string name,
             std::shared_ptr<Expression<>> value
         );
 
-        std::shared_ptr<AssignmentStatement> createAssignment(
-            std::shared_ptr<VariableDeclStatement> variableDeclStatement,
+        std::shared_ptr<AssignmentStmt> createAssignment(
+            std::shared_ptr<VariableDeclStmt> variableDeclStatement,
             std::shared_ptr<Expression<>> value
         );
 
-        std::shared_ptr<IfStatement> createIf(
+        std::shared_ptr<IfStmt> createIf(
             std::shared_ptr<Construct> condition,
             std::shared_ptr<Block> consequentBlock,
             ionshared::OptPtr<Block> alternativeBlock
         );
 
-        std::shared_ptr<ReturnStatement> createReturn(
+        std::shared_ptr<ReturnStmt> createReturn(
             ionshared::OptPtr<Expression<>> value = std::nullopt
         );
     };

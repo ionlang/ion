@@ -6,7 +6,7 @@ namespace ionlang {
         //
     }
 
-    void ErrorMarker::accept(Pass &visitor) {
+    void ErrorMarker::accept(Pass& visitor) {
         visitor.visitErrorMarker(this->dynamicCast<ErrorMarker>());
     }
 }

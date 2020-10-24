@@ -9,7 +9,7 @@ namespace ionlang {
         AstPtrResult<Statement> statement;
 
         // TODO: Symbol table is not being used. Variable decls should be registered?
-        ionshared::PtrSymbolTable<VariableDeclStatement> symbolTable = parent->symbolTable;
+        ionshared::PtrSymbolTable<VariableDeclStmt> symbolTable = parent->symbolTable;
 
         TokenKind currentTokenKind = this->tokenStream.get().kind;
 
@@ -35,10 +35,10 @@ namespace ionlang {
 
             IONLANG_PARSER_ASSERT(util::hasValue(expression))
 
-            statement = std::make_shared<ExprWrapperStatement>(ExprWrapperStatementOpts{
+            statement = Construct::makeChild<ExprWrapperStmt>(
                 parent,
                 util::getResultValue(expression)
-            });
+            );
 
             IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
         }
@@ -46,7 +46,7 @@ namespace ionlang {
         return statement;
     }
 
-    AstPtrResult<IfStatement> Parser::parseIfStatement(const std::shared_ptr<Block>& parent) {
+    AstPtrResult<IfStmt> Parser::parseIfStatement(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIf))
@@ -81,12 +81,12 @@ namespace ionlang {
         }
 
         // Make the if statement construct.
-        std::shared_ptr<IfStatement> ifStatement = std::make_shared<IfStatement>(IfStatementOpts{
+        std::shared_ptr<IfStmt> ifStatement = Construct::makeChild<IfStmt>(
             parent,
             util::getResultValue(condition),
             consequentBlock,
             alternativeBlock
-        });
+        );
 
         // Finally, fill in the gaps.
         consequentBlock->parent = ifStatement;
@@ -98,7 +98,7 @@ namespace ionlang {
         return ifStatement;
     }
 
-    AstPtrResult<ReturnStatement> Parser::parseReturnStatement(const std::shared_ptr<Block>& parent) {
+    AstPtrResult<ReturnStmt> Parser::parseReturnStatement(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordReturn))
@@ -120,13 +120,15 @@ namespace ionlang {
             finalValue = util::getResultValue(valueResult);
         }
 
-        return std::make_shared<ReturnStatement>(ReturnStatementOpts{
+        return Construct::makeChild<ReturnStmt>(
             parent,
             finalValue
-        });
+        );
     }
 
-    AstPtrResult<AssignmentStatement> Parser::parseAssignmentStatement(const std::shared_ptr<Block>& parent) {
+    AstPtrResult<AssignmentStmt> Parser::parseAssignmentStatement(
+        const std::shared_ptr<Block>& parent
+    ) {
         this->beginSourceLocationMapping();
 
         std::optional<std::string> id = this->parseName();
@@ -139,16 +141,16 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(util::hasValue(value))
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
-        return std::make_shared<AssignmentStatement>(AssignmentStatementOpts{
+        return Construct::makeChild<AssignmentStmt>(
             parent,
 
-            std::make_shared<Resolvable<VariableDeclStatement>>(
+            std::make_shared<Resolvable<VariableDeclStmt>>(
                 ResolvableKind::Variable,
                 *id,
                 parent
             ),
 
             util::getResultValue(value)
-        });
+        );
     }
 }

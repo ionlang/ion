@@ -4,12 +4,12 @@
 #include <ionlang/construct/function.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     struct VariableRefExpr : Expression<> {
-        PtrResolvable<VariableDeclStatement> variableDecl;
+        PtrResolvable<VariableDeclStmt> variableDecl;
 
-        explicit VariableRefExpr(PtrResolvable<VariableDeclStatement> variableDecl);
+        explicit VariableRefExpr(PtrResolvable<VariableDeclStmt> variableDecl);
 
         void accept(Pass& visitor) override;
     };

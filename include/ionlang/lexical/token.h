@@ -6,7 +6,7 @@
 namespace ionlang {
     typedef ionshared::BaseToken<TokenKind> Token;
 
-    std::ostream &operator<<(std::ostream &stream, Token &token);
+    std::ostream& operator<<(std::ostream& stream, Token& token);
 
     /**
      * An iterable list of IonLang tokens.

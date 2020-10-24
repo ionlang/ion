@@ -24,8 +24,16 @@ namespace ionlang::test::compare {
         return util::trim(std::move(output)) == util::trim(*contents);
     }
 
-    bool ir(const std::shared_ptr<ionir::LlvmLoweringPass>& llvmLoweringPass, const std::string &fileName) {
-        std::optional<llvm::Module*> llvmModuleBuffer = llvmLoweringPass->getModuleBuffer();
+    bool ir(
+        const std::shared_ptr<ionir::LlvmLoweringPass>& llvmLoweringPass,
+        const std::string& fileName
+    ) {
+        std::optional<llvm::Module*> llvmModuleBuffer{std::nullopt};
+
+        // TODO: Easier way to get the first entry.
+        for (const auto& [name, module] : llvmLoweringPass->getModules()->unwrap()) {
+            llvmModuleBuffer = module;
+        }
 
         if (!ionshared::util::hasValue(llvmModuleBuffer)) {
             throw std::runtime_error("Module buffer in LlvmCodegenPass is not set");

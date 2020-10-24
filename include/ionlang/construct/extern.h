@@ -5,17 +5,18 @@
 #include "module.h"
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     struct Extern : ConstructWithParent<Module> {
+        static std::shared_ptr<Extern> make(
+            const std::shared_ptr<Prototype>& prototype
+        ) noexcept;
+
         std::shared_ptr<Prototype> prototype;
 
-        Extern(
-            std::shared_ptr<Module> parent,
-            std::shared_ptr<Prototype> prototype
-        );
+        explicit Extern(std::shared_ptr<Prototype> prototype);
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
 
         [[nodiscard]] Ast getChildNodes() override;
     };

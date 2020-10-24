@@ -70,4 +70,11 @@ namespace ionlang::diagnostic {
         "Field '%s' in struct '%s' was already previously defined",
         std::nullopt
     );
+
+    IONLANG_NOTICE_DEFINE(
+        functionRedefinition,
+        ionshared::DiagnosticKind::Error,
+        "Function '%s' was already previously defined",
+        std::nullopt
+    );
 }

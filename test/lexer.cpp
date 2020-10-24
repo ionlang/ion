@@ -53,8 +53,8 @@ TEST(LexerTest, LexKeywords) {
     std::array<Token, 4> expected = {
         Token(TokenKind::KeywordModule, "module", 0),
         Token(TokenKind::KeywordFunction, "fn", 8),
-        Token(TokenKind::KeywordIf, "if", 11),
-        Token(TokenKind::KeywordReturn, "return", 14)
+        Token(TokenKind::KeywordIf, "if", 10),
+        Token(TokenKind::KeywordReturn, "return", 13)
     };
 
     // Compare result with expected.

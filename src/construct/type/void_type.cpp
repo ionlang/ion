@@ -7,7 +7,7 @@ namespace ionlang {
         //
     }
 
-    void VoidType::accept(Pass &pass) {
+    void VoidType::accept(Pass& pass) {
         return pass.visitVoidType(this->dynamicCast<VoidType>());
     }
 }

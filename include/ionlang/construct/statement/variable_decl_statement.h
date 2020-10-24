@@ -8,20 +8,22 @@
 namespace ionlang {
     struct Pass;
 
-    struct VariableDeclStatementOpts : StatementOpts {
-        PtrResolvable<Type> type;
+    struct VariableDeclStmt : Statement, ionshared::Named {
+        static std::shared_ptr<VariableDeclStmt> make(
+            const PtrResolvable<Type>& type,
+            const std::string& id,
+            const std::shared_ptr<Expression<>>& value
+        ) noexcept;
 
-        std::string id;
-
-        std::shared_ptr<Expression<>> value;
-    };
-
-    struct VariableDeclStatement : Statement, ionshared::Named {
         PtrResolvable<Type> type;
 
         std::shared_ptr<Expression<>> value;
 
-        explicit VariableDeclStatement(const VariableDeclStatementOpts& opts) noexcept;
+        explicit VariableDeclStmt(
+            PtrResolvable<Type> type,
+            std::string id,
+            std::shared_ptr<Expression<>> value
+        ) noexcept;
 
         void accept(Pass& visitor) override;
 

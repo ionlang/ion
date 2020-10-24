@@ -1,14 +1,30 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    Struct::Struct(std::shared_ptr<Module> parent, std::string name, Fields fields) :
-        ConstructWithParent<Module>(std::move(parent), ConstructKind::Struct),
+    std::shared_ptr<Struct> Struct::make(
+        const std::string& name,
+        const Fields& fields
+    ) noexcept {
+        std::shared_ptr<Struct> result =
+            std::make_shared<Struct>(name, fields);
+
+        auto fieldsNativeMap = fields->unwrap();
+
+        for (const auto& [name, type] : fieldsNativeMap) {
+            type->parent = result;
+        }
+
+        return result;
+    }
+
+    Struct::Struct(std::string name, Fields fields) :
+        ConstructWithParent<Module>(ConstructKind::Struct),
         ionshared::Named{std::move(name)},
         fields(std::move(fields)) {
         //
     }
 
-    void Struct::accept(Pass &visitor) {
+    void Struct::accept(Pass& visitor) {
         visitor.visitStruct(this->dynamicCast<Struct>());
     }
 
@@ -22,17 +38,5 @@ namespace ionlang {
         }
 
         return children;
-    }
-
-    bool Struct::containsField(std::string name) const {
-        return this->fields->contains(std::move(name));
-    }
-
-    ionshared::OptPtr<Type> Struct::lookupField(std::string name) {
-        return this->fields->lookup(std::move(name));
-    }
-
-    void Struct::setField(std::string name, std::shared_ptr<Type> field) {
-        this->fields->set(std::move(name), std::move(field));
     }
 }

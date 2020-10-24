@@ -4,7 +4,7 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    AstPtrResult<Expression<>> Parser::parseLiteral() {
+    AstPtrResult<Expression<>> Parser::parseLiteral(const std::shared_ptr<Construct>& parent) {
         // TODO: Should this go here?
         this->beginSourceLocationMapping();
 
@@ -14,7 +14,7 @@ namespace ionlang {
          */
         switch (this->tokenStream.get().kind) {
             case TokenKind::LiteralInteger: {
-                AstPtrResult<IntegerLiteral> integerLiteralResult = this->parseIntegerLiteral();
+                AstPtrResult<IntegerLiteral> integerLiteralResult = this->parseIntegerLiteral(parent);
 
                 IONLANG_PARSER_ASSERT(util::hasValue(integerLiteralResult))
 
@@ -22,7 +22,7 @@ namespace ionlang {
             }
 
             case TokenKind::LiteralCharacter: {
-                AstPtrResult<CharLiteral> charLiteralResult = this->parseCharLiteral();
+                AstPtrResult<CharLiteral> charLiteralResult = this->parseCharLiteral(parent);
 
                 IONLANG_PARSER_ASSERT(util::hasValue(charLiteralResult))
 
@@ -30,7 +30,7 @@ namespace ionlang {
             }
 
             case TokenKind::LiteralString: {
-                AstPtrResult<StringLiteral> stringLiteralResult = this->parseStringLiteral();
+                AstPtrResult<StringLiteral> stringLiteralResult = this->parseStringLiteral(parent);
 
                 IONLANG_PARSER_ASSERT(util::hasValue(stringLiteralResult))
 
@@ -38,7 +38,7 @@ namespace ionlang {
             }
 
             case TokenKind::LiteralBoolean: {
-                AstPtrResult<BooleanLiteral> booleanLiteralResult = this->parseBooleanLiteral();
+                AstPtrResult<BooleanLiteral> booleanLiteralResult = this->parseBooleanLiteral(parent);
 
                 IONLANG_PARSER_ASSERT(util::hasValue(booleanLiteralResult))
 
@@ -58,7 +58,7 @@ namespace ionlang {
         }
     }
 
-    AstPtrResult<IntegerLiteral> Parser::parseIntegerLiteral() {
+    AstPtrResult<IntegerLiteral> Parser::parseIntegerLiteral(std::shared_ptr<Construct> parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralInteger))
@@ -85,7 +85,7 @@ namespace ionlang {
              */
             value = std::stoll(tokenValue);
         }
-        catch (std::exception &exception) {
+        catch (std::exception& exception) {
             // Value conversion failed.
             this->diagnosticBuilder
                 ->bootstrap(diagnostic::syntaxConversionFailed)
@@ -123,15 +123,19 @@ namespace ionlang {
         std::shared_ptr<IntegerType> integerType =
             std::make_shared<IntegerType>(*valueIntegerKind);
 
+        // TODO: Not proper parent.
+        integerType->parent = parent;
+
         std::shared_ptr<IntegerLiteral> integerLiteral =
             std::make_shared<IntegerLiteral>(integerType, value);
 
+        integerLiteral->parent = parent;
         this->finishSourceLocationMapping(integerLiteral);
 
         return integerLiteral;
     }
 
-    AstPtrResult<BooleanLiteral> Parser::parseBooleanLiteral() {
+    AstPtrResult<BooleanLiteral> Parser::parseBooleanLiteral(std::shared_ptr<Construct> parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralBoolean))
@@ -160,12 +164,13 @@ namespace ionlang {
         std::shared_ptr<BooleanLiteral> booleanLiteral =
             std::make_shared<BooleanLiteral>(boolValue);
 
+        booleanLiteral->parent = parent;
         this->finishSourceLocationMapping(booleanLiteral);
 
         return booleanLiteral;
     }
 
-    AstPtrResult<CharLiteral> Parser::parseCharLiteral() {
+    AstPtrResult<CharLiteral> Parser::parseCharLiteral(std::shared_ptr<Construct> parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralCharacter))
@@ -190,12 +195,13 @@ namespace ionlang {
         std::shared_ptr<CharLiteral> charLiteral =
             std::make_shared<CharLiteral>(stringValue[0]);
 
+        charLiteral->parent = parent;
         this->finishSourceLocationMapping(charLiteral);
 
         return charLiteral;
     }
 
-    AstPtrResult<StringLiteral> Parser::parseStringLiteral() {
+    AstPtrResult<StringLiteral> Parser::parseStringLiteral(std::shared_ptr<Construct> parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->is(TokenKind::LiteralString))
@@ -209,6 +215,7 @@ namespace ionlang {
         std::shared_ptr<StringLiteral> stringLiteral =
             std::make_shared<StringLiteral>(value);
 
+        stringLiteral->parent = parent;
         this->finishSourceLocationMapping(stringLiteral);
 
         return stringLiteral;

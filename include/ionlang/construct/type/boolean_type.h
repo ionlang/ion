@@ -3,7 +3,7 @@
 #include <ionlang/construct/type.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     struct BooleanType : Type {
         explicit BooleanType(
@@ -11,6 +11,6 @@ namespace ionlang {
                 std::make_shared<TypeQualifiers>()
         );
 
-        void accept(Pass &pass) override;
+        void accept(Pass& pass) override;
     };
 }

@@ -39,7 +39,7 @@ fn main(i32 argc) -> i32 {
 
   mikewazowski.bark();
 
-  printf("%s's age is %s (%s in human years).",
+  printf("%s is %s years old (%s in human years).",
     mikewazowski.name,
     mikewazowski.age,
     mikewazowski.computeAgeInHumanYears());

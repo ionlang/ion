@@ -8,7 +8,7 @@ namespace ionlang {
         //
     }
 
-    void BooleanType::accept(Pass &pass) {
+    void BooleanType::accept(Pass& pass) {
         return pass.visitBooleanType(this->dynamicCast<BooleanType>());
     }
 }

@@ -1,6 +1,4 @@
 #include <ionlang/lexical/classifier.h>
-#include <ionlang/const/notice.h>
-#include <ionlang/const/const_name.h>
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
@@ -85,14 +83,6 @@ namespace ionlang {
         return errorMarker;
     }
 
-    void Parser::mapSourceLocation(const AstPtrResult<>& construct) {
-        // TODO: Causing error regarding std::pair.
-//        this->sourceMap->set(
-//            util::getResultValue(std::move(construct)),
-//            this->makeSourceLocation()
-//        );
-    }
-
     void Parser::finishSourceLocationMapping(const std::shared_ptr<Construct>& construct) {
         construct->sourceLocation = this->finishSourceLocation();
     }
@@ -147,13 +137,14 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordGlobal))
 
-        AstPtrResult<Type> typeResult = this->parseType();
+        // TODO: Not proper parent.
+        AstPtrResult<Type> typeResult = this->parseType(parent);
 
         IONLANG_PARSER_ASSERT(util::hasValue(typeResult))
 
-        std::optional<std::string> id = this->parseName();
+        std::optional<std::string> name = this->parseName();
 
-        IONLANG_PARSER_ASSERT(id.has_value())
+        IONLANG_PARSER_ASSERT(name.has_value())
 
         AstPtrResult<Expression<>> valueResult;
 
@@ -162,18 +153,19 @@ namespace ionlang {
             // Skip the equal symbol before continuing parsing.
             this->tokenStream.skip();
 
+            // TODO: Not proper parent.
             // TODO: What about full expressions on globals?
-            valueResult = this->parseLiteral();
+            valueResult = this->parseLiteral(parent);
 
             IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
         }
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
-        std::shared_ptr<Global> global = std::make_shared<Global>(
+        std::shared_ptr<Global> global = Construct::makeChild<Global>(
             parent,
             util::getResultValue(typeResult),
-            *id,
+            *name,
             util::getResultValue(valueResult)
         );
 
@@ -195,7 +187,8 @@ namespace ionlang {
         Fields fields = ionshared::util::makePtrSymbolTable<Type>();
 
         while (!this->is(TokenKind::SymbolBraceR)) {
-            AstPtrResult<Type> fieldTypeResult = this->parseType();
+            // TODO: Not proper parent.
+            AstPtrResult<Type> fieldTypeResult = this->parseType(parent);
 
             IONLANG_PARSER_ASSERT(util::hasValue(fieldTypeResult))
 
@@ -223,7 +216,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceR))
 
-        return std::make_shared<Struct>(parent, *structNameResult, fields);
+        return Construct::makeChild<Struct>(parent, *structNameResult, fields);
     }
 
     AstPtrResult<Block> Parser::parseBlock(const std::shared_ptr<Construct>& parent) {
@@ -231,7 +224,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
-        std::shared_ptr<Block> block = std::make_shared<Block>(parent);
+        std::shared_ptr<Block> block = Construct::makeChild<Block>(parent);
 
         while (!this->is(TokenKind::SymbolBraceR)) {
             AstPtrResult<Statement> statement = this->parseStatement(block);
@@ -300,7 +293,7 @@ namespace ionlang {
         return module;
     }
 
-    AstPtrResult<VariableDeclStatement> Parser::parseVariableDecl(const std::shared_ptr<Block>& parent) {
+    AstPtrResult<VariableDeclStmt> Parser::parseVariableDecl(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         bool isTypeInferred = false;
@@ -311,7 +304,8 @@ namespace ionlang {
             this->tokenStream.skip();
         }
         else {
-            typeResult = this->parseType();
+            // TODO: Not proper parent.
+            typeResult = this->parseType(parent);
 
             IONLANG_PARSER_ASSERT(util::hasValue(typeResult))
         }
@@ -329,12 +323,21 @@ namespace ionlang {
             ? util::getResultValue(valueResult)->type
             : Resolvable<Type>::make(util::getResultValue(typeResult));
 
-        std::shared_ptr<VariableDeclStatement> variableDecl = std::make_shared<VariableDeclStatement>(VariableDeclStatementOpts{
-            parent,
-            finalType,
-            *name,
-            util::getResultValue(valueResult)
-        });
+        std::shared_ptr<VariableDeclStmt> variableDecl =
+            Construct::makeChild<VariableDeclStmt>(
+                parent,
+                finalType,
+                *name,
+                util::getResultValue(valueResult)
+            );
+
+//        /**
+//         * Variable declaration construct owns the type. Assign
+//         * the type's parent.
+//         */
+//        if (!isTypeInferred) {
+//            finalType->parent = variableDecl;
+//        }
 
         // Register the statement on the resulting block's symbol table.
         parent->symbolTable->set(variableDecl->name, variableDecl);

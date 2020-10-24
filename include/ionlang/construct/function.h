@@ -7,22 +7,24 @@
 #include "module.h"
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     struct Function : ConstructWithParent<Module> {
+        static std::shared_ptr<Function> make(
+            const std::shared_ptr<Prototype>& prototype,
+            const std::shared_ptr<Block>& body
+        ) noexcept;
+
         std::shared_ptr<Prototype> prototype;
 
         std::shared_ptr<Block> body;
 
-        ionshared::PtrSymbolTable<LocalVariableDescriptor> localVariables;
-
         Function(
-            std::shared_ptr<Module> parent,
             std::shared_ptr<Prototype> prototype,
             std::shared_ptr<Block> body
         );
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
 
         [[nodiscard]] Ast getChildNodes() override;
     };

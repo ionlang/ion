@@ -5,11 +5,17 @@
 #include <ionlang/construct/function.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     typedef std::vector<std::shared_ptr<Expression<>>> CallArgs;
 
     struct CallExpr : Expression<> {
+        static std::shared_ptr<CallExpr> make(
+            const PtrResolvable<>& calleeResolvable,
+            const CallArgs& args,
+            const PtrResolvable<Type>& type
+        ) noexcept;
+
         PtrResolvable<> calleeResolvable;
 
         CallArgs args;

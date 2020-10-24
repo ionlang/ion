@@ -5,7 +5,7 @@
 #include <ionshared/diagnostics/source_location.h>
 
 namespace ionlang {
-    enum class ConstructKind {
+    enum struct ConstructKind {
         Type,
 
         FunctionBody,
@@ -41,9 +41,9 @@ namespace ionlang {
         Struct
     };
 
-    class Construct;
+    struct Construct;
 
-    class Pass;
+    struct Pass;
 
     typedef ionshared::Ast<Construct> Ast;
 
@@ -87,13 +87,35 @@ namespace ionlang {
             return children;
         }
 
+        /**
+         * Create a shared pointer to a construct, while setting its
+         * parent. Should be preferred instead of creating the shared
+         * pointer and then setting its parent manually for consistency
+         * and error-preventing measures.
+         */
+        template<typename TConstruct, typename ...TArgs>
+        requires std::derived_from<TConstruct, Construct>
+        static std::shared_ptr<TConstruct> makeChild(
+            const std::shared_ptr<Construct>& parent,
+            TArgs&&... args
+        ) {
+            std::shared_ptr<TConstruct> construct =
+                std::make_shared<TConstruct>(std::forward<TArgs>(args)...);
+
+            construct->parent = parent;
+
+            // TODO: Consider having a virtual default-empty 'acceptChild(<ConstructTypeHere> child)' which inserts it into a corresponding list (if any)
+
+            return construct;
+        }
+
         explicit Construct(
             ConstructKind kind,
             std::optional<ionshared::SourceLocation> sourceLocation = std::nullopt,
             ionshared::OptPtr<Construct> parent = std::nullopt
         );
 
-        virtual void accept(Pass &visitor) = 0;
+        virtual void accept(Pass& visitor) = 0;
 
         [[nodiscard]] virtual Ast getChildNodes();
 

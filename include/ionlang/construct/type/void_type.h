@@ -3,11 +3,11 @@
 #include <ionlang/construct/type.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     struct VoidType : Type {
         VoidType();
 
-        void accept(Pass &pass) override;
+        void accept(Pass& pass) override;
     };
 }

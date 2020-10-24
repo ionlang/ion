@@ -5,12 +5,12 @@
 #include <ionlang/construct/pseudo/child_construct.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     struct Attribute : ConstructWithParent<>, ionshared::Named {
-        Attribute(std::shared_ptr<Construct> parent, std::string id);
+        explicit Attribute(std::string id);
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
     };
 
     typedef std::vector<std::shared_ptr<Attribute>> Attributes;

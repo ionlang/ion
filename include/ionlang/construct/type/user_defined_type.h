@@ -3,7 +3,7 @@
 #include <ionlang/construct/type.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     struct UserDefinedType : Type {
         explicit UserDefinedType(

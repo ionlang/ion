@@ -12,7 +12,7 @@ namespace ionlang::test::bootstrap {
     }
 
     TokenStream tokenStream(size_t amountOfItems) {
-        std::vector<Token> tokens = {};
+        std::vector<Token> tokens{};
 
         // Reserve the amount of items in the vector.
         tokens.reserve(amountOfItems);
@@ -26,7 +26,7 @@ namespace ionlang::test::bootstrap {
         return TokenStream(tokens);
     }
 
-    Parser parser(const std::vector<Token> &tokens) {
+    Parser parser(const std::vector<Token>& tokens) {
         return Parser(TokenStream(tokens));
     }
 
@@ -37,7 +37,7 @@ namespace ionlang::test::bootstrap {
     }
 
     std::shared_ptr<IonIrLoweringPass> ionIrLoweringPass() {
-        std::shared_ptr<ionir::Module> module = ionIrModule();
+        std::shared_ptr<ionir::Module> module = bootstrap::ionIrModule();
 
         ionshared::PtrSymbolTable<ionir::Module> modules =
             std::make_shared<ionshared::SymbolTable<std::shared_ptr<ionir::Module>>>();
@@ -59,24 +59,21 @@ namespace ionlang::test::bootstrap {
         return ionIrCodegenPass;
     }
 
-    std::shared_ptr<Function> emptyFunction(std::vector<std::shared_ptr<Statement>> statements) {
+    std::shared_ptr<Function> emptyFunction(const std::vector<std::shared_ptr<Statement>>& statements) {
         std::shared_ptr<VoidType> returnType = type_factory::typeVoid();
 
         // TODO: Consider support for module here.
-        std::shared_ptr<Prototype> prototype = std::make_shared<Prototype>(
+        std::shared_ptr<Prototype> prototype = Prototype::make(
             test::constant::foobar,
             std::make_shared<Args>(),
-            returnType,
-            nullptr
+            returnType
         );
 
         // The parent will be filled in below.
-        std::shared_ptr<Block> body =
-            std::make_shared<Block>(nullptr, std::move(statements));
+        std::shared_ptr<Block> body = Block::make(statements);
 
         // TODO: Provide module parent for function.
-        std::shared_ptr<Function> function =
-            std::make_shared<Function>(nullptr, prototype, body);
+        std::shared_ptr<Function> function = Function::make(prototype, body);
 
         // Fill in the body's parent.
         body->parent = function;

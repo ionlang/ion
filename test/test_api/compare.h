@@ -37,7 +37,7 @@ namespace ionlang::test::compare {
         // Compare results by iterating over both expected and actual, resulting tokens.
         int i = 0;
 
-        for (auto &token : actual) {
+        for (auto& token : actual) {
             // Compare iterator value with its corresponding expected token kind.
             EXPECT_EQ(expected[i], token);
 

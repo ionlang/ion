@@ -21,6 +21,6 @@ namespace ionlang::test::bootstrap {
     [[nodiscard]] std::shared_ptr<IonIrLoweringPass> ionIrLoweringPass();
 
     [[nodiscard]] std::shared_ptr<Function> emptyFunction(
-        std::vector<std::shared_ptr<Statement>> statements = {}
+        const std::vector<std::shared_ptr<Statement>>& statements = {}
     );
 }

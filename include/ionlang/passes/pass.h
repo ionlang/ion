@@ -51,15 +51,15 @@ namespace ionlang {
 
         virtual void visitBlock(std::shared_ptr<Block> node);
 
-        virtual void visitIfStatement(std::shared_ptr<IfStatement> node);
+        virtual void visitIfStatement(std::shared_ptr<IfStmt> node);
 
-        virtual void visitReturnStatement(std::shared_ptr<ReturnStatement> node);
+        virtual void visitReturnStatement(std::shared_ptr<ReturnStmt> node);
 
-        virtual void visitAssignmentStatement(std::shared_ptr<AssignmentStatement> node);
+        virtual void visitAssignmentStatement(std::shared_ptr<AssignmentStmt> node);
 
-        virtual void visitExprWrapperStatement(std::shared_ptr<ExprWrapperStatement> node);
+        virtual void visitExprWrapperStatement(std::shared_ptr<ExprWrapperStmt> node);
 
-        virtual void visitBlockWrapperStatement(std::shared_ptr<BlockWrapperStatement> node);
+        virtual void visitBlockWrapperStatement(std::shared_ptr<BlockWrapperStmt> node);
 
         virtual void visitOperationExpr(std::shared_ptr<OperationExpr> node);
 
@@ -85,7 +85,7 @@ namespace ionlang {
 
         virtual void visitFunction(std::shared_ptr<Function> node);
 
-        virtual void visitVariableDecl(std::shared_ptr<VariableDeclStatement> node);
+        virtual void visitVariableDecl(std::shared_ptr<VariableDeclStmt> node);
 
         virtual void visitScopeAnchor(std::shared_ptr<ionshared::Scoped<Construct>> node);
 

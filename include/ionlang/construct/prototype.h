@@ -6,12 +6,18 @@
 #include "type.h"
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
     /**
      * Prototype's parent is either a function or extern construct.
      */
     struct Prototype : ConstructWithParent<>, ionshared::Named {
+        static std::shared_ptr<Prototype> make(
+            const std::string& id,
+            const std::shared_ptr<Args>& args,
+            const std::shared_ptr<Type>& returnType
+        ) noexcept;
+
         std::shared_ptr<Args> args;
 
         std::shared_ptr<Type> returnType;
@@ -19,13 +25,10 @@ namespace ionlang {
         Prototype(
             std::string id,
             std::shared_ptr<Args> args,
-            std::shared_ptr<Type> returnType,
-
-            // TODO: Make parent first arg.
-            std::shared_ptr<Construct> parent
+            std::shared_ptr<Type> returnType
         );
 
-        void accept(Pass &visitor) override;
+        void accept(Pass& visitor) override;
 
         // TODO: Get child constructs?
 

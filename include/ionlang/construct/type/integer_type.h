@@ -3,9 +3,9 @@
 #include <ionlang/construct/type.h>
 
 namespace ionlang {
-    class Pass;
+    struct Pass;
 
-    enum class IntegerKind {
+    enum struct IntegerKind {
         Int8 = 8,
 
         Int16 = 16,

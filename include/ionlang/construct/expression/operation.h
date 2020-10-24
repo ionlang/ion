@@ -35,24 +35,26 @@ namespace ionlang {
         Not
     };
 
-    struct OperationExprOpts {
-        PtrResolvable<Type> type;
-
-        IntrinsicOperatorKind operation;
-
-        std::shared_ptr<Expression<>> leftSideValue;
-
-        ionshared::OptPtr<Expression<>> rightSideValue;
-    };
-
     struct OperationExpr : Expression<> {
+        static std::shared_ptr<OperationExpr> make(
+            const PtrResolvable<Type>& type,
+            IntrinsicOperatorKind operation,
+            const std::shared_ptr<Expression<>>& leftSideValue,
+            ionshared::OptPtr<Expression<>> rightSideValue
+        ) noexcept;
+
         const IntrinsicOperatorKind operation;
 
         std::shared_ptr<Expression<>> leftSideValue;
 
         ionshared::OptPtr<Expression<>> rightSideValue;
 
-        explicit OperationExpr(const OperationExprOpts& opts) noexcept;
+        OperationExpr(
+            PtrResolvable<Type> type,
+            IntrinsicOperatorKind operation,
+            std::shared_ptr<Expression<>> leftSideValue,
+            ionshared::OptPtr<Expression<>> rightSideValue
+        ) noexcept;
 
         void accept(Pass& visitor) override;
 

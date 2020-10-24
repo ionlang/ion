@@ -5,7 +5,7 @@
 #include "construct.h"
 
 namespace ionlang {
-    enum class TypeQualifier {
+    enum struct TypeQualifier {
         Constant,
 
         Mutable,
@@ -15,7 +15,7 @@ namespace ionlang {
         Pointer
     };
 
-    enum class TypeKind {
+    enum struct TypeKind {
         UserDefined,
 
         Void,
@@ -37,7 +37,9 @@ namespace ionlang {
         explicit Type(
             std::string name,
             TypeKind kind = TypeKind::UserDefined,
-            std::shared_ptr<TypeQualifiers> qualifiers = std::make_shared<TypeQualifiers>()
+
+            std::shared_ptr<TypeQualifiers> qualifiers =
+                std::make_shared<TypeQualifiers>()
         ) noexcept;
     };
 }

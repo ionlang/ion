@@ -3,18 +3,31 @@
 #include <ionlang/misc/statement_builder.h>
 
 namespace ionlang {
+    std::shared_ptr<Block> Block::make(
+        const std::vector<std::shared_ptr<Statement>>& statements,
+        const ionshared::PtrSymbolTable<VariableDeclStmt>& symbolTable
+    ) noexcept {
+        std::shared_ptr<Block> result =
+            std::make_shared<Block>(statements, symbolTable);
+
+        for (const auto& statement : statements) {
+            statement->parent = result;
+        }
+
+        return result;
+    }
+
     Block::Block(
-        std::shared_ptr<Construct> parent,
         std::vector<std::shared_ptr<Statement>> statements,
-        const ionshared::PtrSymbolTable<VariableDeclStatement> &symbolTable
+        const ionshared::PtrSymbolTable<VariableDeclStmt>& symbolTable
     ) :
-        ConstructWithParent<Construct>(std::move(parent), ConstructKind::Block),
-        ionshared::Scoped<VariableDeclStatement>(symbolTable),
+        ConstructWithParent<Construct>(ConstructKind::Block),
+        ionshared::Scoped<VariableDeclStmt>(symbolTable),
         statements(std::move(statements)) {
         //
     }
 
-    void Block::accept(Pass &visitor) {
+    void Block::accept(Pass& visitor) {
         // TODO: Cast fails.
 //        visitor.visitScopeAnchor(this->dynamicCast<ionshared::Scoped<Construct>>());
         visitor.visitBlock(this->dynamicCast<Block>());
@@ -32,8 +45,8 @@ namespace ionlang {
          * the local symbol table.
          */
         if (statement->statementKind == StatementKind::VariableDeclaration) {
-            std::shared_ptr<VariableDeclStatement> variableDecl =
-                statement->dynamicCast<VariableDeclStatement>();
+            std::shared_ptr<VariableDeclStmt> variableDecl =
+                statement->dynamicCast<VariableDeclStmt>();
 
             this->symbolTable->set(variableDecl->name, variableDecl);
         }
@@ -103,9 +116,8 @@ namespace ionlang {
     }
 
     std::shared_ptr<Block> Block::slice(size_t from, std::optional<size_t> to) {
-        std::shared_ptr<Block> newBlock = std::make_shared<Block>(Block{
-            this->getUnboxedParent()
-        });
+        std::shared_ptr<Block> newBlock =
+            Construct::makeChild<Block>(this->forceGetUnboxedParent());
 
         /**
          * NOTE: Index boundary checks are performed when relocation
@@ -153,21 +165,6 @@ namespace ionlang {
         }
 
         return std::nullopt;
-    }
-
-    bool Block::isFunctionBody() {
-        std::shared_ptr<Construct> parent = this->getUnboxedParent();
-
-        // TODO: Better way to know if this is a function body.
-        if (parent == nullptr) {
-            throw std::runtime_error("Unexpected parent construct to be nullptr");
-        }
-
-        /**
-         * A block is considered a function body if it's parent is
-         * a function construct.
-         */
-        return parent->constructKind == ConstructKind::Function;
     }
 
     ionshared::OptPtr<Function> Block::findParentFunction() {
