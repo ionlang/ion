@@ -19,7 +19,7 @@ namespace ionlang {
     }
 
     void ExprWrapperStmt::accept(Pass& visitor) {
-        visitor.visitExprWrapperStatement(this->dynamicCast<ExprWrapperStmt>());
+        visitor.visitExprWrapperStmt(this->dynamicCast<ExprWrapperStmt>());
     }
 
     Ast ExprWrapperStmt::getChildNodes() {

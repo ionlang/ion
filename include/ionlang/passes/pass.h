@@ -57,7 +57,7 @@ namespace ionlang {
 
         virtual void visitAssignmentStmt(std::shared_ptr<AssignmentStmt> construct);
 
-        virtual void visitExprWrapperStatement(std::shared_ptr<ExprWrapperStmt> construct);
+        virtual void visitExprWrapperStmt(std::shared_ptr<ExprWrapperStmt> construct);
 
         virtual void visitBlockWrapperStatement(std::shared_ptr<BlockWrapperStmt> construct);
 

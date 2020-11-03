@@ -548,6 +548,13 @@ namespace ionlang {
         );
     }
 
+    void IonIrLoweringPass::visitExprWrapperStmt(std::shared_ptr<ExprWrapperStmt> construct) {
+        this->symbolTable.set(
+            construct,
+            this->safeEarlyVisitOrLookup(construct->expression)
+        );
+    }
+
     void IonIrLoweringPass::visitCallExpr(std::shared_ptr<CallExpr> construct) {
         PtrResolvable<> calleeRef = construct->calleeResolvable;
 

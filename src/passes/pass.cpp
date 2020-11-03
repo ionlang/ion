@@ -60,7 +60,7 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitExprWrapperStatement(std::shared_ptr<ExprWrapperStmt> construct) {
+    void Pass::visitExprWrapperStmt(std::shared_ptr<ExprWrapperStmt> construct) {
         //
     }
 

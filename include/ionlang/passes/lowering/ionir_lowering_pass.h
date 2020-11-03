@@ -146,6 +146,8 @@ namespace ionlang {
 
         void visitVariableDeclStmt(std::shared_ptr<VariableDeclStmt> construct) override;
 
+        void visitExprWrapperStmt(std::shared_ptr<ExprWrapperStmt> construct) override;
+
         void visitCallExpr(std::shared_ptr<CallExpr> construct) override;
 
         void visitOperationExpr(std::shared_ptr<OperationExpr> construct) override;
