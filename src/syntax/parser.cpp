@@ -162,13 +162,13 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
-        std::shared_ptr<Global> global = Construct::makeChild<Global>(
-            parent,
+        std::shared_ptr<Global> global = Global::make(
             util::getResultValue(typeResult),
             *name,
             util::getResultValue(valueResult)
         );
 
+        global->parent = parent;
         this->finishSourceLocationMapping(global);
 
         return global;
@@ -216,7 +216,11 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceR))
 
-        return Construct::makeChild<Struct>(parent, *structNameResult, fields);
+        std::shared_ptr<Struct> structConstruct = Struct::make(*structNameResult, fields);
+
+        structConstruct->parent = parent;
+
+        return structConstruct;
     }
 
     AstPtrResult<Block> Parser::parseBlock(const std::shared_ptr<Construct>& parent) {
@@ -224,7 +228,9 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
-        std::shared_ptr<Block> block = Construct::makeChild<Block>(parent);
+        std::shared_ptr<Block> block = Block::make();
+
+        block->parent = parent;
 
         while (!this->is(TokenKind::SymbolBraceR)) {
             AstPtrResult<Statement> statement = this->parseStatement(block);
@@ -323,13 +329,13 @@ namespace ionlang {
             ? util::getResultValue(valueResult)->type
             : Resolvable<Type>::make(util::getResultValue(typeResult));
 
-        std::shared_ptr<VariableDeclStmt> variableDecl =
-            Construct::makeChild<VariableDeclStmt>(
-                parent,
-                finalType,
-                *name,
-                util::getResultValue(valueResult)
-            );
+        std::shared_ptr<VariableDeclStmt> variableDecl = VariableDeclStmt::make(
+            finalType,
+            *name,
+            util::getResultValue(valueResult)
+        );
+
+        variableDecl->parent = parent;
 
 //        /**
 //         * Variable declaration construct owns the type. Assign

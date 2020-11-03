@@ -28,10 +28,10 @@ namespace ionlang::test::compare {
         const std::shared_ptr<ionir::LlvmLoweringPass>& llvmLoweringPass,
         const std::string& fileName
     ) {
-        std::optional<llvm::Module*> llvmModuleBuffer{std::nullopt};
+        std::optional<std::shared_ptr<llvm::Module>> llvmModuleBuffer{std::nullopt};
 
         // TODO: Easier way to get the first entry.
-        for (const auto& [name, module] : llvmLoweringPass->getModules()->unwrap()) {
+        for (const auto& [name, module] : llvmLoweringPass->llvmModules->unwrap()) {
             llvmModuleBuffer = module;
         }
 
@@ -41,6 +41,6 @@ namespace ionlang::test::compare {
 
         // TODO: IonIR cannot yet convert constructs to strings (code representation). This forces comparison against resulting LLVM IR instead of IonIR code.
 
-        return compare::ir(ionshared::LlvmModule(*llvmModuleBuffer).makeIr(), fileName);
+        return compare::ir(ionshared::LlvmModule(llvmModuleBuffer->get()).makeIr(), fileName);
     }
 }

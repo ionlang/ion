@@ -94,6 +94,14 @@ if (USE_MD)
     message(STATUS "Using /MD flag")
 endif (USE_MD)
 
+option(IONLANG_BUILD_STATIC_LIB "Build static library" ON)
+
+if (IONLANG_BUILD_STATIC_LIB)
+    set(IONLANG_OPTION_LIB_TYPE STATIC)
+else()
+    set(IONLANG_OPTION_LIB_TYPE SHARED)
+endif()
+
 # Setup versioning.
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "0")
@@ -114,7 +122,7 @@ file(
 )
 
 # Specify that this project is a library.
-add_library("${PROJECT_NAME}" ${SOURCES})
+add_library("${PROJECT_NAME}" ${IONLANG_OPTION_LIB_TYPE} ${SOURCES})
 
 # Link .libs (same functionality handled by llvm_map_components_to_libnames().)
 #target_link_libraries(${PROJECT_NAME} ${LIB_SOURCES})

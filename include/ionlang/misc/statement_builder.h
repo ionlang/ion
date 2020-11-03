@@ -20,6 +20,7 @@ namespace ionlang {
         std::shared_ptr<TStatement> make(TArgs... args) {
             // TODO: Ensure T inherits from Inst or derived.
 
+            // TODO: Should be invoking TStatement::make() for certain statements.
             std::shared_ptr<TStatement> statement =
                 Construct::makeChild<TStatement>(this->block, args...);
 

@@ -25,7 +25,7 @@ namespace ionlang {
 
         ionshared::PtrSymbolTable<ionir::Module> modules;
 
-        IonIrBuffers ionIrBuffers;
+        IonIrBuffers irBuffers;
 
         ionshared::LoweringSymbolTable<std::shared_ptr<Construct>, std::shared_ptr<ionir::Construct>> symbolTable;
 
@@ -49,7 +49,7 @@ namespace ionlang {
         template<typename T = ionir::Construct>
             requires std::derived_from<T, ionir::Construct>
         std::shared_ptr<T> safeEarlyVisitOrLookup(
-            std::shared_ptr<Construct> construct,
+            const std::shared_ptr<Construct>& construct,
             bool useDynamicCast = true,
             bool stashBuffers = true
         ) {

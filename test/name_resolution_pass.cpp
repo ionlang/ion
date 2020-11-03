@@ -13,7 +13,7 @@ TEST(NameResolutionPassTest, Run) {
     ));
 
     // Bootstrap the initial AST.
-    Ast ast = {
+    Ast ast{
         test::bootstrap::emptyFunction()
     };
 
@@ -40,7 +40,7 @@ TEST(NameResolutionPassTest, Run) {
 
     auto assignmentStmt = AssignmentStmt::make(
         Resolvable<VariableDeclStmt>::make(ResolvableKind::Variable, id, functionBody),
-        nullptr
+        IntegerLiteral::make(std::make_shared<IntegerType>(IntegerKind::Int32), 1)->flatten()
     );
 
     statementBuilder->appendStatement(assignmentStmt);

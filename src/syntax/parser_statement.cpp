@@ -35,10 +35,8 @@ namespace ionlang {
 
             IONLANG_PARSER_ASSERT(util::hasValue(expression))
 
-            statement = Construct::makeChild<ExprWrapperStmt>(
-                parent,
-                util::getResultValue(expression)
-            );
+            statement = ExprWrapperStmt::make(util::getResultValue(expression));
+            util::getResultValue(statement)->parent = parent;
 
             IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
         }
@@ -80,13 +78,13 @@ namespace ionlang {
             alternativeBlock = util::getResultValue(alternativeBlockResult);
         }
 
-        // Make the if statement construct.
-        std::shared_ptr<IfStmt> ifStatement = Construct::makeChild<IfStmt>(
-            parent,
+        std::shared_ptr<IfStmt> ifStatement = IfStmt::make(
             util::getResultValue(condition),
             consequentBlock,
             alternativeBlock
         );
+
+        ifStatement->parent = parent;
 
         // Finally, fill in the gaps.
         consequentBlock->parent = ifStatement;
@@ -103,7 +101,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordReturn))
 
-        AstPtrResult<Expression<>> valueResult;
+        AstPtrResult<Expression<>> valueResult{};
 
         // Return statement contains a value. Parse it and save it.
         if (!this->is(TokenKind::SymbolSemiColon)) {
@@ -120,10 +118,13 @@ namespace ionlang {
             finalValue = util::getResultValue(valueResult);
         }
 
-        return Construct::makeChild<ReturnStmt>(
-            parent,
+        std::shared_ptr<ReturnStmt> returnStatement = ReturnStmt::make(
             finalValue
         );
+
+        returnStatement->parent = parent;
+
+        return returnStatement;
     }
 
     AstPtrResult<AssignmentStmt> Parser::parseAssignmentStatement(
@@ -141,9 +142,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(util::hasValue(value))
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
-        return Construct::makeChild<AssignmentStmt>(
-            parent,
-
+        std::shared_ptr<AssignmentStmt> assignmentStatement = AssignmentStmt::make(
             std::make_shared<Resolvable<VariableDeclStmt>>(
                 ResolvableKind::Variable,
                 *id,
@@ -152,5 +151,9 @@ namespace ionlang {
 
             util::getResultValue(value)
         );
+
+        assignmentStatement->parent = parent;
+
+        return assignmentStatement;
     }
 }

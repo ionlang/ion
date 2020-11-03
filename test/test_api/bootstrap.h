@@ -14,11 +14,11 @@ namespace ionlang::test::bootstrap {
 
     [[nodiscard]] Parser parser(const std::vector<Token>& tokens);
 
-    [[nodiscard]]  std::shared_ptr<ionir::Module> ionIrModule(
+    [[nodiscard]]  std::shared_ptr<ionir::Module> irModule(
         const std::string& identifier = "test"
     );
 
-    [[nodiscard]] std::shared_ptr<IonIrLoweringPass> ionIrLoweringPass();
+    [[nodiscard]] std::shared_ptr<IonIrLoweringPass> irLoweringPass();
 
     [[nodiscard]] std::shared_ptr<Function> emptyFunction(
         const std::vector<std::shared_ptr<Statement>>& statements = {}

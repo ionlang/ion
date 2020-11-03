@@ -129,49 +129,6 @@ namespace ionlang {
         }
 
         return leftSideExpression;
-
-//        while (true) {
-//            std::optional<IntrinsicOperatorKind> operation =
-//                util::findIntrinsicOperatorKind(this->tokenStream.get().kind);
-//
-//            IONLANG_PARSER_ASSERT(operation.has_value())
-//
-//            uint32_t operatorPrecedence =
-//                Grammar::intrinsicOperatorPrecedences.at(*operation);
-//
-//            // Skip the operator token.
-//            this->tokenStream.skip();
-//
-//            // TODO: This shouldn't be determined here. Hence, this function should return BinaryOperation (right-side is non-optional).
-//            // TODO: Also adjust documentation.
-//            /**
-//             * If this is a binop that binds at least as tightly as the current binop,
-//             * consume it, otherwise we are done.
-//             */
-//            if (expressionPrecedence >= operatorPrecedence) {
-//                return leftSideExpression;
-//            }
-//
-//            // TODO: Debugging exception here.
-//            // TODO: The problem is that it's while(true) so it's parsing right side @ EOF, which makes rightSideExprResult null.
-//            AstPtrResult<Expression<>> rightSideExpressionResult =
-//                this->parseOperationExpr(expressionPrecedence + 1, nullptr, parent);
-//
-//            IONLANG_PARSER_ASSERT(util::hasValue(rightSideExpressionResult))
-//
-//            // TODO: UNFINISHED!!!!
-//            // ------------------------------------------------------------
-//            // Continue: https://github.com/ionlang/Ion.Net/blob/master/Ion/Parsing/BinaryOpRightSideParser.cs
-//            // ------------------------------------------------------------
-//
-//            // TODO: Should verify that both left and right side's type are the same?
-//            return std::make_shared<OperationExpr>(OperationExprOpts{
-//                leftSideExpression->type,
-//                *operation,
-//                leftSideExpression,
-//                util::getResultValue(rightSideExpressionResult)
-//            });
-//        }
     }
 
     AstPtrResult<CallExpr> Parser::parseCallExpr(const std::shared_ptr<Block>& parent) {

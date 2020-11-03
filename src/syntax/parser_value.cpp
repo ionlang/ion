@@ -45,7 +45,7 @@ namespace ionlang {
                 return util::getResultValue(booleanLiteralResult)->flatten();
             }
 
-            // TODO: Missing literals.
+            // TODO: Missing literal(s)?
 
             default: {
                 this->diagnosticBuilder
@@ -123,12 +123,10 @@ namespace ionlang {
         std::shared_ptr<IntegerType> integerType =
             std::make_shared<IntegerType>(*valueIntegerKind);
 
-        // TODO: Not proper parent.
-        integerType->parent = parent;
-
         std::shared_ptr<IntegerLiteral> integerLiteral =
-            std::make_shared<IntegerLiteral>(integerType, value);
+            IntegerLiteral::make(integerType, value);
 
+        integerType->parent = integerLiteral;
         integerLiteral->parent = parent;
         this->finishSourceLocationMapping(integerLiteral);
 

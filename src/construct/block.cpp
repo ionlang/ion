@@ -116,8 +116,9 @@ namespace ionlang {
     }
 
     std::shared_ptr<Block> Block::slice(size_t from, std::optional<size_t> to) {
-        std::shared_ptr<Block> newBlock =
-            Construct::makeChild<Block>(this->forceGetUnboxedParent());
+        std::shared_ptr<Block> newBlock = Block::make();
+
+        newBlock->parent = this->forceGetUnboxedParent();
 
         /**
          * NOTE: Index boundary checks are performed when relocation

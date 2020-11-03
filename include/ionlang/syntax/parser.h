@@ -117,7 +117,7 @@ namespace ionlang {
 
         std::optional<Arg> parseArg(std::shared_ptr<Construct> parent);
 
-        AstPtrResult<Args> parseArgs(std::shared_ptr<Construct> parent);
+        AstPtrResult<Args> parseArgs(const std::shared_ptr<Construct>& parent);
 
         AstPtrResult<Attribute> parseAttribute(const std::shared_ptr<Construct>& parent);
 

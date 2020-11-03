@@ -30,14 +30,14 @@ namespace ionlang::test::bootstrap {
         return Parser(TokenStream(tokens));
     }
 
-    std::shared_ptr<ionir::Module> ionIrModule(const std::string& identifier) {
+    std::shared_ptr<ionir::Module> irModule(const std::string& identifier) {
         return std::make_shared<ionir::Module>(
             std::make_shared<ionir::Identifier>(identifier)
         );
     }
 
-    std::shared_ptr<IonIrLoweringPass> ionIrLoweringPass() {
-        std::shared_ptr<ionir::Module> module = bootstrap::ionIrModule();
+    std::shared_ptr<IonIrLoweringPass> irLoweringPass() {
+        std::shared_ptr<ionir::Module> module = bootstrap::irModule();
 
         ionshared::PtrSymbolTable<ionir::Module> modules =
             std::make_shared<ionshared::SymbolTable<std::shared_ptr<ionir::Module>>>();
@@ -45,18 +45,18 @@ namespace ionlang::test::bootstrap {
         // TODO: Inserting module, but can be done inline above -- it's just a headache.
         modules->set(**module->identifier, module);
 
-        std::shared_ptr<IonIrLoweringPass> ionIrCodegenPass =
+        std::shared_ptr<IonIrLoweringPass> irCodegenPass =
             std::make_shared<IonIrLoweringPass>(
                 std::make_shared<ionshared::PassContext>(),
                 modules
             );
 
         // TODO: CRITICAL: Breaking tests. Find a way to set the module buffer.
-//        if (!ionIrCodegenPass->setModuleBuffer(**module->identifier)) {
+//        if (!irCodegenPass->setModuleBuffer(**module->identifier)) {
 //            throw std::runtime_error("Could not set active module buffer during bootstrap process");
 //        }
 
-        return ionIrCodegenPass;
+        return irCodegenPass;
     }
 
     std::shared_ptr<Function> emptyFunction(const std::vector<std::shared_ptr<Statement>>& statements) {
