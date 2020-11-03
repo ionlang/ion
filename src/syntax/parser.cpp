@@ -325,12 +325,13 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
 
-        PtrResolvable<Type> finalType = isTypeInferred
-            ? util::getResultValue(valueResult)->type
-            : Resolvable<Type>::make(util::getResultValue(typeResult));
-
         std::shared_ptr<VariableDeclStmt> variableDecl = VariableDeclStmt::make(
-            finalType,
+            isTypeInferred
+                // TODO: Type must be cloned.
+                ? util::getResultValue(valueResult)->type
+
+                : Resolvable<Type>::make(util::getResultValue(typeResult)),
+
             *name,
             util::getResultValue(valueResult)
         );

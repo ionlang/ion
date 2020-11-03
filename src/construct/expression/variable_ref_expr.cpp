@@ -17,4 +17,8 @@ namespace ionlang {
     void VariableRefExpr::accept(Pass& visitor) {
         visitor.visitVariableRefExpr(this->dynamicCast<VariableRefExpr>());
     }
+
+    Ast VariableRefExpr::getChildNodes() {
+        return {this->variableDecl};
+    }
 }

@@ -30,6 +30,7 @@ namespace ionlang {
      * be thrown.
      */
     template<typename T = Construct>
+        requires std::derived_from<T, Construct>
     class Resolvable : public Construct {
     private:
         ionshared::OptPtr<T> value;
@@ -79,7 +80,8 @@ namespace ionlang {
 
         void accept(Pass& visitor) override {
             // TODO: CRITICAL: Fix 'incomplete type' problem.
-            // visitor.visitRef(this->dynamicCast<Ref<T>>());
+            //            visitor.visitResolvable(this->staticCast<Resolvable<>>());
+//            this->value->get().accept(visitor); What about this? Still need to visit Resolvable tho.
         }
 
         [[nodiscard]] std::shared_ptr<T> operator*() {
@@ -96,6 +98,14 @@ namespace ionlang {
 
         ionshared::OptPtr<T> getValue() const noexcept {
             return this->value;
+        }
+
+        [[nodiscard]] std::shared_ptr<T> forceGetValue() const {
+            if (!ionshared::util::hasValue(this->value)) {
+                throw std::runtime_error("Value is not set or nullptr");
+            }
+
+            return *this->value;
         }
 
         template<typename TValue>

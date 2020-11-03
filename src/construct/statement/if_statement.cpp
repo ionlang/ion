@@ -32,7 +32,7 @@ namespace ionlang {
     }
 
     void IfStmt::accept(Pass& visitor) {
-        visitor.visitIfStatement(this->dynamicCast<IfStmt>());
+        visitor.visitIfStmt(this->dynamicCast<IfStmt>());
     }
 
     Ast IfStmt::getChildNodes() {

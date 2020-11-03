@@ -12,5 +12,7 @@ namespace ionlang {
         explicit VariableRefExpr(PtrResolvable<VariableDeclStmt> variableDecl);
 
         void accept(Pass& visitor) override;
+
+        [[nodiscard]] Ast getChildNodes() override;
     };
 }

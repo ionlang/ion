@@ -21,7 +21,7 @@ namespace ionlang {
     }
 
     void ReturnStmt::accept(Pass& visitor) {
-        visitor.visitReturnStatement(this->dynamicCast<ReturnStmt>());
+        visitor.visitReturnStmt(this->dynamicCast<ReturnStmt>());
     }
 
     Ast ReturnStmt::getChildNodes() {

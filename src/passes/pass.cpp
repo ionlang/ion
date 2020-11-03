@@ -6,141 +6,141 @@ namespace ionlang {
         //
     }
 
-    void Pass::visit(std::shared_ptr<Construct> node) {
+    void Pass::visit(std::shared_ptr<Construct> construct) {
         // TODO: Hotfix for circular dep.
-        if (node->constructKind == ConstructKind::Resolvable) {
-            this->visitResolvable(node->staticCast<Resolvable<>>());
+        if (construct->constructKind == ConstructKind::Resolvable) {
+            this->visitResolvable(construct->staticCast<Resolvable<>>());
         }
         // TODO: This should be at the top alone with visitChildren() once fixed.
         else {
-            node->accept(*this);
+            construct->accept(*this);
         }
 
-        this->visitChildren(node);
+        this->visitChildren(construct);
     }
 
-    void Pass::visitChildren(std::shared_ptr<Construct> node) {
+    void Pass::visitChildren(std::shared_ptr<Construct> construct) {
         // TODO: Will it cause StackOverflow error with large ASTs?
-        Ast children = node->getChildNodes();
+        Ast children = construct->getChildNodes();
 
         /**
-         * After visiting the node, attempt to visit all its children
+         * After visiting the construct, attempt to visit all its children
          * as well.
          */
-        for (const auto &child : children) {
+        for (const auto& child : children) {
             this->visit(child);
         }
     }
 
-    void Pass::visitModule(std::shared_ptr<Module> node) {
+    void Pass::visitModule(std::shared_ptr<Module> construct) {
         //
     }
 
-    void Pass::visitPrototype(std::shared_ptr<Prototype> node) {
+    void Pass::visitPrototype(std::shared_ptr<Prototype> construct) {
         //
     }
 
-    void Pass::visitExtern(std::shared_ptr<Extern> node) {
+    void Pass::visitExtern(std::shared_ptr<Extern> construct) {
         //
     }
 
-    void Pass::visitBlock(std::shared_ptr<Block> node) {
+    void Pass::visitBlock(std::shared_ptr<Block> construct) {
         //
     }
 
-    void Pass::visitIfStatement(std::shared_ptr<IfStmt> node) {
+    void Pass::visitIfStmt(std::shared_ptr<IfStmt> construct) {
         //
     }
 
-    void Pass::visitReturnStatement(std::shared_ptr<ReturnStmt> node) {
+    void Pass::visitReturnStmt(std::shared_ptr<ReturnStmt> construct) {
         //
     }
 
-    void Pass::visitAssignmentStatement(std::shared_ptr<AssignmentStmt> node) {
+    void Pass::visitAssignmentStmt(std::shared_ptr<AssignmentStmt> construct) {
         //
     }
 
-    void Pass::visitExprWrapperStatement(std::shared_ptr<ExprWrapperStmt> node) {
+    void Pass::visitExprWrapperStatement(std::shared_ptr<ExprWrapperStmt> construct) {
         //
     }
 
-    void Pass::visitBlockWrapperStatement(std::shared_ptr<BlockWrapperStmt> node) {
+    void Pass::visitBlockWrapperStatement(std::shared_ptr<BlockWrapperStmt> construct) {
         //
     }
 
-    void Pass::visitOperationExpr(std::shared_ptr<OperationExpr> node) {
+    void Pass::visitOperationExpr(std::shared_ptr<OperationExpr> construct) {
         //
     }
 
-    void Pass::visitCallExpr(std::shared_ptr<CallExpr> node) {
+    void Pass::visitCallExpr(std::shared_ptr<CallExpr> construct) {
         //
     }
 
-    void Pass::visitVariableRefExpr(std::shared_ptr<VariableRefExpr> node) {
+    void Pass::visitVariableRefExpr(std::shared_ptr<VariableRefExpr> construct) {
         //
     }
 
-    void Pass::visitBooleanLiteral(std::shared_ptr<BooleanLiteral> node) {
+    void Pass::visitBooleanLiteral(std::shared_ptr<BooleanLiteral> construct) {
         //
     }
 
-    void Pass::visitCharLiteral(std::shared_ptr<CharLiteral> node) {
+    void Pass::visitCharLiteral(std::shared_ptr<CharLiteral> construct) {
         //
     }
 
-    void Pass::visitIntegerLiteral(std::shared_ptr<IntegerLiteral> node) {
+    void Pass::visitIntegerLiteral(std::shared_ptr<IntegerLiteral> construct) {
         //
     }
 
-    void Pass::visitStringLiteral(std::shared_ptr<StringLiteral> node) {
+    void Pass::visitStringLiteral(std::shared_ptr<StringLiteral> construct) {
         //
     }
 
-    void Pass::visitVoidType(std::shared_ptr<VoidType> node) {
+    void Pass::visitVoidType(std::shared_ptr<VoidType> construct) {
         //
     }
 
-    void Pass::visitBooleanType(std::shared_ptr<BooleanType> node) {
+    void Pass::visitBooleanType(std::shared_ptr<BooleanType> construct) {
         //
     }
 
-    void Pass::visitUserDefinedType(std::shared_ptr<UserDefinedType> node) {
+    void Pass::visitUserDefinedType(std::shared_ptr<UserDefinedType> construct) {
         //
     }
 
-    void Pass::visitResolvable(PtrResolvable<> node) {
+    void Pass::visitResolvable(PtrResolvable<> construct) {
         //
     }
 
-    void Pass::visitFunction(std::shared_ptr<Function> node) {
+    void Pass::visitFunction(std::shared_ptr<Function> construct) {
         //
     }
 
-    void Pass::visitVariableDecl(std::shared_ptr<VariableDeclStmt> node) {
+    void Pass::visitVariableDeclStmt(std::shared_ptr<VariableDeclStmt> construct) {
         //
     }
 
-    void Pass::visitScopeAnchor(std::shared_ptr<ionshared::Scoped<Construct>> node) {
+    void Pass::visitScopeAnchor(std::shared_ptr<ionshared::Scoped<Construct>> construct) {
         //
     }
 
-    void Pass::visitIntegerType(std::shared_ptr<IntegerType> node) {
+    void Pass::visitIntegerType(std::shared_ptr<IntegerType> construct) {
         //
     }
 
-    void Pass::visitGlobal(ionshared::Ptr <Global> node) {
+    void Pass::visitGlobal(ionshared::Ptr <Global> construct) {
         //
     }
 
-    void Pass::visitErrorMarker(std::shared_ptr<ErrorMarker> node) {
+    void Pass::visitErrorMarker(std::shared_ptr<ErrorMarker> construct) {
         //
     }
 
-    void Pass::visitAttribute(std::shared_ptr<Attribute> node) {
+    void Pass::visitAttribute(std::shared_ptr<Attribute> construct) {
         //
     }
 
-    void Pass::visitStruct(std::shared_ptr<Struct> node) {
+    void Pass::visitStruct(std::shared_ptr<Struct> construct) {
         //
     }
 

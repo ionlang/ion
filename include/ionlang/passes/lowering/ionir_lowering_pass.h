@@ -20,14 +20,17 @@ namespace ionlang {
 
         [[nodiscard]] static std::shared_ptr<ionir::Type> processTypeQualifiers(
             std::shared_ptr<ionir::Type> type,
-            const std::shared_ptr<TypeQualifiers> &qualifiers
+            const std::shared_ptr<TypeQualifiers>& qualifiers
         );
 
         ionshared::PtrSymbolTable<ionir::Module> modules;
 
         IonIrBuffers irBuffers;
 
-        ionshared::LoweringSymbolTable<std::shared_ptr<Construct>, std::shared_ptr<ionir::Construct>> symbolTable;
+        ionshared::LoweringSymbolTable<
+            std::shared_ptr<Construct>,
+            std::shared_ptr<ionir::Construct>
+        > symbolTable;
 
         uint32_t nameCounter;
 
@@ -135,21 +138,25 @@ namespace ionlang {
 
         void visitVoidType(std::shared_ptr<VoidType> construct) override;
 
-        void visitIfStatement(std::shared_ptr<IfStmt> construct) override;
+        void visitIfStmt(std::shared_ptr<IfStmt> construct) override;
 
-        void visitReturnStatement(std::shared_ptr<ReturnStmt> construct) override;
+        void visitReturnStmt(std::shared_ptr<ReturnStmt> construct) override;
 
-        void visitAssignmentStatement(std::shared_ptr<AssignmentStmt> construct) override;
+        void visitAssignmentStmt(std::shared_ptr<AssignmentStmt> construct) override;
 
-        void visitVariableDecl(std::shared_ptr<VariableDeclStmt> construct) override;
+        void visitVariableDeclStmt(std::shared_ptr<VariableDeclStmt> construct) override;
 
         void visitCallExpr(std::shared_ptr<CallExpr> construct) override;
 
         void visitOperationExpr(std::shared_ptr<OperationExpr> construct) override;
 
+        void visitVariableRefExpr(std::shared_ptr<VariableRefExpr> construct) override;
+
         void visitStruct(std::shared_ptr<Struct> construct) override;
 
         void visitStructDefinition(std::shared_ptr<StructDefinition> construct) override;
+
+        void visitResolvable(PtrResolvable<> construct) override;
 
         // TODO: visitRef() if !isResolved() error, else this->visit(ref->getValue()); Is this a good idea? It may be required for example for if statement condition (if it's a ref). Investigate.
     };

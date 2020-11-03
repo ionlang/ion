@@ -28,7 +28,7 @@ namespace ionlang {
     }
 
     void VariableDeclStmt::accept(Pass& visitor) {
-        visitor.visitVariableDecl(this->dynamicCast<VariableDeclStmt>());
+        visitor.visitVariableDeclStmt(this->dynamicCast<VariableDeclStmt>());
     }
 
     Ast VariableDeclStmt::getChildNodes() {

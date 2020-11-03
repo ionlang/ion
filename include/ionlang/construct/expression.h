@@ -1,11 +1,10 @@
 #pragma once
 
+#include <ionlang/construct/type.h>
 #include <ionlang/construct/pseudo/resolvable.h>
 
 namespace ionlang {
     struct Pass;
-
-    struct Type;
 
     enum struct ExpressionKind {
         Call,

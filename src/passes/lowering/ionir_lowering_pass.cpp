@@ -105,6 +105,12 @@ namespace ionlang {
         if (this->symbolTable.contains(construct)) {
             return;
         }
+        // TODO: Hotfix for circular dependency within template. This else if branch should be removed once addressed.
+        else if (construct->constructKind == ConstructKind::Resolvable) {
+            this->visitResolvable(construct->staticCast<Resolvable<>>());
+
+            return;
+        }
 
         /**
          * Only instruct the construct to visit this instance and
@@ -401,7 +407,7 @@ namespace ionlang {
         ));
     }
 
-    void IonIrLoweringPass::visitIfStatement(std::shared_ptr<IfStmt> construct) {
+    void IonIrLoweringPass::visitIfStmt(std::shared_ptr<IfStmt> construct) {
         std::shared_ptr<Block> parentBlock = construct->forceGetUnboxedParent();
 
         std::shared_ptr<ionir::Construct> irCondition =
@@ -416,7 +422,7 @@ namespace ionlang {
          */
         uint32_t splitOrder = construct->getOrder() + 1;
 
-        // TODO: What if, before splitting, the current basic block buffer already has a terminal inst? But that'd mean that there are more insts after a terminal inst which is an error. Who will catch that? Maybe not really needed to be catched here, instead in typecheck pass or something.
+        // TODO: What if, before splitting, the current basic block buffer already has a terminal inst? But that'd mean that there are more instructions after a terminal inst which is an error. Who will catch that? Maybe not really needed to be caught here, instead in type-check pass or something.
 
         // TODO: What if successor block is considered function body (split inherits?) then no value is pushed onto stack?
         std::shared_ptr<Block> successorBlock;
@@ -481,7 +487,7 @@ namespace ionlang {
         }
     }
 
-    void IonIrLoweringPass::visitReturnStatement(std::shared_ptr<ReturnStmt> construct) {
+    void IonIrLoweringPass::visitReturnStmt(std::shared_ptr<ReturnStmt> construct) {
         ionshared::OptPtr<ionir::Value<>> irValue = std::nullopt;
 
         if (construct->hasValue()) {
@@ -498,7 +504,7 @@ namespace ionlang {
         );
     }
 
-    void IonIrLoweringPass::visitAssignmentStatement(std::shared_ptr<AssignmentStmt> construct) {
+    void IonIrLoweringPass::visitAssignmentStmt(std::shared_ptr<AssignmentStmt> construct) {
         if (!construct->variableDeclStmtRef->isResolved()) {
             // TODO: Better error.
             throw std::runtime_error("Expected variable declaration reference to be resolved");
@@ -519,7 +525,7 @@ namespace ionlang {
         );
     }
 
-    void IonIrLoweringPass::visitVariableDecl(std::shared_ptr<VariableDeclStmt> construct) {
+    void IonIrLoweringPass::visitVariableDeclStmt(std::shared_ptr<VariableDeclStmt> construct) {
         std::shared_ptr<ionir::InstBuilder> irInstBuilder =
             this->irBuffers.makeBuilder();
 
@@ -567,14 +573,19 @@ namespace ionlang {
             irArgs.push_back(this->safeEarlyVisitOrLookup(arg));
         }
 
+        // TODO: Outdated doc.
         /**
          * NOTE: At this point, we know that the basic block buffer is
          * set because the builder buffer is set.
          */
-        this->symbolTable.set(construct, this->irBuffers.makeBuilder()->createCall(
-            irCallee,
-            irArgs
-        ));
+        this->symbolTable.set(
+            construct,
+
+            this->irBuffers.makeBuilder()->createCall(
+                irCallee,
+                irArgs
+            )
+        );
     }
 
     void IonIrLoweringPass::visitOperationExpr(std::shared_ptr<OperationExpr> construct) {
@@ -600,6 +611,16 @@ namespace ionlang {
             irLeftSideValue,
             irRightSideValue
         ));
+    }
+
+    void IonIrLoweringPass::visitVariableRefExpr(std::shared_ptr<VariableRefExpr> construct) {
+        this->symbolTable.set(
+            construct,
+
+            this->safeEarlyVisitOrLookup<ionir::AllocaInst>(
+                construct->variableDecl->forceGetValue()
+            )
+        );
     }
 
     void IonIrLoweringPass::visitStruct(std::shared_ptr<Struct> construct) {
@@ -659,5 +680,17 @@ namespace ionlang {
         this->symbolTable.set(construct, ionir::StructDefinition::make(
             irStructDeclaration, irValues
         ));
+    }
+
+    void IonIrLoweringPass::visitResolvable(PtrResolvable<> construct) {
+        if (!construct->isResolved()) {
+            // TODO: Use diagnostics API (internal error).
+            throw std::runtime_error("Expected resolvable to be resolved at this point");
+        }
+
+        this->symbolTable.set(
+            construct,
+            this->safeEarlyVisitOrLookup(*construct->getValue())
+        );
     }
 }

@@ -24,7 +24,7 @@ namespace ionlang {
     }
 
     void AssignmentStmt::accept(Pass& visitor) {
-        visitor.visitAssignmentStatement(this->dynamicCast<AssignmentStmt>());
+        visitor.visitAssignmentStmt(this->dynamicCast<AssignmentStmt>());
     }
 
     Ast AssignmentStmt::getChildNodes() {

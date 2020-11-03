@@ -78,6 +78,8 @@ namespace ionlang {
                 }
 
                 auto ownerBlockSymbolTable = owner->dynamicCast<Block>()->symbolTable;
+
+                // TODO: What about finding nearest symbol instead?
                 auto valueLookupResult = ownerBlockSymbolTable->lookup(name);
 
                 if (!ionshared::util::hasValue(valueLookupResult)) {

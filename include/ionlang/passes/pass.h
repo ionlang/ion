@@ -39,65 +39,65 @@ namespace ionlang {
     struct Pass : ionshared::BasePass<Construct> {
         explicit Pass(std::shared_ptr<ionshared::PassContext> context);
 
-        virtual void visit(std::shared_ptr<Construct> node);
+        void visit(std::shared_ptr<Construct> construct) override;
 
-        virtual void visitChildren(std::shared_ptr<Construct> node);
+        virtual void visitChildren(std::shared_ptr<Construct> construct);
 
-        virtual void visitModule(std::shared_ptr<Module> node);
+        virtual void visitModule(std::shared_ptr<Module> construct);
 
-        virtual void visitPrototype(std::shared_ptr<Prototype> node);
+        virtual void visitPrototype(std::shared_ptr<Prototype> construct);
 
-        virtual void visitExtern(std::shared_ptr<Extern> node);
+        virtual void visitExtern(std::shared_ptr<Extern> construct);
 
-        virtual void visitBlock(std::shared_ptr<Block> node);
+        virtual void visitBlock(std::shared_ptr<Block> construct);
 
-        virtual void visitIfStatement(std::shared_ptr<IfStmt> node);
+        virtual void visitIfStmt(std::shared_ptr<IfStmt> construct);
 
-        virtual void visitReturnStatement(std::shared_ptr<ReturnStmt> node);
+        virtual void visitReturnStmt(std::shared_ptr<ReturnStmt> construct);
 
-        virtual void visitAssignmentStatement(std::shared_ptr<AssignmentStmt> node);
+        virtual void visitAssignmentStmt(std::shared_ptr<AssignmentStmt> construct);
 
-        virtual void visitExprWrapperStatement(std::shared_ptr<ExprWrapperStmt> node);
+        virtual void visitExprWrapperStatement(std::shared_ptr<ExprWrapperStmt> construct);
 
-        virtual void visitBlockWrapperStatement(std::shared_ptr<BlockWrapperStmt> node);
+        virtual void visitBlockWrapperStatement(std::shared_ptr<BlockWrapperStmt> construct);
 
-        virtual void visitOperationExpr(std::shared_ptr<OperationExpr> node);
+        virtual void visitOperationExpr(std::shared_ptr<OperationExpr> construct);
 
-        virtual void visitCallExpr(std::shared_ptr<CallExpr> node);
+        virtual void visitCallExpr(std::shared_ptr<CallExpr> construct);
 
-        virtual void visitVariableRefExpr(std::shared_ptr<VariableRefExpr> node);
+        virtual void visitVariableRefExpr(std::shared_ptr<VariableRefExpr> construct);
 
-        virtual void visitIntegerLiteral(std::shared_ptr<IntegerLiteral> node);
+        virtual void visitIntegerLiteral(std::shared_ptr<IntegerLiteral> construct);
 
-        virtual void visitCharLiteral(std::shared_ptr<CharLiteral> node);
+        virtual void visitCharLiteral(std::shared_ptr<CharLiteral> construct);
 
-        virtual void visitStringLiteral(std::shared_ptr<StringLiteral> node);
+        virtual void visitStringLiteral(std::shared_ptr<StringLiteral> construct);
 
-        virtual void visitBooleanLiteral(std::shared_ptr<BooleanLiteral> node);
+        virtual void visitBooleanLiteral(std::shared_ptr<BooleanLiteral> construct);
 
-        virtual void visitVoidType(std::shared_ptr<VoidType> node);
+        virtual void visitVoidType(std::shared_ptr<VoidType> construct);
 
-        virtual void visitBooleanType(std::shared_ptr<BooleanType> node);
+        virtual void visitBooleanType(std::shared_ptr<BooleanType> construct);
 
-        virtual void visitUserDefinedType(std::shared_ptr<UserDefinedType> node);
+        virtual void visitUserDefinedType(std::shared_ptr<UserDefinedType> construct);
 
-        virtual void visitResolvable(PtrResolvable<> node);
+        virtual void visitResolvable(PtrResolvable<> construct);
 
-        virtual void visitFunction(std::shared_ptr<Function> node);
+        virtual void visitFunction(std::shared_ptr<Function> construct);
 
-        virtual void visitVariableDecl(std::shared_ptr<VariableDeclStmt> node);
+        virtual void visitVariableDeclStmt(std::shared_ptr<VariableDeclStmt> construct);
 
-        virtual void visitScopeAnchor(std::shared_ptr<ionshared::Scoped<Construct>> node);
+        virtual void visitScopeAnchor(std::shared_ptr<ionshared::Scoped<Construct>> construct);
 
-        virtual void visitIntegerType(std::shared_ptr<IntegerType> node);
+        virtual void visitIntegerType(std::shared_ptr<IntegerType> construct);
 
-        virtual void visitGlobal(std::shared_ptr<Global> node);
+        virtual void visitGlobal(std::shared_ptr<Global> construct);
 
-        virtual void visitErrorMarker(std::shared_ptr<ErrorMarker> node);
+        virtual void visitErrorMarker(std::shared_ptr<ErrorMarker> construct);
 
-        virtual void visitAttribute(std::shared_ptr<Attribute> node);
+        virtual void visitAttribute(std::shared_ptr<Attribute> construct);
 
-        virtual void visitStruct(std::shared_ptr<Struct> node);
+        virtual void visitStruct(std::shared_ptr<Struct> construct);
 
         virtual void visitStructDefinition(std::shared_ptr<StructDefinition> construct);
     };
