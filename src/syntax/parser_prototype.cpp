@@ -3,11 +3,11 @@
 #include <ionlang/syntax/parser.h>
 
 namespace ionlang {
-    AstPtrResult<Args> Parser::parseArgs(const std::shared_ptr<Construct>& parent) {
+    AstPtrResult<ArgumentList> Parser::parseArgumentList(const std::shared_ptr<Construct>& parent) {
         this->beginSourceLocationMapping();
 
-        std::shared_ptr<ionshared::SymbolTable<Arg>> args =
-            std::make_shared<ionshared::SymbolTable<Arg>>();
+        ionshared::PtrSymbolTable<Resolvable<Type>> symbolTable =
+            ionshared::util::makePtrSymbolTable<Resolvable<Type>>();
 
         bool isVariable = false;
 
@@ -16,7 +16,7 @@ namespace ionlang {
             if (this->is(TokenKind::SymbolComma)) {
                 // TODO: Only occurring when the argument list is empty, not when there's no more args to process.
                 // Warn about leading, lonely comma.
-                if (args->isEmpty()) {
+                if (symbolTable->isEmpty()) {
                     this->diagnosticBuilder
                         ->bootstrap(diagnostic::syntaxLeadingCommaInArgs)
                         ->setSourceLocation(this->makeSourceLocation())
@@ -34,17 +34,24 @@ namespace ionlang {
                 break;
             }
 
-            std::optional<Arg> argResult = this->parseArg(parent);
+            AstPtrResult<Resolvable<Type>> type = this->parseType(parent);
 
-            IONLANG_PARSER_ASSERT(argResult.has_value())
+            IONLANG_PARSER_ASSERT(util::hasValue(type))
 
-            Arg arg = *argResult;
+            std::optional<std::string> name = this->parseName();
 
-            args->set(arg.second, arg);
+            IONLANG_PARSER_ASSERT(name.has_value())
+
+            symbolTable->set(*name, util::getResultValue(type));
         }
         while (this->is(TokenKind::SymbolComma));
 
-        return std::make_shared<Args>(args, isVariable);
+        std::shared_ptr<ArgumentList> argumentList =
+            ArgumentList::make(symbolTable, isVariable);
+
+        argumentList->parent = parent;
+
+        return argumentList;
     }
 
     AstPtrResult<Attribute> Parser::parseAttribute(const std::shared_ptr<Construct>& parent) {
@@ -87,16 +94,16 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(name.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
-        std::shared_ptr<Args> args = std::make_shared<Args>();
+        std::shared_ptr<ArgumentList> argumentList = ArgumentList::make();
 
         // Parse arguments if applicable.
         if (!this->is(TokenKind::SymbolParenthesesR)) {
             // TODO: Not proper parent.
-            AstPtrResult<Args> temporaryArgs = this->parseArgs(parent);
+            AstPtrResult<ArgumentList> temporaryArgumentList = this->parseArgumentList(parent);
 
-            IONLANG_PARSER_ASSERT(util::hasValue(temporaryArgs))
+            IONLANG_PARSER_ASSERT(util::hasValue(temporaryArgumentList))
 
-            args = util::getResultValue(temporaryArgs);
+            argumentList = util::getResultValue(temporaryArgumentList);
         }
 
         this->tokenStream.skip();
@@ -104,13 +111,13 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolArrow))
 
         // TODO: Not proper parent.
-        AstPtrResult<Type> returnType = this->parseType(parent);
+        AstPtrResult<Resolvable<Type>> returnType = this->parseType(parent);
 
         IONLANG_PARSER_ASSERT(util::hasValue(returnType))
 
         std::shared_ptr<Prototype> prototype = Prototype::make(
             *name,
-            args,
+            argumentList,
             util::getResultValue(returnType)
         );
 

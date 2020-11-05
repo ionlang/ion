@@ -6,7 +6,7 @@
 namespace ionlang {
     struct Pass;
 
-    enum struct ExpressionKind {
+    enum struct ExpressionKind : uint32_t {
         Call,
 
         Operation,
@@ -43,7 +43,7 @@ namespace ionlang {
             //
         }
 
-        std::shared_ptr<Expression<>> flatten() {
+        std::shared_ptr<Expression<>> flattenExpression() {
             return this->staticCast<Expression<>>();
         }
     };

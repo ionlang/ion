@@ -9,19 +9,19 @@
 namespace ionlang {
     struct Pass;
 
-    struct Global : ConstructWithParent<Module>, ionshared::Named {
+    struct Global : ConstructWithParent<Module, Construct, ConstructKind>, ionshared::Named {
         static std::shared_ptr<Global> make(
-            const std::shared_ptr<Type>& type,
+            const PtrResolvable<Type>& type,
             const std::string& name,
             ionshared::OptPtr<Expression<>> value = std::nullopt
         ) noexcept;
 
-        std::shared_ptr<Type> type;
+        PtrResolvable<Type> type;
 
         ionshared::OptPtr<Expression<>> value;
 
         Global(
-            std::shared_ptr<Type> type,
+            const PtrResolvable<Type>& type,
             std::string name,
             ionshared::OptPtr<Expression<>> value = std::nullopt
         );

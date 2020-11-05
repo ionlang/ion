@@ -21,8 +21,8 @@ namespace ionlang {
         std::vector<std::shared_ptr<Statement>> statements,
         const ionshared::PtrSymbolTable<VariableDeclStmt>& symbolTable
     ) :
-        ConstructWithParent<Construct>(ConstructKind::Block),
-        ionshared::Scoped<VariableDeclStmt>(symbolTable),
+        Construct(ConstructKind::Block),
+        ionshared::Scoped<VariableDeclStmt, ConstructKind>(symbolTable),
         statements(std::move(statements)) {
         //
     }
@@ -54,7 +54,10 @@ namespace ionlang {
         // TODO: What about other named statements? Currently there might be none -- but in the future this might be an edge case, it's really daunting to write checks for each named construct (also recall there's Identifier, so we can't just std::dynamic_pointer_cast<ionshared::Named>).
     }
 
-    bool Block::relocateStatement(size_t orderIndex, const std::shared_ptr<Block>& target) {
+    bool Block::relocateStatement(
+        size_t orderIndex,
+        const std::shared_ptr<Block>& target
+    ) {
         /**
          * The size of the local statements vector is less than
          * the provided index.
@@ -118,7 +121,7 @@ namespace ionlang {
     std::shared_ptr<Block> Block::slice(size_t from, std::optional<size_t> to) {
         std::shared_ptr<Block> newBlock = Block::make();
 
-        newBlock->parent = this->forceGetUnboxedParent();
+        newBlock->parent = this->parent;
 
         /**
          * NOTE: Index boundary checks are performed when relocation

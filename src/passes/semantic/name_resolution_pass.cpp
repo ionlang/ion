@@ -20,7 +20,7 @@ namespace ionlang {
         }
 
         auto rootModuleSymbolTable =
-            parentFunction->get()->forceGetUnboxedParent()->context->getGlobalScope();
+            parentFunction->get()->forceGetUnboxedParent()->context->globalScope;
 
         auto lookupResult = rootModuleSymbolTable->lookup(std::move(name));
 
@@ -41,7 +41,7 @@ namespace ionlang {
 
     void NameResolutionPass::visitModule(std::shared_ptr<Module> node) {
         // TODO: Is it push_back() or push_front()?
-        this->scope.push_back(node->context->getGlobalScope());
+        this->scope.push_back(node->context->globalScope);
     }
 
     void NameResolutionPass::visitResolvable(PtrResolvable<> node) {
@@ -69,7 +69,7 @@ namespace ionlang {
         };
 
         switch (*node->resolvableKind) {
-            case ResolvableKind::Variable: {
+            case ResolvableKind::NearestVariableOrArgument: {
                 // TODO: Must use flow graph to find variable declarations from other blocks (remember blocks can be nested).
 
                 if (owner->constructKind != ConstructKind::Block) {
@@ -77,10 +77,37 @@ namespace ionlang {
                     throw std::runtime_error("Cannot resolve variable declaration when owner is not a block");
                 }
 
-                auto ownerBlockSymbolTable = owner->dynamicCast<Block>()->symbolTable;
+                ionshared::OptPtr<Construct> valueLookupResult{std::nullopt};
 
-                // TODO: What about finding nearest symbol instead?
-                auto valueLookupResult = ownerBlockSymbolTable->lookup(name);
+                owner->dynamicCast<Block>()->traverseScopes([&](auto& scope) -> bool {
+                    ionshared::OptPtr<Construct> symbolResult = scope.symbolTable->lookup(name);
+
+                    if (!ionshared::util::hasValue(symbolResult)) {
+                        return true;
+                    }
+
+                    // TODO: Simplify code.
+                    std::shared_ptr<Construct> symbol = *symbolResult;
+
+                    // TODO: Doesn't make any sense. Argument list isn't part of a scope.
+                    if (symbol->constructKind == ConstructKind::ArgumentList) {
+
+                    }
+                    else if (symbol->constructKind == ConstructKind::Statement
+                        && symbol->template dynamicCast<Statement>()->statementKind
+                        == StatementKind::VariableDeclaration) {
+                        valueLookupResult = symbol->template dynamicCast<VariableDeclStmt>();
+                    }
+                    else {
+                        return true;
+                    }
+
+                    valueLookupResult = symbol;
+
+                    return false;
+
+                    return true;
+                });
 
                 if (!ionshared::util::hasValue(valueLookupResult)) {
                     throwUndefinedReference();
@@ -132,7 +159,7 @@ namespace ionlang {
                 break;
             }
 
-            case ResolvableKind::Struct: {
+            case ResolvableKind::StructType: {
                 ionshared::OptPtr<Construct> lookupResult =
                     NameResolutionPass::findGlobalConstruct(name, owner);
 
@@ -204,7 +231,7 @@ namespace ionlang {
 //        }
     }
 
-    void NameResolutionPass::visitScopeAnchor(std::shared_ptr<ionshared::Scoped<Construct>> node) {
+    void NameResolutionPass::visitScopeAnchor(std::shared_ptr<Scoped<>> node) {
         // TODO: ScopeStack should be pushed & popped, but its never popped.
         // TODO: CRITICAL: Throwing SEGFAULT because node is NULL (casting fails).
         //        this->scopeStack.add(node->getSymbolTable());

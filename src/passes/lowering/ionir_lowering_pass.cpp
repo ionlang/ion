@@ -132,7 +132,7 @@ namespace ionlang {
 
         // Proceed to visit all the module's children (top-level constructs).
         std::map<std::string, std::shared_ptr<Construct>> moduleNativeSymbolTable =
-            construct->context->getGlobalScope()->unwrap();
+            construct->context->globalScope->unwrap();
 
         for (const auto& [id, topLevelConstruct] : moduleNativeSymbolTable) {
             this->visit(topLevelConstruct);
@@ -217,31 +217,31 @@ namespace ionlang {
             this->safeEarlyVisitOrLookup<ionir::Type>(construct->returnType);
 
         std::shared_ptr<ionir::Args> irArguments = std::make_shared<ionir::Args>();
-        std::shared_ptr<Args> arguments = construct->args;
-        auto nativeArgumentsMap = arguments->items->unwrap();
 
-        irArguments->isVariable = arguments->isVariable;
+        irArguments->isVariable = construct->argumentList->isVariable;
+
+        auto argumentListNativeMap = construct->argumentList->symbolTable->unwrap();
 
         // TODO: Should Args be a construct, and be visited?
-        for (const auto& [id, argument] : nativeArgumentsMap) {
+        for (const auto& [name, type] : argumentListNativeMap) {
             irArguments->items->set(
-                argument.second,
+                name,
 
                 std::make_pair(
-                    this->safeEarlyVisitOrLookup<ionir::Type>(argument.first),
-                    argument.second
+                    this->safeEarlyVisitOrLookup<ionir::Type>(**type),
+                    name
                 )
             );
         }
 
-        std::shared_ptr<ionir::Prototype> irPrototype = ionir::Prototype::make(
-            construct->name,
-            irArguments,
-            irReturnType
-        );
+        std::shared_ptr<ionir::Prototype> irPrototype =
+            ionir::Prototype::make(
+                construct->name,
+                irArguments,
+                irReturnType
+            );
 
         irPrototype->parent = this->irBuffers.modules.forceGetTopItem();
-
         this->symbolTable.set(construct, irPrototype);
     }
 
@@ -407,6 +407,45 @@ namespace ionlang {
         ));
     }
 
+    void IonIrLoweringPass::visitStructType(std::shared_ptr<StructType> construct) {
+        // TODO: What if it's visited as a inline type and not a struct declaration?
+
+        std::shared_ptr<ionir::Module> irModuleBuffer =
+            this->irBuffers.modules.forceGetTopItem();
+
+        ionir::Scope globalSymbolTable = irModuleBuffer->context->getGlobalScope();
+
+        // TODO: Check local symbol table too?
+        if (globalSymbolTable->contains(construct->typeName)) {
+            // TODO: Use DiagnosticBuilder.
+            throw std::runtime_error("Struct was already previously defined in the module");
+        }
+
+        auto fieldsNativeMap = construct->fields->unwrap();
+
+        ionir::Fields irFields =
+            ionshared::util::makePtrSymbolTable<ionir::Type>();
+
+        for (const auto& [name, irType] : fieldsNativeMap) {
+            irFields->set(
+                name,
+                this->safeEarlyVisitOrLookup<ionir::Type>(irType)
+            );
+        }
+
+        std::shared_ptr<ionir::StructType> irStruct =
+            ionir::StructType::make(construct->typeName, irFields);
+
+        irStruct->parent = this->irBuffers.modules.forceGetTopItem();
+
+        irModuleBuffer->context->getGlobalScope()->set(
+            construct->typeName,
+            irStruct
+        );
+
+        this->symbolTable.set(construct, irStruct);
+    }
+
     void IonIrLoweringPass::visitIfStmt(std::shared_ptr<IfStmt> construct) {
         std::shared_ptr<Block> parentBlock = construct->forceGetUnboxedParent();
 
@@ -444,7 +483,7 @@ namespace ionlang {
         else {
             // TODO: Symbol table not being migrated.
             successorBlock = Block::make();
-            successorBlock->parent = parentBlock->forceGetUnboxedParent();
+            successorBlock->parent = parentBlock->parent;
         }
 
         // TODO: Hotfix to avoid function body (thus overriding bufferFunction's body).
@@ -625,56 +664,16 @@ namespace ionlang {
             construct,
 
             this->safeEarlyVisitOrLookup<ionir::AllocaInst>(
-                construct->variableDecl->forceGetValue()
+                **construct->variableDecl
             )
         );
-    }
-
-    void IonIrLoweringPass::visitStruct(std::shared_ptr<Struct> construct) {
-        std::shared_ptr<ionir::Module> irModuleBuffer =
-            this->irBuffers.modules.forceGetTopItem();
-
-        ionir::Scope globalSymbolTable = irModuleBuffer->context->getGlobalScope();
-
-        // TODO: Check local symbol table too?
-        if (globalSymbolTable->contains(construct->name)) {
-            // TODO: Use DiagnosticBuilder.
-            throw std::runtime_error("Struct was already previously defined in the module");
-        }
-
-        auto fieldsNativeMap = construct->fields->unwrap();
-
-        ionir::Fields irFields =
-            ionshared::util::makePtrSymbolTable<ionir::Type>();
-
-        for (const auto& [name, irType] : fieldsNativeMap) {
-            irFields->set(
-                name,
-                this->safeEarlyVisitOrLookup<ionir::Type>(irType)
-            );
-        }
-
-        std::shared_ptr<ionir::Struct> irStruct =
-            ionir::Struct::make(construct->name, irFields);
-
-        irModuleBuffer->context->getGlobalScope()->set(
-            construct->name,
-            irStruct
-        );
-
-        this->symbolTable.set(construct, irStruct);
     }
 
     void IonIrLoweringPass::visitStructDefinition(
         std::shared_ptr<StructDefinition> construct
     ) {
-        if (!construct->declaration->isResolved()) {
-            // TODO: Use diagnostics.
-            throw std::runtime_error("Declaration must be resolved at this point");
-        }
-
-        std::shared_ptr<ionir::Struct> irStructDeclaration =
-            this->safeEarlyVisitOrLookup<ionir::Struct>(**construct->declaration);
+        std::shared_ptr<ionir::StructType> irStructType =
+            this->safeEarlyVisitOrLookup<ionir::StructType>(**construct->type);
 
         std::vector<std::shared_ptr<ionir::Value<>>> irValues{};
 
@@ -685,7 +684,8 @@ namespace ionlang {
         }
 
         this->symbolTable.set(construct, ionir::StructDefinition::make(
-            irStructDeclaration, irValues
+            irStructType,
+            irValues
         ));
     }
 

@@ -2,7 +2,7 @@
 
 namespace ionlang {
     std::shared_ptr<Global> Global::make(
-        const std::shared_ptr<Type>& type,
+        const PtrResolvable<Type>& type,
         const std::string& name,
         ionshared::OptPtr<Expression<>> value
     ) noexcept {
@@ -19,11 +19,11 @@ namespace ionlang {
     }
 
     Global::Global(
-        std::shared_ptr<Type> type,
+        const PtrResolvable<Type>& type,
         std::string name,
         ionshared::OptPtr<Expression<>> value
     ) :
-        ConstructWithParent<Module>(ConstructKind::Global),
+        ConstructWithParent<Module, Construct, ConstructKind>(ConstructKind::Global),
         ionshared::Named{std::move(name)},
         type(std::move(type)),
         value(std::move(value)) {

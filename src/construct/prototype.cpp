@@ -4,26 +4,27 @@
 
 namespace ionlang {
     std::shared_ptr<Prototype> Prototype::make(
-        const std::string& id,
-        const std::shared_ptr<Args>& args,
-        const std::shared_ptr<Type>& returnType
+        const std::string& name,
+        const std::shared_ptr<ArgumentList>& argumentList,
+        const PtrResolvable<Type>& returnType
     ) noexcept {
         std::shared_ptr<Prototype> result =
-            std::make_shared<Prototype>(id, args, returnType);
+            std::make_shared<Prototype>(name, argumentList, returnType);
 
+        argumentList->parent = result;
         returnType->parent = result;
 
         return result;
     }
 
     Prototype::Prototype(
-        std::string id,
-        std::shared_ptr<Args> args,
-        std::shared_ptr<Type> returnType
+        std::string name,
+        std::shared_ptr<ArgumentList> argumentList,
+        PtrResolvable<Type> returnType
     ) :
-        ConstructWithParent<>(ConstructKind::Prototype),
-        Named{std::move(id)},
-        args(std::move(args)),
+        Construct(ConstructKind::Prototype),
+        Named{std::move(name)},
+        argumentList(std::move(argumentList)),
         returnType(std::move(returnType)) {
         //
     }
@@ -32,11 +33,19 @@ namespace ionlang {
         visitor.visitPrototype(this->dynamicCast<Prototype>());
     }
 
-    std::optional<std::string> Prototype::getMangledId() {
-        std::shared_ptr<Construct> localParent = this->forceGetUnboxedParent();
+    Ast Prototype::getChildNodes() {
+        return {
+            this->argumentList,
+            this->returnType
+        };
+    }
+
+    std::optional<std::string> Prototype::getMangledName() {
+        std::shared_ptr<Construct> localParent = this->forceGetParent();
         ConstructKind parentConstructKind = localParent->constructKind;
 
-        if (parentConstructKind != ConstructKind::Extern && parentConstructKind != ConstructKind::Function) {
+        if (parentConstructKind != ConstructKind::Extern
+            && parentConstructKind != ConstructKind::Function) {
             return std::nullopt;
         }
 
@@ -44,23 +53,23 @@ namespace ionlang {
             localParent->dynamicCast<ConstructWithParent<Module>>();
 
         // TODO: Need to make sure that mangled id is compatible with LLVM IR ids.
-        std::stringstream mangledId;
+        std::stringstream mangledName{};
 
-        mangledId << localParentAsChild->forceGetUnboxedParent()->name
+        mangledName << localParentAsChild->forceGetUnboxedParent()->name
             << IONLANG_MANGLE_SEPARATOR
-            << this->returnType->name
+            << this->returnType->name.value_or(this->returnType->forceGetValue()->typeName)
             << IONLANG_MANGLE_SEPARATOR
             << this->name;
 
-        auto argsMap = this->args->items->unwrap();
+        auto argumentListNativeMap = this->argumentList->symbolTable->unwrap();
 
-        for (const auto &[id, arg] : argsMap) {
-            mangledId << IONLANG_MANGLE_SEPARATOR
-                << arg.first->name
+        for (const auto &[name, type] : argumentListNativeMap) {
+            mangledName << IONLANG_MANGLE_SEPARATOR
+                << type->name.value_or(type->forceGetValue()->typeName)
                 << IONLANG_MANGLE_SEPARATOR
-                << arg.second;
+                << name;
         }
 
-        return mangledId.str();
+        return mangledName.str();
     }
 }

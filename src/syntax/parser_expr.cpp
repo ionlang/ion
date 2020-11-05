@@ -193,8 +193,8 @@ namespace ionlang {
         this->tokenStream.skip();
 
         std::shared_ptr<StructDefinition> structDefinition = StructDefinition::make(
-            Resolvable<Struct>::make(
-                ResolvableKind::Struct,
+            Resolvable<StructType>::make(
+                ResolvableKind::StructType,
                 *name,
                 parent
             ),

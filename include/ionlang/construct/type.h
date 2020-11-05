@@ -15,8 +15,8 @@ namespace ionlang {
         Pointer
     };
 
-    enum struct TypeKind {
-        UserDefined,
+    enum struct TypeKind : uint32_t {
+        Struct,
 
         Void,
 
@@ -29,14 +29,16 @@ namespace ionlang {
 
     typedef ionshared::Set<TypeQualifier> TypeQualifiers;
 
-    struct Type : Construct, ionshared::Named {
+    struct Type : Construct {
+        const std::string typeName;
+
         const TypeKind typeKind;
 
         std::shared_ptr<TypeQualifiers> qualifiers;
 
-        explicit Type(
+        Type(
             std::string name,
-            TypeKind kind = TypeKind::UserDefined,
+            TypeKind kind,
 
             std::shared_ptr<TypeQualifiers> qualifiers =
                 std::make_shared<TypeQualifiers>()

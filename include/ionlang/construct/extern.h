@@ -1,13 +1,13 @@
 #pragma once
 
-#include <ionlang/construct/pseudo/child_construct.h>
+#include <ionlang/construct/pseudo/construct_with_parent.h>
 #include "prototype.h"
 #include "module.h"
 
 namespace ionlang {
     struct Pass;
 
-    struct Extern : ConstructWithParent<Module> {
+    struct Extern : ConstructWithParent<Module, Construct, ConstructKind> {
         static std::shared_ptr<Extern> make(
             const std::shared_ptr<Prototype>& prototype
         ) noexcept;

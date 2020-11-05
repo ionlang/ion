@@ -1,14 +1,13 @@
 #pragma once
 
+#include <ionshared/tracking/scoped.h>
 #include <ionshared/tracking/symbol_table.h>
 #include <ionshared/construct/base_construct.h>
 #include <ionshared/diagnostics/source_location.h>
 
 namespace ionlang {
-    enum struct ConstructKind {
+    enum struct ConstructKind : uint32_t {
         Type,
-
-        FunctionBody,
 
         Prototype,
 
@@ -22,9 +21,7 @@ namespace ionlang {
 
         VariableRef,
 
-        VariableDecl,
-
-        StructDecl,
+        StructDefinition,
 
         Module,
 
@@ -38,7 +35,7 @@ namespace ionlang {
 
         Attribute,
 
-        Struct
+        ArgumentList
     };
 
     struct Construct;
@@ -129,4 +126,9 @@ namespace ionlang {
 
         [[nodiscard]] std::optional<std::string> findConstructName();
     };
+
+    template<typename T = Construct>
+    // TODO: Used with partial types.
+//        requires std::derived_from<T, Construct>
+    using Scoped = ionshared::Scoped<T, ConstructKind>;
 }

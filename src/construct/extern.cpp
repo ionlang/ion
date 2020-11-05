@@ -13,7 +13,7 @@ namespace ionlang {
     }
 
     Extern::Extern(std::shared_ptr<Prototype> prototype) :
-        ConstructWithParent<Module>(ConstructKind::Extern),
+        ConstructWithParent<Module, Construct, ConstructKind>(ConstructKind::Extern),
         prototype(std::move(prototype)) {
         //
     }

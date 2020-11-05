@@ -35,12 +35,12 @@ TEST(NameResolutionPassTest, Run) {
         std::make_shared<IntegerLiteral>(
             type_factory::typeInteger32(),
             1
-        )->flatten()
+        )->flattenExpression()
     );
 
     auto assignmentStmt = AssignmentStmt::make(
-        Resolvable<VariableDeclStmt>::make(ResolvableKind::Variable, id, functionBody),
-        IntegerLiteral::make(std::make_shared<IntegerType>(IntegerKind::Int32), 1)->flatten()
+        Resolvable<VariableDeclStmt>::make(ResolvableKind::NearestVariableOrArgument, id, functionBody),
+        IntegerLiteral::make(std::make_shared<IntegerType>(IntegerKind::Int32), 1)->flattenExpression()
     );
 
     statementBuilder->appendStatement(assignmentStmt);

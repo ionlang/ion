@@ -8,7 +8,7 @@
 namespace ionlang {
     struct Pass;
 
-    typedef ionshared::Scope<Construct> Scope;
+//    typedef ionshared::Scope<Construct> Scope;
 
     typedef ionshared::Context<Construct> Context;
 

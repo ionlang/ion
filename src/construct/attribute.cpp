@@ -2,7 +2,7 @@
 
 namespace ionlang {
     Attribute::Attribute(std::string id) :
-        ConstructWithParent<>(ConstructKind::Attribute),
+        ConstructWithParent<Module, Construct, ConstructKind>(ConstructKind::Attribute),
         ionshared::Named{std::move(id)} {
         //
     }

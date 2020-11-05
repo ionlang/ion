@@ -3,7 +3,7 @@
 #include <ionlang/const/grammar.h>
 #include <ionlang/construct/function.h>
 #include <ionlang/construct/extern.h>
-#include <ionlang/construct/struct.h>
+#include <ionlang/construct/type/struct_type.h>
 
 namespace ionlang::util {
     std::string resolveIntegerKindName(IntegerKind kind) {
@@ -52,7 +52,7 @@ namespace ionlang::util {
             return TypeKind::String;
         }
 
-        return TypeKind::UserDefined;
+        return TypeKind::Struct;
     }
 
     std::optional<IntegerKind> calculateIntegerKindFromBitLength(uint32_t bitLength) noexcept {
@@ -88,16 +88,16 @@ namespace ionlang::util {
 
         // Otherwise, handle other specific cases.
         switch (constructKind) {
+            case ConstructKind::Type: {
+                return construct->dynamicCast<Type>()->typeName;
+            }
+
             case ConstructKind::Function: {
                 return construct->dynamicCast<Function>()->prototype->name;
             }
 
             case ConstructKind::Extern: {
                 return construct->dynamicCast<Extern>()->prototype->name;
-            }
-
-            case ConstructKind::Struct: {
-                return construct->dynamicCast<Struct>()->name;
             }
 
             case ConstructKind::Statement: {

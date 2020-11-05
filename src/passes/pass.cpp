@@ -104,7 +104,11 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitUserDefinedType(std::shared_ptr<UserDefinedType> construct) {
+    void Pass::visitIntegerType(std::shared_ptr<IntegerType> construct) {
+        //
+    }
+
+    void Pass::visitStructType(std::shared_ptr<StructType> construct) {
         //
     }
 
@@ -120,11 +124,7 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitScopeAnchor(std::shared_ptr<ionshared::Scoped<Construct>> construct) {
-        //
-    }
-
-    void Pass::visitIntegerType(std::shared_ptr<IntegerType> construct) {
+    void Pass::visitScopeAnchor(std::shared_ptr<Scoped<>> construct) {
         //
     }
 
@@ -140,11 +140,11 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitStruct(std::shared_ptr<Struct> construct) {
+    void Pass::visitStructDefinition(std::shared_ptr<StructDefinition> construct) {
         //
     }
 
-    void Pass::visitStructDefinition(std::shared_ptr<StructDefinition> construct) {
+    void Pass::visitArgumentList(std::shared_ptr<ArgumentList> construct) {
         //
     }
 }

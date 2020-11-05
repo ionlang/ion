@@ -1,4 +1,3 @@
-#include <utility>
 #include <ionir/construct/module.h>
 #include <ionir/construct/identifier.h>
 #include <ionlang/const/const.h>
@@ -65,8 +64,8 @@ namespace ionlang::test::bootstrap {
         // TODO: Consider support for module here.
         std::shared_ptr<Prototype> prototype = Prototype::make(
             test::constant::foobar,
-            std::make_shared<Args>(),
-            returnType
+            ArgumentList::make(),
+            Resolvable<Type>::make(returnType)
         );
 
         // The parent will be filled in below.

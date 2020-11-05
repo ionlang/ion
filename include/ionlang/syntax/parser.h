@@ -11,7 +11,7 @@
 #include <ionlang/passes/pass.h>
 #include <ionlang/misc/util.h>
 
-#define IONLANG_PARSER_ASSERT(condition) if (!condition) { return this->makeErrorMarker(); }
+#define IONLANG_PARSER_ASSERT(condition) if (!(condition)) { return this->makeErrorMarker(); }
 
 namespace ionlang {
     // TODO
@@ -75,7 +75,7 @@ namespace ionlang {
 
         [[nodiscard]] std::shared_ptr<ionshared::DiagnosticBuilder> getDiagnosticBuilder() const noexcept;
 
-        AstPtrResult<> parseTopLevelFork(const std::shared_ptr<Module>& parent);
+        AstPtrResult<> parseTopLevelConstruct(const std::shared_ptr<Module>& parent);
 
         /**
          * Parses a integer literal in the form of long (or integer 64).
@@ -90,34 +90,32 @@ namespace ionlang {
 
         std::optional<std::string> parseName();
 
-        AstPtrResult<Type> parseType(const std::shared_ptr<Construct>& parent);
+        AstPtrResult<Resolvable<Type>> parseType(const std::shared_ptr<Construct>& parent);
 
-        AstPtrResult<VoidType> parseVoidType(std::shared_ptr<Construct> parent);
+        AstPtrResult<VoidType> parseVoidType(const std::shared_ptr<Construct>& parent);
 
         AstPtrResult<BooleanType> parseBooleanType(
-            std::shared_ptr<Construct> parent,
+            const std::shared_ptr<Construct>& parent,
 
             const std::shared_ptr<TypeQualifiers>& qualifiers =
                 std::make_shared<TypeQualifiers>()
         );
 
         AstPtrResult<IntegerType> parseIntegerType(
-            std::shared_ptr<Construct> parent,
+            const std::shared_ptr<Construct>& parent,
 
             const std::shared_ptr<TypeQualifiers>& qualifiers =
                 std::make_shared<TypeQualifiers>()
         );
 
-        AstPtrResult<UserDefinedType> parseUserDefinedType(
-            std::shared_ptr<Construct> parent,
+        AstPtrResult<Resolvable<StructType>> parseStructType(
+            const std::shared_ptr<Construct>& parent,
 
             const std::shared_ptr<TypeQualifiers>& qualifiers =
                 std::make_shared<TypeQualifiers>()
         );
 
-        std::optional<Arg> parseArg(std::shared_ptr<Construct> parent);
-
-        AstPtrResult<Args> parseArgs(const std::shared_ptr<Construct>& parent);
+        AstPtrResult<ArgumentList> parseArgumentList(const std::shared_ptr<Construct>& parent);
 
         AstPtrResult<Attribute> parseAttribute(const std::shared_ptr<Construct>& parent);
 
@@ -131,7 +129,7 @@ namespace ionlang {
 
         AstPtrResult<Global> parseGlobal(const std::shared_ptr<Module>& parent);
 
-        AstPtrResult<Struct> parseStruct(const std::shared_ptr<Module>& parent);
+        AstPtrResult<StructType> parseStructType(const std::shared_ptr<Module>& parent);
 
         AstPtrResult<Expression<>> parseLiteral(const std::shared_ptr<Construct>& parent);
 
@@ -161,15 +159,13 @@ namespace ionlang {
 
         AstPtrResult<Statement> parseStatement(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<VariableDeclStmt> parseVariableDecl(const std::shared_ptr<Block>& parent);
+        AstPtrResult<VariableDeclStmt> parseVariableDeclStmt(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<IfStmt> parseIfStatement(const std::shared_ptr<Block>& parent);
+        AstPtrResult<IfStmt> parseIfStmt(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<ReturnStmt> parseReturnStatement(const std::shared_ptr<Block>& parent);
+        AstPtrResult<ReturnStmt> parseReturnStmt(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<AssignmentStmt> parseAssignmentStatement(const std::shared_ptr<Block>& parent);
-
-        std::optional<std::string> parseLine();
+        AstPtrResult<AssignmentStmt> parseAssignmentStmt(const std::shared_ptr<Block>& parent);
 
         // TODO: Add comment-parsing support.
 
@@ -182,7 +178,7 @@ namespace ionlang {
             IONLANG_PARSER_ASSERT(name.has_value())
 
             // TODO: Parsing variable ref. only! Not taking in what kind in params!
-            return std::make_shared<Resolvable<T>>(ResolvableKind::Variable, *name, owner);
+            return std::make_shared<Resolvable<T>>(ResolvableKind::NearestVariableOrArgument, *name, owner);
         }
     };
 }

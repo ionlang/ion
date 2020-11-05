@@ -1,22 +1,22 @@
 #pragma once
 
-#include <ionshared/misc/named.h>
-#include "construct.h"
+#include "../../../../../../../../../Program Files (x86)/ionshared/include/ionshared/misc/named.h"
+#include "../construct.h"
 
 namespace ionlang {
     struct Pass;
 
-    typedef ionshared::PtrSymbolTable<Type> Fields;
+    typedef ionshared::PtrSymbolTable<Resolvable<Type>> Fields;
 
-    struct Struct : ConstructWithParent<Module>, ionshared::Named {
-        static std::shared_ptr<Struct> make(
+    struct StructType : ConstructWithParent<Module, Type, std::string, TypeKind> {
+        static std::shared_ptr<StructType> make(
             const std::string& name,
             const Fields& fields
         ) noexcept;
 
         Fields fields;
 
-        Struct(
+        StructType(
             std::string name,
             Fields fields
         );

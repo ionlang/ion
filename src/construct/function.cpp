@@ -18,7 +18,7 @@ namespace ionlang {
         std::shared_ptr<Prototype> prototype,
         std::shared_ptr<Block> body
     ) :
-        ConstructWithParent<Module>(ConstructKind::Function),
+        ConstructWithParent<Module, Construct, ConstructKind>(ConstructKind::Function),
         prototype(std::move(prototype)),
         body(std::move(body)) {
         //

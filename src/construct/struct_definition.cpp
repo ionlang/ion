@@ -2,11 +2,13 @@
 
 namespace ionlang {
     std::shared_ptr<StructDefinition> StructDefinition::make(
-        const PtrResolvable<Struct>& declaration,
-        std::vector<std::shared_ptr<Expression<>>> values
+        const PtrResolvable<StructType>& type,
+        const std::vector<std::shared_ptr<Expression<>>>& values
     ) noexcept {
         std::shared_ptr<StructDefinition> result =
-            std::make_shared<StructDefinition>(declaration, values);
+            std::make_shared<StructDefinition>(type, values);
+
+        type->setTransitiveParent(result);
 
         for (const auto& value : values) {
             value->parent = result;
@@ -16,17 +18,14 @@ namespace ionlang {
     }
 
     StructDefinition::StructDefinition(
-        const PtrResolvable<Struct>& declaration,
+        const PtrResolvable<StructType>& type,
         std::vector<std::shared_ptr<Expression<>>> values
-    ) noexcept :
+    ) :
         Expression<>(
             ExpressionKind::StructDefinition,
-
-            // TODO: CRITICAL: How do we know declaration.name is not std::nullopt?
-            std::make_shared<UserDefinedType>(*declaration->name)
+            type->staticCast<Resolvable<Type>>()
         ),
 
-        declaration(declaration),
         values(std::move(values)) {
         //
     }
@@ -38,8 +37,7 @@ namespace ionlang {
     Ast StructDefinition::getChildNodes() {
         Ast children = Construct::convertChildren(this->values);
 
-        // TODO: Declaration isn't technically a child, instead a resolvable. Maybe need a different getResolvables() method?
-        children.push_back(this->declaration);
+        children.push_back(this->type);
 
         return children;
     }

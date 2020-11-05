@@ -8,7 +8,7 @@ namespace ionlang {
         std::shared_ptr<TypeQualifiers> qualifiers
     ) noexcept :
         Construct(ConstructKind::Type),
-        ionshared::Named{std::move(name)},
+        typeName(name),
         typeKind(kind),
         qualifiers(std::move(qualifiers)) {
         //

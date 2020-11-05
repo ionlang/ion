@@ -1,14 +1,13 @@
 #pragma once
 
 #include <ionshared/misc/helpers.h>
-#include <ionlang/construct/pseudo/child_construct.h>
+#include <ionlang/construct/pseudo/construct_with_parent.h>
+#include "block.h"
 
 namespace ionlang {
     struct Pass;
 
-    struct Block;
-
-    enum struct StatementKind {
+    enum struct StatementKind : uint32_t {
         If,
 
         Return,
@@ -24,7 +23,7 @@ namespace ionlang {
         BlockWrapper
     };
 
-    struct Statement : ConstructWithParent<Block> {
+    struct Statement : ConstructWithParent<Block, Construct, ConstructKind> {
         const StatementKind statementKind;
 
         const ionshared::OptPtr<Statement> yields;

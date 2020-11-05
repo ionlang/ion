@@ -18,7 +18,7 @@ namespace ionlang {
 
                 IONLANG_PARSER_ASSERT(util::hasValue(integerLiteralResult))
 
-                return util::getResultValue(integerLiteralResult)->flatten();
+                return util::getResultValue(integerLiteralResult)->flattenExpression();
             }
 
             case TokenKind::LiteralCharacter: {
@@ -26,7 +26,7 @@ namespace ionlang {
 
                 IONLANG_PARSER_ASSERT(util::hasValue(charLiteralResult))
 
-                return util::getResultValue(charLiteralResult)->flatten();
+                return util::getResultValue(charLiteralResult)->flattenExpression();
             }
 
             case TokenKind::LiteralString: {
@@ -34,7 +34,7 @@ namespace ionlang {
 
                 IONLANG_PARSER_ASSERT(util::hasValue(stringLiteralResult))
 
-                return util::getResultValue(stringLiteralResult)->flatten();
+                return util::getResultValue(stringLiteralResult)->flattenExpression();
             }
 
             case TokenKind::LiteralBoolean: {
@@ -42,7 +42,7 @@ namespace ionlang {
 
                 IONLANG_PARSER_ASSERT(util::hasValue(booleanLiteralResult))
 
-                return util::getResultValue(booleanLiteralResult)->flatten();
+                return util::getResultValue(booleanLiteralResult)->flattenExpression();
             }
 
             // TODO: Missing literal(s)?

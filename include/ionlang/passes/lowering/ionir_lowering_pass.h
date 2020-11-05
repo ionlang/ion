@@ -138,6 +138,8 @@ namespace ionlang {
 
         void visitVoidType(std::shared_ptr<VoidType> construct) override;
 
+        void visitStructType(std::shared_ptr<StructType> construct) override;
+
         void visitIfStmt(std::shared_ptr<IfStmt> construct) override;
 
         void visitReturnStmt(std::shared_ptr<ReturnStmt> construct) override;
@@ -153,8 +155,6 @@ namespace ionlang {
         void visitOperationExpr(std::shared_ptr<OperationExpr> construct) override;
 
         void visitVariableRefExpr(std::shared_ptr<VariableRefExpr> construct) override;
-
-        void visitStruct(std::shared_ptr<Struct> construct) override;
 
         void visitStructDefinition(std::shared_ptr<StructDefinition> construct) override;
 

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <ionshared/misc/named.h>
-#include <ionlang/construct/pseudo/args.h>
-#include <ionlang/construct/pseudo/child_construct.h>
+#include <ionlang/construct/argument_list.h>
+#include <ionlang/construct/pseudo/construct_with_parent.h>
 #include "type.h"
 
 namespace ionlang {
@@ -11,32 +11,32 @@ namespace ionlang {
     /**
      * Prototype's parent is either a function or extern construct.
      */
-    struct Prototype : ConstructWithParent<>, ionshared::Named {
+    struct Prototype : Construct, ionshared::Named {
         static std::shared_ptr<Prototype> make(
-            const std::string& id,
-            const std::shared_ptr<Args>& args,
-            const std::shared_ptr<Type>& returnType
+            const std::string& name,
+            const std::shared_ptr<ArgumentList>& argumentList,
+            const PtrResolvable<Type>& returnType
         ) noexcept;
 
-        std::shared_ptr<Args> args;
+        std::shared_ptr<ArgumentList> argumentList;
 
-        std::shared_ptr<Type> returnType;
+        PtrResolvable<Type> returnType;
 
         Prototype(
-            std::string id,
-            std::shared_ptr<Args> args,
-            std::shared_ptr<Type> returnType
+            std::string name,
+            std::shared_ptr<ArgumentList> argumentList,
+            PtrResolvable<Type> returnType
         );
 
         void accept(Pass& visitor) override;
 
-        // TODO: Get child constructs?
+        Ast getChildNodes() override;
 
-        // TODO: Move this method to IonIR, since it has no use here.
+        // TODO: Move this method to IonIR, since it has no use here?
         /**
          * Returns a mangled identifier if the parent is either an
          * extern or function.
          */
-        [[nodiscard]] std::optional<std::string> getMangledId();
+        [[nodiscard]] std::optional<std::string> getMangledName();
     };
 }

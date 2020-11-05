@@ -15,7 +15,7 @@ namespace ionlang {
     Ast Module::getChildNodes() {
         return Construct::convertChildren(
             // TODO: What about normal scopes? Merge that with global scope. Or actually, module just uses global context, right?
-            this->context->getGlobalScope()
+            this->context->globalScope
         );
     }
 }

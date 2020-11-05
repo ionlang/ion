@@ -28,12 +28,12 @@
 #include <ionlang/construct/type.h>
 #include <ionlang/construct/type/void_type.h>
 #include <ionlang/construct/type/boolean_type.h>
-#include <ionlang/construct/type/user_defined_type.h>
+#include <ionlang/construct/type/struct_type.h>
 #include <ionlang/construct/function.h>
 #include <ionlang/construct/global.h>
 #include <ionlang/construct/attribute.h>
-#include <ionlang/construct/struct.h>
 #include <ionlang/construct/struct_definition.h>
+#include <ionlang/construct/argument_list.h>
 
 namespace ionlang {
     struct Pass : ionshared::BasePass<Construct> {
@@ -79,7 +79,9 @@ namespace ionlang {
 
         virtual void visitBooleanType(std::shared_ptr<BooleanType> construct);
 
-        virtual void visitUserDefinedType(std::shared_ptr<UserDefinedType> construct);
+        virtual void visitIntegerType(std::shared_ptr<IntegerType> construct);
+
+        virtual void visitStructType(std::shared_ptr<StructType> construct);
 
         virtual void visitResolvable(PtrResolvable<> construct);
 
@@ -87,9 +89,7 @@ namespace ionlang {
 
         virtual void visitVariableDeclStmt(std::shared_ptr<VariableDeclStmt> construct);
 
-        virtual void visitScopeAnchor(std::shared_ptr<ionshared::Scoped<Construct>> construct);
-
-        virtual void visitIntegerType(std::shared_ptr<IntegerType> construct);
+        virtual void visitScopeAnchor(std::shared_ptr<Scoped<>> construct);
 
         virtual void visitGlobal(std::shared_ptr<Global> construct);
 
@@ -97,9 +97,9 @@ namespace ionlang {
 
         virtual void visitAttribute(std::shared_ptr<Attribute> construct);
 
-        virtual void visitStruct(std::shared_ptr<Struct> construct);
-
         virtual void visitStructDefinition(std::shared_ptr<StructDefinition> construct);
+
+        virtual void visitArgumentList(std::shared_ptr<ArgumentList> construct);
     };
 
     typedef ionshared::BasePassManager<Pass, Construct> PassManager;

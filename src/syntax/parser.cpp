@@ -101,7 +101,7 @@ namespace ionlang {
         return this->diagnosticBuilder;
     }
 
-    AstPtrResult<> Parser::parseTopLevelFork(const std::shared_ptr<Module>& parent) {
+    AstPtrResult<> Parser::parseTopLevelConstruct(const std::shared_ptr<Module>& parent) {
         this->beginSourceLocationMapping();
 
         switch (this->tokenStream.get().kind) {
@@ -118,7 +118,7 @@ namespace ionlang {
             }
 
             case TokenKind::KeywordStruct: {
-                return util::getResultValue(this->parseStruct(parent));
+                return util::getResultValue(this->parseStructType(parent));
             }
 
             default: {
@@ -138,7 +138,7 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordGlobal))
 
         // TODO: Not proper parent.
-        AstPtrResult<Type> typeResult = this->parseType(parent);
+        AstPtrResult<Resolvable<Type>> typeResult = this->parseType(parent);
 
         IONLANG_PARSER_ASSERT(util::hasValue(typeResult))
 
@@ -174,7 +174,7 @@ namespace ionlang {
         return global;
     }
 
-    AstPtrResult<Struct> Parser::parseStruct(const std::shared_ptr<Module>& parent) {
+    AstPtrResult<StructType> Parser::parseStructType(const std::shared_ptr<Module>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordStruct))
@@ -184,11 +184,11 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(structNameResult.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
-        Fields fields = ionshared::util::makePtrSymbolTable<Type>();
+        Fields fields = ionshared::util::makePtrSymbolTable<Resolvable<Type>>();
 
         while (!this->is(TokenKind::SymbolBraceR)) {
             // TODO: Not proper parent.
-            AstPtrResult<Type> fieldTypeResult = this->parseType(parent);
+            AstPtrResult<Resolvable<Type>> fieldTypeResult = this->parseType(parent);
 
             IONLANG_PARSER_ASSERT(util::hasValue(fieldTypeResult))
 
@@ -216,7 +216,7 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceR))
 
-        std::shared_ptr<Struct> structConstruct = Struct::make(*structNameResult, fields);
+        std::shared_ptr<StructType> structConstruct = StructType::make(*structNameResult, fields);
 
         structConstruct->parent = parent;
 
@@ -256,13 +256,14 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(id.has_value())
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
-        Scope globalScope =
-            std::make_shared<ionshared::SymbolTable<std::shared_ptr<Construct>>>();
+        Context::Scope globalScope =
+            ionshared::util::makePtrSymbolTable<Construct>();
 
-        std::shared_ptr<Module> module = std::make_shared<Module>(*id, std::make_shared<Context>(globalScope));
+        std::shared_ptr<Module> module =
+            std::make_shared<Module>(*id, std::make_shared<Context>(globalScope));
 
         while (!this->is(TokenKind::SymbolBraceR)) {
-            AstPtrResult<> topLevelConstructResult = this->parseTopLevelFork(module);
+            AstPtrResult<> topLevelConstructResult = this->parseTopLevelConstruct(module);
 
             // TODO: Make notice if it has no value? Or is it enough with the notice under 'parseTopLevel()'?
             if (util::hasValue(topLevelConstructResult)) {
@@ -297,62 +298,5 @@ namespace ionlang {
         this->finishSourceLocationMapping(module);
 
         return module;
-    }
-
-    AstPtrResult<VariableDeclStmt> Parser::parseVariableDecl(const std::shared_ptr<Block>& parent) {
-        this->beginSourceLocationMapping();
-
-        bool isTypeInferred = false;
-        AstPtrResult<Type> typeResult{};
-
-        if (this->is(TokenKind::KeywordLet)) {
-            isTypeInferred = true;
-            this->tokenStream.skip();
-        }
-        else {
-            // TODO: Not proper parent.
-            typeResult = this->parseType(parent);
-
-            IONLANG_PARSER_ASSERT(util::hasValue(typeResult))
-        }
-
-        std::optional<std::string> name = this->parseName();
-
-        IONLANG_PARSER_ASSERT(name.has_value())
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual))
-
-        AstPtrResult<Expression<>> valueResult = this->parseExpression(parent);
-
-        IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
-
-        std::shared_ptr<VariableDeclStmt> variableDecl = VariableDeclStmt::make(
-            isTypeInferred
-                // TODO: Type must be cloned.
-                ? util::getResultValue(valueResult)->type
-
-                : Resolvable<Type>::make(util::getResultValue(typeResult)),
-
-            *name,
-            util::getResultValue(valueResult)
-        );
-
-        variableDecl->parent = parent;
-
-//        /**
-//         * Variable declaration construct owns the type. Assign
-//         * the type's parent.
-//         */
-//        if (!isTypeInferred) {
-//            finalType->parent = variableDecl;
-//        }
-
-        // Register the statement on the resulting block's symbol table.
-        parent->symbolTable->set(variableDecl->name, variableDecl);
-
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
-
-        this->finishSourceLocationMapping(variableDecl);
-
-        return variableDecl;
     }
 }

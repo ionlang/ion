@@ -28,10 +28,10 @@ namespace ionlang {
 
         void visitModule(std::shared_ptr<Module> node) override;
 
-        void visitScopeAnchor(std::shared_ptr<ionshared::Scoped<Construct>> node) override;
+        void visitScopeAnchor(std::shared_ptr<Scoped<>> node) override;
 
         void visitResolvable(PtrResolvable<> node) override;
 
-        [[nodiscard]] const std::list<ionshared::PtrSymbolTable<Construct>> &getScope() const;
+        [[nodiscard]] const std::list<ionshared::PtrSymbolTable<Construct>>& getScope() const;
     };
 }

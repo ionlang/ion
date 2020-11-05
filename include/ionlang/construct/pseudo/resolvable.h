@@ -11,7 +11,11 @@ namespace ionlang {
     struct Pass;
 
     enum struct ResolvableKind {
-        Variable,
+        /**
+         * The nearest variable declaration, argument, or
+         * global variable.
+         */
+        NearestVariableOrArgument,
 
         /**
          * A reference to a function or extern.
@@ -20,7 +24,7 @@ namespace ionlang {
 
         PrototypeReturnType,
 
-        Struct
+        StructType
     };
 
     /**
@@ -34,6 +38,8 @@ namespace ionlang {
     class Resolvable : public Construct {
     private:
         ionshared::OptPtr<T> value;
+
+        ionshared::OptPtr<Construct> cachedParent;
 
     public:
         [[nodiscard]] static std::shared_ptr<Resolvable<T>> make(
@@ -65,7 +71,8 @@ namespace ionlang {
             resolvableKind(kind),
             name(std::move(name)),
             context(std::move(context)),
-            value(std::nullopt) {
+            value(std::nullopt),
+            cachedParent(std::nullopt) {
             //
         }
 
@@ -132,7 +139,29 @@ namespace ionlang {
 
             this->value = value;
 
+            if (ionshared::util::hasValue(this->cachedParent)) {
+                value->parent = *this->cachedParent;
+            }
+
             return true;
+        }
+
+        /**
+         * Cache a parent construct to be applied once the resolvable
+         * is resolved, or if it is already resolved, apply it to the
+         * value immediately. Will also update the resolvable's parent.
+         */
+        void setTransitiveParent(std::shared_ptr<Construct> parent) {
+            if (this->isResolved()) {
+                this->value->get()->parent = parent;
+            }
+
+            this->parent = parent;
+            this->cachedParent = parent;
+        }
+
+        std::shared_ptr<Resolvable<>> flattenResolvable() {
+            return this->template staticCast<Resolvable<>>();
         }
     };
 

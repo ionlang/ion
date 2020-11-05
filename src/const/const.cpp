@@ -18,23 +18,20 @@ namespace ionlang {
     };
 
     std::map<ConstructKind, std::string> Const::constructNames = {
-        {ConstructKind::Type, "Type"},
-        {ConstructKind::FunctionBody, "FunctionBody"},
-        {ConstructKind::Prototype, "Prototype"},
-        {ConstructKind::Function, "Function"},
-        {ConstructKind::Extern, "Extern"},
-        {ConstructKind::Global, "Global"},
-        {ConstructKind::Block, "BasicBlock"},
-        {ConstructKind::VariableRef, "VariableReference"},
-        {ConstructKind::VariableDecl, "VariableDeclaration"},
-        {ConstructKind::StructDecl, "StructDeclaration"},
-        {ConstructKind::Module, "Module"},
-        {ConstructKind::Resolvable, "Reference"},
-        {ConstructKind::Expression, "Expression"},
-        {ConstructKind::Statement, "Statement"},
-        {ConstructKind::ErrorMarker, "ErrorMarker"},
-        {ConstructKind::Attribute, "Attribute"},
-        {ConstructKind::Struct, "Struct"}
+        {ConstructKind::Type, "type"},
+        {ConstructKind::Prototype, "prototype"},
+        {ConstructKind::Function, "function"},
+        {ConstructKind::Extern, "extern"},
+        {ConstructKind::Global, "global"},
+        {ConstructKind::Block, "basic block"},
+        {ConstructKind::VariableRef, "variable reference"},
+        {ConstructKind::StructDefinition, "struct definition"},
+        {ConstructKind::Module, "module"},
+        {ConstructKind::Resolvable, "resolvable"},
+        {ConstructKind::Expression, "expression"},
+        {ConstructKind::Statement, "statement"},
+        {ConstructKind::ErrorMarker, "error marker"},
+        {ConstructKind::Attribute, "attribute"}
     };
 
     std::map<TokenKind, IntegerKind> Const::tokenKindToIntegerKind = {

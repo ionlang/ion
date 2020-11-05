@@ -9,13 +9,10 @@ TEST(CodeGenTest, VisitExtern) {
     std::shared_ptr<IonIrLoweringPass> irCodegenPass =
         test::bootstrap::irLoweringPass();
 
-    std::shared_ptr<VoidType> returnType = std::make_shared<VoidType>();
-    std::shared_ptr<Args> args = std::make_shared<Args>();
-
     std::shared_ptr<Prototype> prototype = Prototype::make(
         test::constant::foobar,
-        args,
-        returnType
+        ArgumentList::make(),
+        Resolvable<Type>::make(std::make_shared<VoidType>())
     );
 
     // TODO: No parent module.
@@ -92,7 +89,7 @@ TEST(CodeGenTest, VisitVariableDecl) {
     std::shared_ptr<VariableDeclStmt> variableDecl = VariableDeclStmt::make(
         Resolvable<Type>::make(std::make_shared<BooleanType>()),
         test::constant::foo,
-        std::make_shared<BooleanLiteral>(true)->flatten()
+        std::make_shared<BooleanLiteral>(true)->flattenExpression()
     );
 
     std::shared_ptr<Function> function = test::bootstrap::emptyFunction({

@@ -4,7 +4,7 @@
 
 namespace ionlang {
     // TODO: Consider using Ref<> to register pending type reference if user-defined type is parsed?
-    AstPtrResult<Type> Parser::parseType(const std::shared_ptr<Construct>& parent) {
+    AstPtrResult<Resolvable<Type>> Parser::parseType(const std::shared_ptr<Construct>& parent) {
         std::shared_ptr<TypeQualifiers> qualifiers =
             std::make_shared<TypeQualifiers>();
 
@@ -54,19 +54,27 @@ namespace ionlang {
                 || token.kind == TokenKind::Identifier
         ))
 
-        AstPtrResult<Type> type;
+        AstPtrResult<Resolvable<Type>> type;
 
         if (token.kind == TokenKind::TypeVoid) {
-            type = util::getResultValue(this->parseVoidType(parent));
+            type = Resolvable<Type>::make(
+                util::getResultValue(this->parseVoidType(parent))
+            );
         }
         else if (token.kind == TokenKind::TypeBool) {
-            type = util::getResultValue(this->parseBooleanType(parent, qualifiers));
+            type = Resolvable<Type>::make(
+                util::getResultValue(this->parseBooleanType(parent, qualifiers))
+            );
         }
         else if (Classifier::isIntegerType(token.kind)) {
-            type = util::getResultValue(this->parseIntegerType(parent, qualifiers));
+            type = Resolvable<Type>::make(
+                util::getResultValue(this->parseIntegerType(parent, qualifiers))
+            );
         }
         else if (token.kind == TokenKind::Identifier) {
-            type = util::getResultValue(this->parseUserDefinedType(parent, qualifiers));
+            type = util::getResultValue(
+                this->parseStructType(parent, qualifiers)
+            )->staticCast<Resolvable<Type>>();
         }
 
         // TODO: Add support for missing types.
@@ -77,7 +85,7 @@ namespace ionlang {
         return type;
     }
 
-    AstPtrResult<VoidType> Parser::parseVoidType(std::shared_ptr<Construct> parent) {
+    AstPtrResult<VoidType> Parser::parseVoidType(const std::shared_ptr<Construct>& parent) {
         /**
          * Void type does not accept references nor pointer
          * specifiers, so just simply skip over its token.
@@ -92,7 +100,7 @@ namespace ionlang {
     }
 
     AstPtrResult<BooleanType> Parser::parseBooleanType(
-        std::shared_ptr<Construct> parent,
+        const std::shared_ptr<Construct>& parent,
         const std::shared_ptr<TypeQualifiers>& qualifiers
     ) {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::TypeBool))
@@ -106,7 +114,7 @@ namespace ionlang {
     }
 
     AstPtrResult<IntegerType> Parser::parseIntegerType(
-        std::shared_ptr<Construct> parent,
+        const std::shared_ptr<Construct>& parent,
         const std::shared_ptr<TypeQualifiers>& qualifiers
     ) {
         TokenKind currentTokenKind = this->tokenStream.get().kind;
@@ -143,8 +151,8 @@ namespace ionlang {
         return integerType;
     }
 
-    AstPtrResult<UserDefinedType> Parser::parseUserDefinedType(
-        std::shared_ptr<Construct> parent,
+    AstPtrResult<Resolvable<StructType>> Parser::parseStructType(
+        const std::shared_ptr<Construct>& parent,
         const std::shared_ptr<TypeQualifiers>& qualifiers
     ) {
         IONLANG_PARSER_ASSERT(this->expect(TokenKind::Identifier))
@@ -153,14 +161,15 @@ namespace ionlang {
 
         this->tokenStream.skip();
 
-        std::shared_ptr<UserDefinedType> userDefinedType =
-            std::make_shared<UserDefinedType>(
+        PtrResolvable<StructType> structType =
+            Resolvable<StructType>::make(
+                ResolvableKind::StructType,
                 name,
-                qualifiers
+                parent
             );
 
-        userDefinedType->parent = parent;
+        structType->parent = parent;
 
-        return userDefinedType;
+        return structType;
     }
 }

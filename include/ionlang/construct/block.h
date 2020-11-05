@@ -5,18 +5,22 @@
 #include <ionshared/misc/helpers.h>
 #include <ionshared/tracking/symbol_table.h>
 #include <ionshared/tracking/scoped.h>
-#include <ionlang/construct/pseudo/child_construct.h>
-#include "ionlang/construct/statement/variable_decl_statement.h"
-#include "statement.h"
-#include "function.h"
+#include <ionlang/construct/construct.h>
+#include "module.h"
 
 namespace ionlang {
     struct Pass;
 
+    struct Statement;
+
     struct StatementBuilder;
 
+    struct VariableDeclStmt;
+
+    struct Function;
+
     // TODO: Must be verified to contain a single terminal instruction at the end?
-    struct Block : ConstructWithParent<>, ionshared::Scoped<VariableDeclStmt> {
+    struct Block : Construct, Scoped<VariableDeclStmt> {
         static std::shared_ptr<Block> make(
             const std::vector<std::shared_ptr<Statement>>& statements = {},
 
@@ -89,8 +93,6 @@ namespace ionlang {
         [[nodiscard]] ionshared::OptPtr<Statement> findFirstStatement() noexcept;
 
         [[nodiscard]] ionshared::OptPtr<Statement> findLastStatement() noexcept;
-
-        [[nodiscard]] bool isFunctionBody();
 
         [[nodiscard]] ionshared::OptPtr<Function> findParentFunction();
     };

@@ -5,7 +5,7 @@ namespace ionlang {
         StatementKind kind,
         ionshared::OptPtr<Statement> yields
     ) :
-        ConstructWithParent(ConstructKind::Statement),
+        ConstructWithParent<Block, Construct, ConstructKind>(ConstructKind::Statement),
         statementKind(kind),
         yields(std::move(yields)) {
         //

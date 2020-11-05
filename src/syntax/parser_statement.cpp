@@ -13,21 +13,26 @@ namespace ionlang {
 
         TokenKind currentTokenKind = this->tokenStream.get().kind;
 
-        // A built-in type at this position can only mean a variable declaration.
-        if (Classifier::isBuiltInType(currentTokenKind)) {
-            statement = util::getResultValue(this->parseVariableDecl(parent));
+        /**
+         * A built-in type at this position can only mean a
+         * variable declaration, same for an identifier followed
+         * by another identifier.
+         */
+        if (Classifier::isBuiltInType(currentTokenKind)
+            || (currentTokenKind == TokenKind::Identifier && this->isNext(TokenKind::Identifier))) {
+            statement = util::getResultValue(this->parseVariableDeclStmt(parent));
         }
         // If statement.
         else if (currentTokenKind == TokenKind::KeywordIf) {
-            statement = util::getResultValue(this->parseIfStatement(parent));
+            statement = util::getResultValue(this->parseIfStmt(parent));
         }
         // Return statement.
         else if (currentTokenKind == TokenKind::KeywordReturn) {
-            statement = util::getResultValue(this->parseReturnStatement(parent));
+            statement = util::getResultValue(this->parseReturnStmt(parent));
         }
         // Assignment statement.
-        else if (currentTokenKind == TokenKind::Identifier && this->isNext(TokenKind::SymbolEqual)) {
-            statement = util::getResultValue(this->parseAssignmentStatement(parent));
+        else if (this->isNext(TokenKind::SymbolEqual)) {
+            statement = util::getResultValue(this->parseAssignmentStmt(parent));
         }
         // Otherwise, it must be a primary expression.
         else {
@@ -44,7 +49,7 @@ namespace ionlang {
         return statement;
     }
 
-    AstPtrResult<IfStmt> Parser::parseIfStatement(const std::shared_ptr<Block>& parent) {
+    AstPtrResult<IfStmt> Parser::parseIfStmt(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIf))
@@ -96,7 +101,7 @@ namespace ionlang {
         return ifStatement;
     }
 
-    AstPtrResult<ReturnStmt> Parser::parseReturnStatement(const std::shared_ptr<Block>& parent) {
+    AstPtrResult<ReturnStmt> Parser::parseReturnStmt(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordReturn))
@@ -127,7 +132,7 @@ namespace ionlang {
         return returnStatement;
     }
 
-    AstPtrResult<AssignmentStmt> Parser::parseAssignmentStatement(
+    AstPtrResult<AssignmentStmt> Parser::parseAssignmentStmt(
         const std::shared_ptr<Block>& parent
     ) {
         this->beginSourceLocationMapping();
@@ -144,7 +149,7 @@ namespace ionlang {
 
         std::shared_ptr<AssignmentStmt> assignmentStatement = AssignmentStmt::make(
             std::make_shared<Resolvable<VariableDeclStmt>>(
-                ResolvableKind::Variable,
+                ResolvableKind::NearestVariableOrArgument,
                 *id,
                 parent
             ),
@@ -155,5 +160,64 @@ namespace ionlang {
         assignmentStatement->parent = parent;
 
         return assignmentStatement;
+    }
+
+    AstPtrResult<VariableDeclStmt> Parser::parseVariableDeclStmt(
+        const std::shared_ptr<Block>& parent
+    ) {
+        this->beginSourceLocationMapping();
+
+        bool isTypeInferred = false;
+        AstPtrResult<Resolvable<Type>> typeResult{};
+
+        if (this->is(TokenKind::KeywordLet)) {
+            isTypeInferred = true;
+            this->tokenStream.skip();
+        }
+        else {
+            // TODO: Not proper parent.
+            typeResult = this->parseType(parent);
+
+            IONLANG_PARSER_ASSERT(util::hasValue(typeResult))
+        }
+
+        std::optional<std::string> name = this->parseName();
+
+        IONLANG_PARSER_ASSERT(name.has_value())
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolEqual))
+
+        AstPtrResult<Expression<>> valueResult = this->parseExpression(parent);
+
+        IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
+
+        std::shared_ptr<VariableDeclStmt> variableDecl = VariableDeclStmt::make(
+            isTypeInferred
+                // TODO: Type must be cloned.
+                ? util::getResultValue(valueResult)->type
+
+                : util::getResultValue(typeResult),
+
+            *name,
+            util::getResultValue(valueResult)
+        );
+
+        variableDecl->parent = parent;
+
+        //        /**
+        //         * Variable declaration construct owns the type. Assign
+        //         * the type's parent.
+        //         */
+        //        if (!isTypeInferred) {
+        //            finalType->parent = variableDecl;
+        //        }
+
+        // Register the statement on the resulting block's symbol table.
+        parent->symbolTable->set(variableDecl->name, variableDecl);
+
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
+
+        this->finishSourceLocationMapping(variableDecl);
+
+        return variableDecl;
     }
 }
