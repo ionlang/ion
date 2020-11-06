@@ -25,6 +25,8 @@ namespace ionlang::const_name {
 
     static const std::string typeInt64 = "i64";
 
+    static const std::string typeUnsignedInt8 = "ui8";
+
     static const std::string typeUnsignedInt16 = "ui16";
 
     static const std::string typeUnsignedInt32 = "ui32";

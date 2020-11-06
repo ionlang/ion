@@ -31,7 +31,9 @@ namespace ionlang {
         {ConstructKind::Expression, "expression"},
         {ConstructKind::Statement, "statement"},
         {ConstructKind::ErrorMarker, "error marker"},
-        {ConstructKind::Attribute, "attribute"}
+        {ConstructKind::Attribute, "attribute"},
+        {ConstructKind::Identifier, "identifier"},
+        {ConstructKind::Import, "import"}
     };
 
     std::map<TokenKind, IntegerKind> Const::tokenKindToIntegerKind = {
@@ -60,7 +62,7 @@ namespace ionlang {
         return *Const::integerTypeResolverMap.lookup(kind);
     }
 
-    std::optional<std::string> Const::getConstructKindName(ConstructKind constructKind) {
+    std::optional<std::string> Const::findConstructKindName(ConstructKind constructKind) {
         if (ionshared::util::mapContains<ConstructKind, std::string>(Const::constructNames, constructKind)) {
             return Const::constructNames[constructKind];
         }
@@ -68,7 +70,7 @@ namespace ionlang {
         return std::nullopt;
     }
 
-    std::optional<IntegerKind> Const::getIntegerKind(TokenKind tokenKind) {
+    std::optional<IntegerKind> Const::findIntegerKind(TokenKind tokenKind) {
         if (ionshared::util::mapContains<TokenKind, IntegerKind>(Const::tokenKindToIntegerKind, tokenKind)) {
             return Const::tokenKindToIntegerKind[tokenKind];
         }

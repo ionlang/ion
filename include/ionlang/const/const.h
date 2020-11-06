@@ -29,8 +29,8 @@ namespace ionlang {
 
         static std::map<TokenKind, IntegerKind> tokenKindToIntegerKind;
 
-        static std::optional<std::string> getConstructKindName(ConstructKind constructKind);
+        static std::optional<std::string> findConstructKindName(ConstructKind constructKind);
 
-        static std::optional<IntegerKind> getIntegerKind(TokenKind tokenKind);
+        static std::optional<IntegerKind> findIntegerKind(TokenKind tokenKind);
     };
 }

@@ -147,4 +147,12 @@ namespace ionlang {
     void Pass::visitArgumentList(std::shared_ptr<ArgumentList> construct) {
         //
     }
+
+    void Pass::visitIdentifier(std::shared_ptr<Identifier> construct) {
+        //
+    }
+
+    void Pass::visitImport(std::shared_ptr<Import> construct) {
+        //
+    }
 }

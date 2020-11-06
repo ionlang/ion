@@ -34,6 +34,8 @@
 #include <ionlang/construct/attribute.h>
 #include <ionlang/construct/struct_definition.h>
 #include <ionlang/construct/argument_list.h>
+#include <ionlang/construct/identifier.h>
+#include <ionlang/construct/import.h>
 
 namespace ionlang {
     struct Pass : ionshared::BasePass<Construct> {
@@ -100,6 +102,10 @@ namespace ionlang {
         virtual void visitStructDefinition(std::shared_ptr<StructDefinition> construct);
 
         virtual void visitArgumentList(std::shared_ptr<ArgumentList> construct);
+
+        virtual void visitIdentifier(std::shared_ptr<Identifier> construct);
+
+        virtual void visitImport(std::shared_ptr<Import> construct);
     };
 
     typedef ionshared::BasePassManager<Pass, Construct> PassManager;

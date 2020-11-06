@@ -29,6 +29,6 @@ namespace ionlang {
     }
 
     std::optional<std::string> Construct::findConstructName() {
-        return Const::getConstructKindName(this->constructKind);
+        return Const::findConstructKindName(this->constructKind);
     }
 }

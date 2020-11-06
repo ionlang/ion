@@ -134,7 +134,6 @@ namespace ionlang {
 
     AstPtrResult<Global> Parser::parseGlobal(const std::shared_ptr<Module>& parent) {
         this->beginSourceLocationMapping();
-
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordGlobal))
 
         // TODO: Not proper parent.
@@ -225,7 +224,6 @@ namespace ionlang {
 
     AstPtrResult<Block> Parser::parseBlock(const std::shared_ptr<Construct>& parent) {
         this->beginSourceLocationMapping();
-
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
         std::shared_ptr<Block> block = Block::make();
@@ -236,7 +234,6 @@ namespace ionlang {
             AstPtrResult<Statement> statement = this->parseStatement(block);
 
             IONLANG_PARSER_ASSERT(util::hasValue(statement))
-
             block->appendStatement(util::getResultValue(statement));
         }
 
@@ -294,9 +291,76 @@ namespace ionlang {
         }
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceR))
-
         this->finishSourceLocationMapping(module);
 
         return module;
+    }
+
+    AstPtrResult<Identifier> Parser::parseIdentifier() {
+        std::string baseName{};
+        std::vector<std::string> scopePath{};
+        bool isPrime = true;
+
+        this->beginSourceLocationMapping();
+
+        do {
+            if (this->is(TokenKind::SymbolScope) && isPrime) {
+                this->getDiagnosticBuilder()
+                    ->bootstrap(diagnostic::syntaxUnexpectedToken)
+
+                    ->formatMessage(
+                        Grammar::findTokenKindNameOr(TokenKind::Identifier),
+                        Grammar::findTokenKindNameOr(TokenKind::SymbolScope)
+                    )
+
+                    ->setSourceLocation(this->makeSourceLocation())
+                    ->finish();
+
+                return this->makeErrorMarker();
+            }
+            else if (!isPrime) {
+                IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolScope));
+            }
+
+            std::optional<std::string> name = this->parseName();
+
+            IONLANG_PARSER_ASSERT(name.has_value())
+
+            if (isPrime) {
+                baseName = *name;
+            }
+            else {
+                scopePath.push_back(*name);
+            }
+
+            isPrime = false;
+
+        }
+        while (this->is(TokenKind::Identifier)
+            || this->is(TokenKind::SymbolScope));
+
+        std::shared_ptr<Identifier> id =
+            std::make_shared<Identifier>(baseName, scopePath);
+
+        this->finishSourceLocationMapping(id);
+
+        return id;
+    }
+
+    AstPtrResult<Import> Parser::parseImport() {
+        this->beginSourceLocationMapping();
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordImport));
+
+        AstPtrResult<Identifier> id = this->parseIdentifier();
+
+        IONLANG_PARSER_ASSERT(util::hasValue(id))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
+
+        std::shared_ptr<Import> import =
+            Import::make(util::getResultValue(id));
+
+        this->finishSourceLocationMapping(import);
+
+        return import;
     }
 }

@@ -36,6 +36,8 @@ namespace ionlang {
         {"unsafe", TokenKind::KeywordUnsafe},
         {"struct", TokenKind::KeywordStruct},
         {"let", TokenKind::KeywordLet},
+        {"import", TokenKind::KeywordImport},
+        {"intrinsic", TokenKind::KeywordIntrinsic},
 
         // Statement keywords.
         {const_name::statementReturn, TokenKind::KeywordReturn},
@@ -48,14 +50,16 @@ namespace ionlang {
         {const_name::typeInt16, TokenKind::TypeInt16},
         {const_name::typeInt32, TokenKind::TypeInt32},
         {const_name::typeInt64, TokenKind::TypeInt64},
-        // TODO: Int128?
-        // TODO
-        //            {const_name::typeUnsignedInt16, TokenKind::TypeUnsignedInt16},
-        //            {const_name::typeUnsignedInt32, TokenKind::TypeUnsignedInt32},
-        //            {const_name::typeUnsignedInt64, TokenKind::TypeUnsignedInt64},
+        {const_name::typeUnsignedInt8, TokenKind::TypeUnsignedInt8},
+        {const_name::typeUnsignedInt16, TokenKind::TypeUnsignedInt16},
+        {const_name::typeUnsignedInt32, TokenKind::TypeUnsignedInt32},
+        {const_name::typeUnsignedInt64, TokenKind::TypeUnsignedInt64},
         {const_name::typeFloat16, TokenKind::TypeFloat16},
         {const_name::typeFloat32, TokenKind::TypeFloat32},
         {const_name::typeFloat64, TokenKind::TypeFloat64},
+
+        // TODO: Unsigned floats.
+
         {const_name::typeChar, TokenKind::TypeChar},
         {const_name::typeString, TokenKind::TypeString},
 
@@ -79,7 +83,8 @@ namespace ionlang {
         {"->", TokenKind::SymbolArrow},
         {"&", TokenKind::SymbolAmpersand},
         {"@", TokenKind::SymbolAt},
-        {"...", TokenKind::SymbolEllipsis}
+        {"...", TokenKind::SymbolEllipsis},
+        {"::", TokenKind::SymbolScope}
     });
 
     const ionshared::BiMap<std::string, TokenKind> Grammar::intrinsicOperators({
@@ -108,10 +113,10 @@ namespace ionlang {
         TokenKind::TypeInt16,
         TokenKind::TypeInt32,
         TokenKind::TypeInt64,
-        // TODO
-//        TokenKind::TypeUnsignedInt16,
-//        TokenKind::TypeUnsignedInt32,
-//        TokenKind::TypeUnsignedInt64,
+        TokenKind::TypeUnsignedInt8,
+        TokenKind::TypeUnsignedInt16,
+        TokenKind::TypeUnsignedInt32,
+        TokenKind::TypeUnsignedInt64,
         TokenKind::TypeFloat16,
         TokenKind::TypeFloat32,
         TokenKind::TypeFloat64,

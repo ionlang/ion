@@ -20,35 +20,85 @@ namespace ionlang {
 
         LiteralBoolean,
 
+        /**
+         * $
+         */
         SymbolDollar,
 
+        /**
+         * #
+         */
         SymbolHash,
 
+        /**
+         * (
+         */
         SymbolParenthesesL,
 
+        /**
+         * )
+         */
         SymbolParenthesesR,
 
+        /**
+         * [
+         */
         SymbolBracketL,
 
+        /**
+         * ]
+         */
         SymbolBracketR,
 
+        /**
+         * ,
+         */
         SymbolComma,
 
+        /**
+         * =
+         */
         SymbolEqual,
 
+        /**
+         * ;
+         */
         SymbolSemiColon,
 
+        /**
+         * {
+         */
         SymbolBraceL,
 
+        /**
+         * }
+         */
         SymbolBraceR,
 
+        /**
+         * ->
+         */
         SymbolArrow,
 
+        /**
+         * &
+         */
         SymbolAmpersand,
 
+        /**
+         * @
+         */
         SymbolAt,
 
+        /**
+         * ...
+         */
         SymbolEllipsis,
+
+        /**
+         * ::
+         */
+        SymbolScope,
 
         KeywordFunction,
 
@@ -70,6 +120,10 @@ namespace ionlang {
 
         KeywordLet,
 
+        KeywordImport,
+
+        KeywordIntrinsic,
+
         TypeVoid,
 
         TypeBool,
@@ -81,6 +135,14 @@ namespace ionlang {
         TypeInt32,
 
         TypeInt64,
+
+        TypeUnsignedInt8,
+
+        TypeUnsignedInt16,
+
+        TypeUnsignedInt32,
+
+        TypeUnsignedInt64,
 
         TypeFloat16,
 

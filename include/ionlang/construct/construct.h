@@ -35,7 +35,11 @@ namespace ionlang {
 
         Attribute,
 
-        ArgumentList
+        ArgumentList,
+
+        Identifier,
+
+        Import
     };
 
     struct Construct;

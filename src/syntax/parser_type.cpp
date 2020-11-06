@@ -127,7 +127,7 @@ namespace ionlang {
         // TODO: Missing support for is signed or not?
 
         std::optional<IntegerKind> integerKind =
-            Const::getIntegerKind(currentTokenKind);
+            Const::findIntegerKind(currentTokenKind);
 
         if (!integerKind.has_value()) {
             // TODO: Use proper exception/error.
