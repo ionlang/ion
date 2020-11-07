@@ -18,15 +18,15 @@ extern puts(i8* msg) -> i32;
 extern printf(i8* format, ...) -> i32;
 
 struct Animal {
-  i8* name;
+  i8* id;
 
   ui8 age;
 
-  fn sayName() { puts(this.name); }
+  fn sayName() { puts(this.id); }
 }
 
 struct Dog extends Animal {
-  fn bark() -> void { printf("%s barks woof woof!", this.name); }
+  fn bark() -> void { printf("%s barks woof woof!", this.id); }
 
   fn computeAgeInHumanYears() -> ui8 { return this.age * 7; }
 }
@@ -40,7 +40,7 @@ fn main(i32 argc) -> i32 {
   mikewazowski.bark();
 
   printf("%s is %s years old (%s in human years).",
-    mikewazowski.name,
+    mikewazowski.id,
     mikewazowski.age,
     mikewazowski.computeAgeInHumanYears());
 

@@ -55,7 +55,7 @@ namespace ionlang {
          * to have its kind, name and context defined.
          */
         std::shared_ptr<Construct> owner = *node->context;
-        std::string name = *node->name;
+        std::string name = *node->id;
 
         auto throwUndefinedReference = [name]{
             throw std::runtime_error("Undefined reference to '" + name + "'");

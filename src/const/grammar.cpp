@@ -41,6 +41,13 @@ namespace ionlang {
         {"constructor", TokenKind::KeywordConstructor},
         {"destructor", TokenKind::KeywordDestructor},
         {"operator", TokenKind::KeywordOperator},
+        {"type", TokenKind::KeywordType},
+        {"attribute", TokenKind::KeywordAttribute},
+        {"extends", TokenKind::KeywordExtends},
+        {"public", TokenKind::KeywordPublic},
+        {"protected", TokenKind::KeywordProtected},
+        {"private", TokenKind::KeywordPrivate},
+        {"export", TokenKind::KeywordExport},
 
         // Statement keywords.
         {const_name::statementReturn, TokenKind::KeywordReturn},
@@ -65,6 +72,7 @@ namespace ionlang {
 
         {const_name::typeChar, TokenKind::TypeChar},
         {const_name::typeString, TokenKind::TypeString},
+        {const_name::typeOpaque, TokenKind::TypeOpaque},
 
         // Qualifier keywords.
         {"const", TokenKind::QualifierConst},
@@ -124,14 +132,15 @@ namespace ionlang {
         TokenKind::TypeFloat32,
         TokenKind::TypeFloat64,
         TokenKind::TypeChar,
-        TokenKind::TypeString
+        TokenKind::TypeString,
+        TokenKind::TypeOpaque
     };
 
     bool Grammar::sortByKeyLength(
-        const std::pair<std::string, TokenKind>& a,
-        const std::pair<std::string, TokenKind>& b
+        const std::pair<std::string, TokenKind>& pairA,
+        const std::pair<std::string, TokenKind>& pairB
     ) {
-        return a.first > b.first;
+        return pairA.first > pairB.first;
     }
 
     void Grammar::ensureInit() {

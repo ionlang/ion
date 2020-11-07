@@ -150,7 +150,7 @@ TEST(ParserTest, ParseEmptyPrototype) {
     std::shared_ptr<Prototype> prototype = util::getResultValue(prototypeResult);
 
     // Verify return type.
-    EXPECT_EQ(prototype->returnType->name, "type");
+    EXPECT_EQ(prototype->returnType->id, "type");
 
     // Verify prototype.
     EXPECT_EQ(prototype->name, test::constant::foobar);

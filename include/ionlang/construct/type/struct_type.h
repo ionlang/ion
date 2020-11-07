@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../../../../../../../../../Program Files (x86)/ionshared/include/ionshared/misc/named.h"
-#include "../construct.h"
+#include <ionshared/misc/named.h>
+#include <ionlang/construct/method.h>
+#include <ionlang/construct/type.h>
 
 namespace ionlang {
     struct Pass;
@@ -11,7 +12,8 @@ namespace ionlang {
     struct StructType : ConstructWithParent<Module, Type, std::string, TypeKind> {
         static std::shared_ptr<StructType> make(
             const std::string& name,
-            const Fields& fields
+            const Fields& fields,
+            const ionshared::PtrSymbolTable<Method>& methods
         ) noexcept;
 
         Fields fields;

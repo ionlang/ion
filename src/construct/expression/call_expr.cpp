@@ -4,15 +4,15 @@
 namespace ionlang {
     std::shared_ptr<CallExpr> CallExpr::make(
         const PtrResolvable<>& calleeResolvable,
-        const CallArgs& args,
+        const CallArgs& arguments,
         const PtrResolvable<Type>& type
     ) noexcept {
         std::shared_ptr<CallExpr> result =
-            std::make_shared<CallExpr>(calleeResolvable, args, type);
+            std::make_shared<CallExpr>(calleeResolvable, arguments, type);
 
         calleeResolvable->parent = result;
 
-        for (const auto& argument : args) {
+        for (const auto& argument : arguments) {
             argument->parent = result;
         }
 
@@ -21,12 +21,12 @@ namespace ionlang {
 
     CallExpr::CallExpr(
         PtrResolvable<> calleeResolvable,
-        CallArgs args,
+        CallArgs arguments,
         const PtrResolvable<Type>& type
     ) noexcept :
         Expression<>(ExpressionKind::Call, type),
         calleeResolvable(std::move(calleeResolvable)),
-        args(std::move(args)) {
+        arguments(std::move(arguments)) {
         //
     }
 

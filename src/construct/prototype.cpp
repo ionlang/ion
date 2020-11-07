@@ -57,7 +57,7 @@ namespace ionlang {
 
         mangledName << localParentAsChild->forceGetUnboxedParent()->name
             << IONLANG_MANGLE_SEPARATOR
-            << this->returnType->name.value_or(this->returnType->forceGetValue()->typeName)
+            << this->returnType->id.value_or(this->returnType->forceGetValue()->typeName)
             << IONLANG_MANGLE_SEPARATOR
             << this->name;
 
@@ -65,7 +65,7 @@ namespace ionlang {
 
         for (const auto &[name, type] : argumentListNativeMap) {
             mangledName << IONLANG_MANGLE_SEPARATOR
-                << type->name.value_or(type->forceGetValue()->typeName)
+                << type->id.value_or(type->forceGetValue()->typeName)
                 << IONLANG_MANGLE_SEPARATOR
                 << name;
         }

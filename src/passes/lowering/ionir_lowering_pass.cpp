@@ -615,7 +615,7 @@ namespace ionlang {
 
         std::vector<std::shared_ptr<ionir::Construct>> irArgs{};
 
-        for (const auto& arg : construct->args) {
+        for (const auto& arg : construct->arguments) {
             irArgs.push_back(this->safeEarlyVisitOrLookup(arg));
         }
 

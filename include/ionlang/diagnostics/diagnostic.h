@@ -77,4 +77,11 @@ namespace ionlang::diagnostic {
         "Function '%s' was already previously defined",
         std::nullopt
     );
+
+    IONLANG_NOTICE_DEFINE(
+        intrinsicUnknownModule,
+        ionshared::DiagnosticKind::Error,
+        "There is no intrinsic module named '%s'",
+        std::nullopt
+    );
 }

@@ -1,3 +1,4 @@
+#include <ionlang/const/const.h>
 #include <ionlang/lexical/classifier.h>
 #include <ionlang/syntax/parser.h>
 
@@ -371,5 +372,61 @@ namespace ionlang {
         this->finishSourceLocationMapping(import);
 
         return import;
+    }
+
+    AstPtrResult<> Parser::parseIntrinsic(const std::shared_ptr<Block>& parent) {
+        this->beginSourceLocationMapping();
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordIntrinsic))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolScope))
+
+        AstPtrResult<CallExpr> callExpr = this->parseCallExpr(parent);
+
+        IONLANG_PARSER_ASSERT(util::hasValue(callExpr))
+
+        std::optional<std::shared_ptr<Identifier>> calleeResolvableId =
+            util::getResultValue(callExpr)->calleeResolvable->id;
+
+        IONLANG_PARSER_ASSERT(calleeResolvableId.has_value())
+        IONLANG_PARSER_ASSERT(calleeResolvableId->get()->scopePath.size() == 1)
+
+        std::string intrinsicModuleName = calleeResolvableId->get()->baseName;
+
+        if (!Const::intrinsicModules.contains(intrinsicModuleName)) {
+            this->getDiagnosticBuilder()
+                ->bootstrap(diagnostic::intrinsicUnknownModule)
+                ->formatMessage(intrinsicModuleName)
+                ->setSourceLocation(this->makeSourceLocation())
+                ->finish();
+
+            return this->makeErrorMarker();
+        }
+
+        IntrinsicModuleKind intrinsicModuleKind =
+            Const::intrinsicModules.unwrapConst().at(intrinsicModuleName);
+
+        std::string calleeName = calleeResolvableId->get()->scopePath.at(0);
+
+        switch (intrinsicModuleKind) {
+            case IntrinsicModuleKind::Reflection: {
+                // TODO: Hard-coded strings.
+
+                if (calleeName == "nameOf") {
+                    // TODO: Access CallExpr's args.
+                    return std::make_shared<NameOfIntrinsic>();
+                }
+                else if (calleeName == "typeOf") {
+                    // TODO: Access CallExpr's args.
+                    return std::make_shared<TypeOfIntrinsic>();
+                }
+
+                // TODO: Use diagnostics API (user error).
+                throw std::runtime_error("Unknown intrinsic callee name");
+            }
+
+            default: {
+                // TODO: Use diagnostics API (internal error).
+                throw std::runtime_error("Unknown intrinsic module kind");
+            }
+        }
     }
 }

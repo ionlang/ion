@@ -5,6 +5,11 @@ namespace ionlang {
     ionshared::Map<IntegerKind, LlvmIntTypeResolver> Const::integerTypeResolverMap =
         ionshared::Map<IntegerKind, LlvmIntTypeResolver>();
 
+    const ionshared::Map<std::string, IntrinsicModuleKind> Const::intrinsicModules({
+        {"reflection", IntrinsicModuleKind::Reflection},
+        {"array", IntrinsicModuleKind::Array}
+    });
+
     const std::string Const::basicBlockInternalPrefix = ".";
 
     const std::string Const::basicBlockEntryId = "entry";

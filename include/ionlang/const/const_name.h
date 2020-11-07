@@ -43,6 +43,8 @@ namespace ionlang::const_name {
 
     static const std::string typeString = "str";
 
+    static const std::string typeOpaque = "opaque";
+
     static const std::string statementReturn = "return";
 
     static const std::string statementIf = "if";

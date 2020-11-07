@@ -10,13 +10,21 @@
 #include <ionlang/lexical/token_kind.h>
 
 namespace ionlang {
-    typedef llvm::IntegerType *(llvm::IntegerType::*LlvmIntTypeResolver)(llvm::LLVMContext &context);
+    typedef llvm::IntegerType* (llvm::IntegerType::*LlvmIntTypeResolver)(llvm::LLVMContext& context);
+
+    enum IntrinsicModuleKind {
+        Reflection,
+
+        Array
+    };
 
     class Const {
     private:
         static ionshared::Map<IntegerKind, LlvmIntTypeResolver> integerTypeResolverMap;
 
     public:
+        static const ionshared::Map<std::string, IntrinsicModuleKind> intrinsicModules;
+
         static const std::string basicBlockInternalPrefix;
 
         static const std::string basicBlockEntryId;

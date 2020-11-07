@@ -3,6 +3,7 @@
 #include <ionlang/construct/pseudo/resolvable.h>
 #include <ionlang/construct/expression.h>
 #include <ionlang/construct/function.h>
+#include <ionlang/construct/type.h>
 
 namespace ionlang {
     struct Pass;
@@ -12,17 +13,17 @@ namespace ionlang {
     struct CallExpr : Expression<> {
         static std::shared_ptr<CallExpr> make(
             const PtrResolvable<>& calleeResolvable,
-            const CallArgs& args,
+            const CallArgs& arguments,
             const PtrResolvable<Type>& type
         ) noexcept;
 
         PtrResolvable<> calleeResolvable;
 
-        CallArgs args;
+        CallArgs arguments;
 
         CallExpr(
             PtrResolvable<> calleeResolvable,
-            CallArgs args,
+            CallArgs arguments,
             const PtrResolvable<Type>& type
         ) noexcept;
 

@@ -4,6 +4,7 @@
 #include <utility>
 #include <ionshared/misc/util.h>
 #include <ionshared/misc/named.h>
+#include <ionlang/construct/identifier.h>
 #include <ionlang/construct/construct.h>
 
 namespace ionlang {
@@ -50,26 +51,28 @@ namespace ionlang {
 
         [[nodiscard]] static std::shared_ptr<Resolvable<T>> make(
             ResolvableKind kind,
-            std::string name,
+            std::shared_ptr<Identifier> id,
             std::shared_ptr<Construct> context
         ) noexcept {
-            return std::make_shared<Resolvable<T>>(kind, name, context);
+            // TODO: Should identifier be made a child?
+            return std::make_shared<Resolvable<T>>(kind, id, context);
         }
 
         const std::optional<ResolvableKind> resolvableKind;
 
-        const std::optional<std::string> name;
+        // TODO: Should the identifier be a child?
+        const std::optional<std::shared_ptr<Identifier>> id;
 
         const ionshared::OptPtr<Construct> context;
 
         Resolvable(
             ResolvableKind kind,
-            std::string name,
+            std::shared_ptr<Identifier> id,
             std::shared_ptr<Construct> context // TODO: Change type to Scope (or Context for deeper lookup?).
         ) noexcept :
             Construct(ConstructKind::Resolvable),
             resolvableKind(kind),
-            name(std::move(name)),
+            id(std::move(id)),
             context(std::move(context)),
             value(std::nullopt),
             cachedParent(std::nullopt) {
@@ -79,7 +82,7 @@ namespace ionlang {
         explicit Resolvable(std::shared_ptr<T> value) noexcept :
             Construct(ConstructKind::Resolvable),
             resolvableKind(std::nullopt),
-            name(std::nullopt),
+            id(std::nullopt),
             context(std::nullopt),
             value(value) {
             //

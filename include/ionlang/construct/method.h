@@ -3,14 +3,13 @@
 #include <string>
 #include <vector>
 #include <ionshared/misc/named.h>
-#include <ionir/construct/pseudo/args.h>
-#include <ionir/construct/pseudo/child_construct.h>
-#include <ionir/construct/type/struct.h>
-#include "type.h"
+#include <ionlang/construct/block.h>
 #include "function.h"
 
 namespace ionlang {
     struct Pass;
+
+    struct StructType;
 
     enum MethodKind {
         Normal,
@@ -27,7 +26,7 @@ namespace ionlang {
             MethodKind kind,
             const std::shared_ptr<StructType>& structType,
             const std::shared_ptr<Prototype>& prototype,
-            const std::vector<std::shared_ptr<BasicBlock>>& basicBlocks
+            const std::shared_ptr<Block>& body
         ) noexcept;
 
         const MethodKind methodKind;
@@ -37,8 +36,8 @@ namespace ionlang {
         Method(
             MethodKind kind,
             std::shared_ptr<StructType> structType,
-            std::shared_ptr<Prototype> prototype,
-            std::vector<std::shared_ptr<BasicBlock>> basicBlocks
+            const std::shared_ptr<Prototype>& prototype,
+            std::shared_ptr<Block> body
         ) noexcept;
 
         void accept(Pass& visitor) override;

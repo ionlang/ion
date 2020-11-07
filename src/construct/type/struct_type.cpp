@@ -1,14 +1,13 @@
 #include <ionlang/passes/pass.h>
 
-#include <utility>
-
 namespace ionlang {
     std::shared_ptr<StructType> StructType::make(
         const std::string& name,
-        const Fields& fields
+        const Fields& fields,
+        const ionshared::PtrSymbolTable<Method>& methods
     ) noexcept {
         std::shared_ptr<StructType> result =
-            std::make_shared<StructType>(name, fields);
+            std::make_shared<StructType>(name, fields, methods);
 
         auto fieldsNativeMap = fields->unwrap();
 
@@ -16,12 +15,23 @@ namespace ionlang {
             type->parent = result;
         }
 
+        auto methodsNativeMap = methods->unwrap();
+
+        for (const auto& [name, method] : methodsNativeMap) {
+            method->parent = result;
+        }
+
         return result;
     }
 
-    StructType::StructType(std::string name, Fields fields) :
+    StructType::StructType(
+        std::string name,
+        Fields fields,
+        ionshared::PtrSymbolTable<Method> methods
+    ) :
         ConstructWithParent<Module, Type, std::string, TypeKind>(std::move(name), TypeKind::Struct),
-        fields(std::move(fields)) {
+        fields(std::move(fields)),
+        methods(std::move(methods)) {
         //
     }
 

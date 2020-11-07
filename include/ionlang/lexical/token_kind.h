@@ -130,6 +130,22 @@ namespace ionlang {
 
         KeywordOperator,
 
+        KeywordType,
+
+        KeywordAttribute,
+
+        KeywordExtends,
+
+        KeywordPublic,
+
+        KeywordProtected,
+
+        KeywordPrivate,
+
+        KeywordExport,
+
+        TypeOpaque,
+
         TypeVoid,
 
         TypeBool,

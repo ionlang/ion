@@ -25,8 +25,8 @@ namespace ionlang {
         static TokenKindVector types;
 
         static bool sortByKeyLength(
-            const std::pair<std::string, TokenKind>& a,
-            const std::pair<std::string, TokenKind>& b
+            const std::pair<std::string, TokenKind>& pairA,
+            const std::pair<std::string, TokenKind>& pairB
         );
 
         static void ensureInit();

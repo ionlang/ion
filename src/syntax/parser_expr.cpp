@@ -134,9 +134,9 @@ namespace ionlang {
     AstPtrResult<CallExpr> Parser::parseCallExpr(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
 
-        std::optional<std::string> calleeId = this->parseName();
+        AstPtrResult<Identifier> calleeId = this->parseIdentifier();
 
-        IONLANG_PARSER_ASSERT(calleeId.has_value())
+        IONLANG_PARSER_ASSERT(util::hasValue(calleeId))
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
         CallArgs callArgs{};
@@ -160,9 +160,19 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
 
         std::shared_ptr<CallExpr> callExpr = CallExpr::make(
-            Resolvable<>::make(ResolvableKind::Prototype, *calleeId, parent),
+            Resolvable<>::make(
+                ResolvableKind::Prototype,
+                util::getResultValue(calleeId),
+                parent
+            ),
+
             callArgs,
-            Resolvable<Type>::make(ResolvableKind::PrototypeReturnType, *calleeId, parent)
+
+            Resolvable<Type>::make(
+                ResolvableKind::PrototypeReturnType,
+                util::getResultValue(calleeId),
+                parent
+            )
         );
 
         this->finishSourceLocationMapping(callExpr);
@@ -195,7 +205,7 @@ namespace ionlang {
         std::shared_ptr<StructDefinition> structDefinition = StructDefinition::make(
             Resolvable<StructType>::make(
                 ResolvableKind::StructType,
-                *name,
+                std::make_shared<Identifier>(*name),
                 parent
             ),
 
