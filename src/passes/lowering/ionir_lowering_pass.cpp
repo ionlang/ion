@@ -700,4 +700,8 @@ namespace ionlang {
             this->safeEarlyVisitOrLookup(*construct->getValue())
         );
     }
+
+    void IonIrLoweringPass::visitCast(std::shared_ptr<Cast> construct) {
+        // TODO
+    }
 }

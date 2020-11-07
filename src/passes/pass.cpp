@@ -155,4 +155,8 @@ namespace ionlang {
     void Pass::visitImport(std::shared_ptr<Import> construct) {
         //
     }
+
+    void Pass::visitCast(std::shared_ptr<Cast> construct) {
+        //
+    }
 }
