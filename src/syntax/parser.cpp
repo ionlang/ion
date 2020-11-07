@@ -219,8 +219,11 @@ namespace ionlang {
             }
             // Method.
             else if (Classifier::isMethodOrFunction(currentTokenKind)) {
-
+                // TODO: Implement.
+                this->parseMethod();
             }
+
+            // TODO: What if reached here?
         }
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceR))
