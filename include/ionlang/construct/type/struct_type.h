@@ -16,9 +16,12 @@ namespace ionlang {
 
         Fields fields;
 
+        ionshared::PtrSymbolTable<Method> methods;
+
         StructType(
             std::string name,
-            Fields fields
+            Fields fields,
+            ionshared::PtrSymbolTable<Method> methods
         );
 
         void accept(Pass& visitor) override;

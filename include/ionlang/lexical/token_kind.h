@@ -124,6 +124,12 @@ namespace ionlang {
 
         KeywordIntrinsic,
 
+        KeywordConstructor,
+
+        KeywordDestructor,
+
+        KeywordOperator,
+
         TypeVoid,
 
         TypeBool,

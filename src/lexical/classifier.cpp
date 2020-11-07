@@ -60,4 +60,11 @@ namespace ionlang {
             || tokenKind == TokenKind::KeywordIf
             || tokenKind == TokenKind::KeywordReturn;
     }
+
+    bool Classifier::isMethodOrFunction(TokenKind tokenKind) {
+        return tokenKind == TokenKind::KeywordConstructor
+            || tokenKind == TokenKind::KeywordDestructor
+            || tokenKind == TokenKind::KeywordOperator
+            || tokenKind == TokenKind::KeywordFunction;
+    }
 }

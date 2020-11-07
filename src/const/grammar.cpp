@@ -38,6 +38,9 @@ namespace ionlang {
         {"let", TokenKind::KeywordLet},
         {"import", TokenKind::KeywordImport},
         {"intrinsic", TokenKind::KeywordIntrinsic},
+        {"constructor", TokenKind::KeywordConstructor},
+        {"destructor", TokenKind::KeywordDestructor},
+        {"operator", TokenKind::KeywordOperator},
 
         // Statement keywords.
         {const_name::statementReturn, TokenKind::KeywordReturn},
@@ -202,7 +205,7 @@ namespace ionlang {
         // Sort.
         auto mergeBufferBiNativeMap = mergeBufferBiMap->firstMap.unwrapConst();
 
-        for (const auto &pair : mergeBufferBiNativeMap) {
+        for (const auto& pair : mergeBufferBiNativeMap) {
             Grammar::simpleRules.push_back(pair);
         }
 

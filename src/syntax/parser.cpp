@@ -184,33 +184,42 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
         Fields fields = ionshared::util::makePtrSymbolTable<Resolvable<Type>>();
+        TokenKind currentTokenKind = this->tokenStream.get().kind;
 
         while (!this->is(TokenKind::SymbolBraceR)) {
-            // TODO: Not proper parent.
-            AstPtrResult<Resolvable<Type>> fieldTypeResult = this->parseType(parent);
+            // Field.
+            if (Classifier::isBuiltInType(currentTokenKind)
+                || this->is(TokenKind::Identifier)) {
+                // TODO: Not proper parent.
+                AstPtrResult<Resolvable<Type>> fieldTypeResult = this->parseType(parent);
 
-            IONLANG_PARSER_ASSERT(util::hasValue(fieldTypeResult))
+                IONLANG_PARSER_ASSERT(util::hasValue(fieldTypeResult))
 
-            std::optional<std::string> fieldNameResult = this->parseName();
+                std::optional<std::string> fieldNameResult = this->parseName();
 
-            IONLANG_PARSER_ASSERT(fieldNameResult.has_value())
-            IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
+                IONLANG_PARSER_ASSERT(fieldNameResult.has_value())
+                IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
-            /**
-             * A field with the same name was already previously
-             * parsed and set on the fields map.
-             */
-            if (fields->contains(*fieldNameResult)) {
-                // TODO: Replace strings, since 'structFieldRedefinition' takes in field and struct names.
-                this->diagnosticBuilder
-                    ->bootstrap(diagnostic::structFieldRedefinition)
-                    ->setSourceLocation(this->makeSourceLocation())
-                    ->finish();
+                /**
+                 * A field with the same name was already previously
+                 * parsed and set on the fields map.
+                 */
+                if (fields->contains(*fieldNameResult)) {
+                    // TODO: Replace strings, since 'structFieldRedefinition' takes in field and struct names.
+                    this->diagnosticBuilder
+                        ->bootstrap(diagnostic::structFieldRedefinition)
+                        ->setSourceLocation(this->makeSourceLocation())
+                        ->finish();
 
-                return this->makeErrorMarker();
+                    return this->makeErrorMarker();
+                }
+
+                fields->set(*fieldNameResult, util::getResultValue(fieldTypeResult));
             }
+            // Method.
+            else if (Classifier::isMethodOrFunction(currentTokenKind)) {
 
-            fields->set(*fieldNameResult, util::getResultValue(fieldTypeResult));
+            }
         }
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceR))

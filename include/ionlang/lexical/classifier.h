@@ -25,5 +25,9 @@ namespace ionlang {
             TokenKind tokenKind,
             std::optional<TokenKind> nextTokenKind
         );
+
+        [[nodiscard]] static bool isMethodOrFunction(
+            TokenKind tokenKind
+        );
     };
 }
