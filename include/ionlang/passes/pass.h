@@ -108,7 +108,7 @@ namespace ionlang {
 
         virtual void visitImport(std::shared_ptr<Import> construct);
 
-        virtual void visitCast(std::shared_ptr<Cast> construct);
+        virtual void visitCastExpr(std::shared_ptr<CastExpr> construct);
     };
 
     typedef ionshared::BasePassManager<Pass, Construct> PassManager;

@@ -1,33 +1,34 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    std::shared_ptr<Cast> Cast::make(
-        const std::shared_ptr<Type>& type,
+    std::shared_ptr<CastExpr> CastExpr::make(
+        const std::shared_ptr<Resolvable<Type>>& type,
         const std::shared_ptr<Expression<>>& value
     ) noexcept {
-        std::shared_ptr<Cast> result =
-            std::make_shared<Cast>(type, value);
+        std::shared_ptr<CastExpr> result =
+            std::make_shared<CastExpr>(type, value);
 
-        type->parent = result;
+        type->setTransitiveParent(result);
         value->parent = result;
 
         return result;
     }
 
-    Cast::Cast(
-        std::shared_ptr<Type> type,
+    CastExpr::CastExpr(
+        std::shared_ptr<Resolvable<Type>> type,
         std::shared_ptr<Expression<>> value
     ) noexcept :
+        Expression<>(ExpressionKind::CastExpr),
         type(std::move(type)),
         value(std::move(value)) {
         //
     }
 
-    void Cast::accept(Pass& visitor) {
-        visitor.visitCast(this->dynamicCast<Cast>());
+    void CastExpr::accept(Pass& visitor) {
+        visitor.visitCastExpr(this->dynamicCast<CastExpr>());
     }
 
-    Ast Cast::getChildNodes() {
+    Ast CastExpr::getChildNodes() {
         return {
             this->type,
             this->value

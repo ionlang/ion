@@ -21,7 +21,9 @@ namespace ionlang {
 
         StringLiteral,
 
-        StructDefinition
+        StructDefinition,
+
+        Cast
     };
 
     template<typename T = Type>

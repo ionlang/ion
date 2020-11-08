@@ -156,11 +156,11 @@ namespace ionlang {
 
         void visitVariableRefExpr(std::shared_ptr<VariableRefExpr> construct) override;
 
+        void visitCastExpr(std::shared_ptr<CastExpr> construct) override;
+
         void visitStructDefinition(std::shared_ptr<StructDefinition> construct) override;
 
         void visitResolvable(PtrResolvable<> construct) override;
-
-        void visitCast(std::shared_ptr<Cast> construct) override;
 
         // TODO: visitRef() if !isResolved() error, else this->visit(ref->getValue()); Is this a good idea? It may be required for example for if statement condition (if it's a ref). Investigate.
     };

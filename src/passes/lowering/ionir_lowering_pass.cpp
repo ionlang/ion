@@ -669,6 +669,10 @@ namespace ionlang {
         );
     }
 
+    void IonIrLoweringPass::visitCastExpr(std::shared_ptr<CastExpr> construct) {
+        // TODO
+    }
+
     void IonIrLoweringPass::visitStructDefinition(
         std::shared_ptr<StructDefinition> construct
     ) {
@@ -699,9 +703,5 @@ namespace ionlang {
             construct,
             this->safeEarlyVisitOrLookup(*construct->getValue())
         );
-    }
-
-    void IonIrLoweringPass::visitCast(std::shared_ptr<Cast> construct) {
-        // TODO
     }
 }

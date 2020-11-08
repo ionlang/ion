@@ -156,7 +156,7 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitCast(std::shared_ptr<Cast> construct) {
+    void Pass::visitCastExpr(std::shared_ptr<CastExpr> construct) {
         //
     }
 }

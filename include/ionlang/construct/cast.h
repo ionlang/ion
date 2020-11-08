@@ -1,24 +1,24 @@
 #pragma once
 
+#include <ionlang/construct/pseudo/resolvable.h>
 #include "type.h"
-#include "construct.h"
 #include "expression.h"
 
 namespace ionlang {
     struct Pass;
 
-    struct Cast : Construct {
-        static std::shared_ptr<Cast> make(
-            const std::shared_ptr<Type>& type,
+    struct CastExpr : Expression<> {
+        static std::shared_ptr<CastExpr> make(
+            const std::shared_ptr<Resolvable<Type>>& type,
             const std::shared_ptr<Expression<>>& value
         ) noexcept;
 
-        std::shared_ptr<Type> type;
+        std::shared_ptr<Resolvable<Type>> type;
 
         std::shared_ptr<Expression<>> value;
 
-        Cast(
-            std::shared_ptr<Type> type,
+        CastExpr(
+            std::shared_ptr<Resolvable<Type>> type,
             std::shared_ptr<Expression<>> value
         ) noexcept;
 

@@ -173,6 +173,8 @@ namespace ionlang {
 
         AstPtrResult<> parseIntrinsic(const std::shared_ptr<Block>& parent);
 
+        AstPtrResult<CastExpr> parseCast(const std::shared_ptr<Block>& parent);
+
         // TODO: Add comment-parsing support.
 
         template<typename T = Construct>
