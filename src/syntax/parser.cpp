@@ -432,30 +432,4 @@ namespace ionlang {
             }
         }
     }
-
-    AstPtrResult<CastExpr> Parser::parseCast(const std::shared_ptr<Block>& parent) {
-        this->beginSourceLocationMapping();
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
-
-        AstPtrResult<Resolvable<Type>> type = this->parseType(parent);
-
-        IONLANG_PARSER_ASSERT(util::hasValue(type))
-        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
-
-        AstPtrResult<Expression<>> value = this->parsePrimaryExpr(parent);
-
-        IONLANG_PARSER_ASSERT(util::hasValue(value))
-
-        std::shared_ptr<CastExpr> cast = CastExpr::make(
-            util::getResultValue(type),
-            util::getResultValue(value)
-        );
-
-        // TODO: Is this proper parent?
-        cast->parent = parent;
-
-        this->finishSourceLocationMapping(cast);
-
-        return cast;
-    }
 }

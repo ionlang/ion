@@ -1,12 +1,12 @@
 #include <ionlang/passes/pass.h>
 
 namespace ionlang {
-    std::shared_ptr<StructDefinition> StructDefinition::make(
+    std::shared_ptr<StructDefExpr> StructDefExpr::make(
         const PtrResolvable<StructType>& type,
         const std::vector<std::shared_ptr<Expression<>>>& values
     ) noexcept {
-        std::shared_ptr<StructDefinition> result =
-            std::make_shared<StructDefinition>(type, values);
+        std::shared_ptr<StructDefExpr> result =
+            std::make_shared<StructDefExpr>(type, values);
 
         type->setTransitiveParent(result);
 
@@ -17,7 +17,7 @@ namespace ionlang {
         return result;
     }
 
-    StructDefinition::StructDefinition(
+    StructDefExpr::StructDefExpr(
         const PtrResolvable<StructType>& type,
         std::vector<std::shared_ptr<Expression<>>> values
     ) :
@@ -30,11 +30,11 @@ namespace ionlang {
         //
     }
 
-    void StructDefinition::accept(Pass& visitor) {
-        visitor.visitStructDefinition(this->dynamicCast<StructDefinition>());
+    void StructDefExpr::accept(Pass& visitor) {
+        visitor.visitStructDefinition(this->dynamicCast<StructDefExpr>());
     }
 
-    Ast StructDefinition::getChildNodes() {
+    Ast StructDefExpr::getChildNodes() {
         Ast children = Construct::convertChildren(this->values);
 
         children.push_back(this->type);

@@ -158,7 +158,7 @@ namespace ionlang {
 
         void visitCastExpr(std::shared_ptr<CastExpr> construct) override;
 
-        void visitStructDefinition(std::shared_ptr<StructDefinition> construct) override;
+        void visitStructDefinition(std::shared_ptr<StructDefExpr> construct) override;
 
         void visitResolvable(PtrResolvable<> construct) override;
 

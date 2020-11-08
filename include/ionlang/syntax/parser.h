@@ -149,9 +149,11 @@ namespace ionlang {
 
         AstPtrResult<CallExpr> parseCallExpr(const std::shared_ptr<Block>& parent);
 
-        AstPtrResult<StructDefinition> parseStructDefinitionExpr(
+        AstPtrResult<StructDefExpr> parseStructDefExpr(
             const std::shared_ptr<Block>& parent
         );
+
+        AstPtrResult<CastExpr> parseCastExpr(const std::shared_ptr<Block>& parent);
 
         AstPtrResult<Block> parseBlock(const std::shared_ptr<Construct>& parent);
 
@@ -172,8 +174,6 @@ namespace ionlang {
         AstPtrResult<Import> parseImport();
 
         AstPtrResult<> parseIntrinsic(const std::shared_ptr<Block>& parent);
-
-        AstPtrResult<CastExpr> parseCast(const std::shared_ptr<Block>& parent);
 
         // TODO: Add comment-parsing support.
 

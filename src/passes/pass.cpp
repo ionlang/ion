@@ -140,7 +140,7 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitStructDefinition(std::shared_ptr<StructDefinition> construct) {
+    void Pass::visitStructDefinition(std::shared_ptr<StructDefExpr> construct) {
         //
     }
 

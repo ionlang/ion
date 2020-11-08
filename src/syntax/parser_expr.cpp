@@ -60,7 +60,7 @@ namespace ionlang {
             return util::getResultValue(this->parseCallExpr(parent));
         }
         else if (this->isNext(TokenKind::SymbolBraceL)) {
-            return util::getResultValue(this->parseStructDefinitionExpr(parent));
+            return util::getResultValue(this->parseStructDefExpr(parent));
         }
 
         // TODO: Is this the correct parent for the ref?
@@ -180,7 +180,7 @@ namespace ionlang {
         return callExpr;
     }
 
-    AstPtrResult<StructDefinition> Parser::parseStructDefinitionExpr(
+    AstPtrResult<StructDefExpr> Parser::parseStructDefExpr(
         const std::shared_ptr<Block>& parent
     ) {
         this->beginSourceLocationMapping();
@@ -202,7 +202,7 @@ namespace ionlang {
 
         this->tokenStream.skip();
 
-        std::shared_ptr<StructDefinition> structDefinition = StructDefinition::make(
+        std::shared_ptr<StructDefExpr> structDefinition = StructDefExpr::make(
             Resolvable<StructType>::make(
                 ResolvableKind::StructType,
                 std::make_shared<Identifier>(*name),
@@ -215,5 +215,31 @@ namespace ionlang {
         this->finishSourceLocationMapping(structDefinition);
 
         return structDefinition;
+    }
+
+    AstPtrResult<CastExpr> Parser::parseCastExpr(const std::shared_ptr<Block>& parent) {
+        this->beginSourceLocationMapping();
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
+
+        AstPtrResult<Resolvable<Type>> type = this->parseType(parent);
+
+        IONLANG_PARSER_ASSERT(util::hasValue(type))
+        IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
+
+        AstPtrResult<Expression<>> value = this->parsePrimaryExpr(parent);
+
+        IONLANG_PARSER_ASSERT(util::hasValue(value))
+
+        std::shared_ptr<CastExpr> cast = CastExpr::make(
+            util::getResultValue(type),
+            util::getResultValue(value)
+        );
+
+        // TODO: Is this proper parent?
+        cast->parent = parent;
+
+        this->finishSourceLocationMapping(cast);
+
+        return cast;
     }
 }

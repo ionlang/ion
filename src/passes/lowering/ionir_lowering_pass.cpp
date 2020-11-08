@@ -674,7 +674,7 @@ namespace ionlang {
     }
 
     void IonIrLoweringPass::visitStructDefinition(
-        std::shared_ptr<StructDefinition> construct
+        std::shared_ptr<StructDefExpr> construct
     ) {
         std::shared_ptr<ionir::StructType> irStructType =
             this->safeEarlyVisitOrLookup<ionir::StructType>(**construct->type);

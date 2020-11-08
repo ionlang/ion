@@ -5,8 +5,8 @@
 namespace ionlang {
     struct Pass;
 
-    struct StructDefinition : Expression<> {
-        static std::shared_ptr<StructDefinition> make(
+    struct StructDefExpr : Expression<> {
+        static std::shared_ptr<StructDefExpr> make(
             const PtrResolvable<StructType>& type,
             const std::vector<std::shared_ptr<Expression<>>>& values = {}
         ) noexcept;
@@ -14,7 +14,7 @@ namespace ionlang {
         std::vector<std::shared_ptr<Expression<>>> values;
 
         // TODO: Should be marked as 'noexcept' but must first ensure Resolvable<StructType> -> Resolvable<Type> flattening (via ->staticCast) never throws.
-        explicit StructDefinition(
+        explicit StructDefExpr(
             const PtrResolvable<StructType>& type,
             std::vector<std::shared_ptr<Expression<>>> values = {}
         );

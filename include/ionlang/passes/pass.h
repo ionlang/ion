@@ -100,7 +100,7 @@ namespace ionlang {
 
         virtual void visitAttribute(std::shared_ptr<Attribute> construct);
 
-        virtual void visitStructDefinition(std::shared_ptr<StructDefinition> construct);
+        virtual void visitStructDefinition(std::shared_ptr<StructDefExpr> construct);
 
         virtual void visitArgumentList(std::shared_ptr<ArgumentList> construct);
 
