@@ -2,18 +2,24 @@
 
 namespace ionlang {
     std::shared_ptr<Cast> Cast::make(
-        const std::shared_ptr<Type>& type
+        const std::shared_ptr<Type>& type,
+        const std::shared_ptr<Expression<>>& value
     ) noexcept {
         std::shared_ptr<Cast> result =
-            std::make_shared<Cast>(type);
+            std::make_shared<Cast>(type, value);
 
         type->parent = result;
+        value->parent = result;
 
         return result;
     }
 
-    Cast::Cast(std::shared_ptr<Type> type) :
-        type(std::move(type)) {
+    Cast::Cast(
+        std::shared_ptr<Type> type,
+        std::shared_ptr<Expression<>> value
+    ) noexcept :
+        type(std::move(type)),
+        value(std::move(value)) {
         //
     }
 
@@ -22,6 +28,9 @@ namespace ionlang {
     }
 
     Ast Cast::getChildNodes() {
-        return {this->type};
+        return {
+            this->type,
+            this->value
+        };
     }
 }
