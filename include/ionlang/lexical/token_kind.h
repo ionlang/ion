@@ -144,6 +144,12 @@ namespace ionlang {
 
         KeywordExport,
 
+        KeywordImplements,
+
+        KeywordInterface,
+
+        KeywordAttaches,
+
         TypeOpaque,
 
         TypeVoid,

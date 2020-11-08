@@ -17,7 +17,7 @@ namespace ionlang {
         }
 
         this->diagnosticBuilder
-            ->bootstrap(diagnostic::syntaxUnexpectedToken)
+            ->bootstrap(diagnostic::syntaxExpectedOtherToken)
             ->setSourceLocation(this->makeSourceLocation())
             ->formatMessage(
                 Grammar::findTokenKindNameOr(tokenKind),

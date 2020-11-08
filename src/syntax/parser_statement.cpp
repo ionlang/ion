@@ -103,7 +103,6 @@ namespace ionlang {
 
     AstPtrResult<ReturnStmt> Parser::parseReturnStmt(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
-
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::KeywordReturn))
 
         AstPtrResult<Expression<>> valueResult{};
@@ -111,7 +110,6 @@ namespace ionlang {
         // Return statement contains a value. Parse it and save it.
         if (!this->is(TokenKind::SymbolSemiColon)) {
             valueResult = this->parseExpression(parent);
-
             IONLANG_PARSER_ASSERT(util::hasValue(valueResult))
         }
 

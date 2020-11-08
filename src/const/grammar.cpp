@@ -48,6 +48,9 @@ namespace ionlang {
         {"protected", TokenKind::KeywordProtected},
         {"private", TokenKind::KeywordPrivate},
         {"export", TokenKind::KeywordExport},
+        {"implements", TokenKind::KeywordImplements},
+        {"interface", TokenKind::KeywordInterface},
+        {"attaches", TokenKind::KeywordAttaches},
 
         // Statement keywords.
         {const_name::statementReturn, TokenKind::KeywordReturn},
