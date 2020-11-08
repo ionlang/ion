@@ -298,6 +298,8 @@ namespace ionlang {
         std::shared_ptr<Module> module =
             std::make_shared<Module>(*id, std::make_shared<Context>(globalScope));
 
+        this->moduleBuffer = module;
+
         while (!this->is(TokenKind::SymbolBraceR)) {
             AstPtrResult<> topLevelConstructResult = this->parseTopLevelConstruct(module);
 
