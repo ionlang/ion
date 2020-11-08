@@ -92,6 +92,7 @@ namespace ionlang {
         TokenStream stream,
         std::shared_ptr<ionshared::DiagnosticBuilder> diagnosticBuilder
     ) noexcept :
+        moduleBuffer(std::nullopt),
         tokenStream(std::move(stream)),
         diagnosticBuilder(std::move(diagnosticBuilder)),
         sourceLocationMappingStartStack() {
@@ -185,6 +186,10 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceL))
 
         Fields fields = ionshared::util::makePtrSymbolTable<Resolvable<Type>>();
+
+        ionshared::PtrSymbolTable<Method> methods =
+            ionshared::util::makePtrSymbolTable<Method>();
+
         TokenKind currentTokenKind = this->tokenStream.get().kind;
 
         while (!this->is(TokenKind::SymbolBraceR)) {
@@ -206,9 +211,9 @@ namespace ionlang {
                  * parsed and set on the fields map.
                  */
                 if (fields->contains(*fieldNameResult)) {
-                    // TODO: Replace strings, since 'structFieldRedefinition' takes in field and struct names.
                     this->diagnosticBuilder
                         ->bootstrap(diagnostic::structFieldRedefinition)
+                        ->formatMessage(*fieldNameResult, *structNameResult)
                         ->setSourceLocation(this->makeSourceLocation())
                         ->finish();
 
@@ -219,8 +224,25 @@ namespace ionlang {
             }
             // Method.
             else if (Classifier::isMethodOrFunction(currentTokenKind)) {
-                // TODO: Implement.
-                this->parseMethod();
+                AstPtrResult<Method> methodResult = this->parseMethod();
+
+                IONLANG_PARSER_ASSERT(util::hasValue(methodResult))
+
+                std::shared_ptr<Method> method = util::getResultValue(methodResult);
+
+                /**
+                 * A field with the same name was already previously
+                 * parsed and set on the fields map.
+                 */
+                if (methods->contains(method->prototype->name)) {
+                    this->diagnosticBuilder
+                        ->bootstrap(diagnostic::structMethodRedefinition)
+                        ->formatMessage(method->prototype->name, *structNameResult)
+                        ->setSourceLocation(method->sourceLocation)
+                        ->finish();
+
+                    return this->makeErrorMarker();
+                }
             }
 
             // TODO: What if reached here?
@@ -228,7 +250,11 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceR))
 
-        std::shared_ptr<StructType> structConstruct = StructType::make(*structNameResult, fields);
+        std::shared_ptr<StructType> structConstruct = StructType::make(
+            *structNameResult,
+            fields,
+            methods
+        );
 
         structConstruct->parent = parent;
 
@@ -289,7 +315,7 @@ namespace ionlang {
             // No more tokens to process.
             if (!this->tokenStream.hasNext() && !this->is(TokenKind::SymbolBraceR)) {
                 this->getDiagnosticBuilder()
-                    ->bootstrap(diagnostic::syntaxUnexpectedToken)
+                    ->bootstrap(diagnostic::syntaxExpectedOtherToken)
 
                     ->formatMessage(
                         Grammar::findTokenKindNameOr(TokenKind::SymbolBraceR),
@@ -319,7 +345,7 @@ namespace ionlang {
         do {
             if (this->is(TokenKind::SymbolScope) && isPrime) {
                 this->getDiagnosticBuilder()
-                    ->bootstrap(diagnostic::syntaxUnexpectedToken)
+                    ->bootstrap(diagnostic::syntaxExpectedOtherToken)
 
                     ->formatMessage(
                         Grammar::findTokenKindNameOr(TokenKind::Identifier),
@@ -415,11 +441,13 @@ namespace ionlang {
 
                 if (calleeName == "nameOf") {
                     // TODO: Access CallExpr's args.
-                    return std::make_shared<NameOfIntrinsic>();
+//                    return std::make_shared<NameOfIntrinsic>();
+                    throw std::runtime_error("Not implemented");
                 }
                 else if (calleeName == "typeOf") {
                     // TODO: Access CallExpr's args.
-                    return std::make_shared<TypeOfIntrinsic>();
+//                    return std::make_shared<TypeOfIntrinsic>();
+                    throw std::runtime_error("Not implemented");
                 }
 
                 // TODO: Use diagnostics API (user error).
@@ -431,5 +459,75 @@ namespace ionlang {
                 throw std::runtime_error("Unknown intrinsic module kind");
             }
         }
+    }
+
+    AstPtrResult<Method> Parser::parseMethod(const std::shared_ptr<StructType>& structType) {
+        this->beginSourceLocationMapping();
+
+        TokenKind currentTokenKind = this->tokenStream.get().kind;
+        MethodKind methodKind;
+
+        switch (currentTokenKind) {
+            case TokenKind::KeywordFunction: {
+                methodKind = MethodKind::Normal;
+
+                break;
+            }
+
+            case TokenKind::KeywordOperator: {
+                methodKind = MethodKind::OperatorOverload;
+
+                break;
+            }
+
+            case TokenKind::KeywordConstructor: {
+                methodKind = MethodKind::Constructor;
+
+                break;
+            }
+
+            case TokenKind::KeywordDestructor: {
+                methodKind = MethodKind::Destructor;
+
+                break;
+            }
+
+            default: {
+                this->diagnosticBuilder
+                    ->bootstrap(diagnostic::syntaxUnexpectedToken_)
+                    ->formatMessage(Grammar::findTokenKindNameOr(currentTokenKind))
+                    ->setSourceLocation(this->makeSourceLocation())
+                    ->finish();
+
+                return this->makeErrorMarker();
+            }
+        }
+
+        this->tokenStream.skip();
+
+        // TODO: Parsing prototype WILL fail on constructors/destructors, as well as all others except function/Normal (they don't have fn keyword).
+        AstPtrResult<Prototype> prototypeResult = this->parsePrototype(parentModule);
+
+        IONLANG_PARSER_ASSERT(util::hasValue(prototypeResult))
+
+        AstPtrResult<Block> bodyResult = this->parseBlock(function);
+
+        IONLANG_PARSER_ASSERT(util::hasValue(bodyResult))
+
+        /**
+         * Create the resulting function construct here, to be provided
+         * as the parent when parsing the body block.
+         */
+        std::shared_ptr<Method> method = Method::make(
+            methodKind,
+            structType,
+            util::getResultValue(prototypeResult),
+            util::getResultValue(bodyResult)
+        );
+
+        method->parent = structType;
+        this->finishSourceLocationMapping(method);
+
+        return method;
     }
 }

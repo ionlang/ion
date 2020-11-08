@@ -14,12 +14,12 @@ namespace ionlang {
     Identifier::operator std::string() const {
         std::stringstream stream{};
 
+        stream << this->baseName;
+
         for (const auto& scopePath : this->scopePath) {
             // TODO: Avoid having it hard-coded.
-            stream << scopePath << "::";
+            stream << "::" << scopePath;
         }
-
-        stream << this->name;
 
         return stream.str();
     }

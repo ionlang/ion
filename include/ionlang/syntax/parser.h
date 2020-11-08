@@ -20,6 +20,8 @@ namespace ionlang {
 
     class Parser {
     private:
+        std::optional<std::shared_ptr<Module>> moduleBuffer;
+
         TokenStream tokenStream;
 
         std::shared_ptr<ionshared::DiagnosticBuilder> diagnosticBuilder;
@@ -174,6 +176,8 @@ namespace ionlang {
         AstPtrResult<Import> parseImport();
 
         AstPtrResult<> parseIntrinsic(const std::shared_ptr<Block>& parent);
+
+        AstPtrResult<Method> parseMethod(const std::shared_ptr<StructType>& structType);
 
         // TODO: Add comment-parsing support.
 

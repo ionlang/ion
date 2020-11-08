@@ -37,6 +37,7 @@
 #include <ionlang/construct/identifier.h>
 #include <ionlang/construct/import.h>
 #include <ionlang/construct/cast.h>
+#include <ionlang/construct/method.h>
 
 namespace ionlang {
     struct Pass : ionshared::BasePass<Construct> {
@@ -109,6 +110,8 @@ namespace ionlang {
         virtual void visitImport(std::shared_ptr<Import> construct);
 
         virtual void visitCastExpr(std::shared_ptr<CastExpr> construct);
+
+        virtual void visitMethod(std::shared_ptr<Method> construct);
     };
 
     typedef ionshared::BasePassManager<Pass, Construct> PassManager;

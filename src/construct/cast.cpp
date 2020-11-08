@@ -18,8 +18,10 @@ namespace ionlang {
         std::shared_ptr<Resolvable<Type>> type,
         std::shared_ptr<Expression<>> value
     ) noexcept :
-        Expression<>(ExpressionKind::CastExpr),
-        type(std::move(type)),
+        // TODO: Shouldn't type be cloned? Think it through.
+        Expression<>(ExpressionKind::Cast, type),
+
+        type(type),
         value(std::move(value)) {
         //
     }

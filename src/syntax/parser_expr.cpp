@@ -41,13 +41,11 @@ namespace ionlang {
 
     AstPtrResult<Expression<>> Parser::parseParenthesesExpr(const std::shared_ptr<Block>& parent) {
         this->beginSourceLocationMapping();
-
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesL))
 
         AstPtrResult<Expression<>> expression = this->parseExpression(parent);
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolParenthesesR))
-
         this->finishSourceLocationMapping(util::getResultValue(expression));
 
         return expression;
@@ -196,7 +194,6 @@ namespace ionlang {
             AstPtrResult<Expression<>> value = this->parseExpression(parent);
 
             IONLANG_PARSER_ASSERT(util::hasValue(value))
-
             values.push_back(util::getResultValue(value));
         }
 

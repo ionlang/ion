@@ -4,14 +4,14 @@
 #include <vector>
 #include <ionshared/misc/named.h>
 #include <ionlang/construct/block.h>
-#include "function.h"
+#include "construct.h"
 
 namespace ionlang {
     struct Pass;
 
     struct StructType;
 
-    enum MethodKind {
+    enum struct MethodKind {
         Normal,
 
         Constructor,
@@ -21,7 +21,7 @@ namespace ionlang {
         OperatorOverload
     };
 
-    struct Method : Function {
+    struct Method : Construct {
         static std::shared_ptr<Method> make(
             MethodKind kind,
             const std::shared_ptr<StructType>& structType,
@@ -33,10 +33,14 @@ namespace ionlang {
 
         std::shared_ptr<StructType> structType;
 
+        std::shared_ptr<Prototype> prototype;
+
+        std::shared_ptr<Block> body;
+
         Method(
             MethodKind kind,
             std::shared_ptr<StructType> structType,
-            const std::shared_ptr<Prototype>& prototype,
+            std::shared_ptr<Prototype> prototype,
             std::shared_ptr<Block> body
         ) noexcept;
 

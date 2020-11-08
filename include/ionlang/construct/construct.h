@@ -39,7 +39,9 @@ namespace ionlang {
 
         Identifier,
 
-        Import
+        Import,
+
+        Method
     };
 
     struct Construct;

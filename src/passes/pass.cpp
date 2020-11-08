@@ -159,4 +159,8 @@ namespace ionlang {
     void Pass::visitCastExpr(std::shared_ptr<CastExpr> construct) {
         //
     }
+
+    void Pass::visitMethod(std::shared_ptr<Method> construct) {
+        //
+    }
 }

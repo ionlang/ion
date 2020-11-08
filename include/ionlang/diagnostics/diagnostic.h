@@ -51,7 +51,15 @@ namespace ionlang::diagnostic {
     );
 
     IONLANG_NOTICE_DEFINE(
-        syntaxUnexpectedToken,
+        // TODO: Rename when all occurrences of the other renamed diagnostic are addressed/verified.
+        syntaxUnexpectedToken_,
+        ionshared::DiagnosticKind::Error,
+        "Unexpected token '%s'",
+        std::nullopt
+    );
+
+    IONLANG_NOTICE_DEFINE(
+        syntaxExpectedOtherToken,
         ionshared::DiagnosticKind::Error,
         "Expected token '%s' but got '%s'",
         std::nullopt
@@ -68,6 +76,13 @@ namespace ionlang::diagnostic {
         structFieldRedefinition,
         ionshared::DiagnosticKind::Error,
         "Field '%s' in struct '%s' was already previously defined",
+        std::nullopt
+    );
+
+    IONLANG_NOTICE_DEFINE(
+        structMethodRedefinition,
+        ionshared::DiagnosticKind::Error,
+        "Method '%s' in struct '%s' was already previously defined",
         std::nullopt
     );
 

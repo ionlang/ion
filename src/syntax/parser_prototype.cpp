@@ -87,6 +87,8 @@ namespace ionlang {
     }
 
     AstPtrResult<Prototype> Parser::parsePrototype(const std::shared_ptr<Module>& parent) {
+        // TODO: Parent module not used.
+
         this->beginSourceLocationMapping();
 
         std::optional<std::string> name = this->parseName();

@@ -63,7 +63,7 @@ namespace ionlang {
 
         auto argumentListNativeMap = this->argumentList->symbolTable->unwrap();
 
-        for (const auto &[name, type] : argumentListNativeMap) {
+        for (const auto& [name, type] : argumentListNativeMap) {
             mangledName << IONLANG_MANGLE_SEPARATOR
                 << type->id.value_or(type->forceGetValue()->typeName)
                 << IONLANG_MANGLE_SEPARATOR
