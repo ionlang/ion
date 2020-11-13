@@ -164,7 +164,7 @@ namespace ionlang {
         PtrResolvable<StructType> structType =
             Resolvable<StructType>::make(
                 ResolvableKind::StructType,
-                name,
+                std::make_shared<Identifier>(name),
                 parent
             );
 

@@ -8,7 +8,7 @@ namespace ionlang {
         const std::shared_ptr<Block>& body
     ) noexcept {
         std::shared_ptr<Method> result =
-            std::make_shared<Method>(kind, prototype, body);
+            std::make_shared<Method>(kind, structType, prototype, body);
 
         prototype->parent = result;
         body->parent = result;

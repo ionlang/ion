@@ -224,7 +224,8 @@ namespace ionlang {
             }
             // Method.
             else if (Classifier::isMethodOrFunction(currentTokenKind)) {
-                AstPtrResult<Method> methodResult = this->parseMethod();
+                // TODO: Parent is nullptr, should be 'structType' (below).
+                AstPtrResult<Method> methodResult = this->parseMethod(nullptr);
 
                 IONLANG_PARSER_ASSERT(util::hasValue(methodResult))
 
@@ -250,15 +251,15 @@ namespace ionlang {
 
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolBraceR))
 
-        std::shared_ptr<StructType> structConstruct = StructType::make(
+        std::shared_ptr<StructType> structType = StructType::make(
             *structNameResult,
             fields,
             methods
         );
 
-        structConstruct->parent = parent;
+        structType->parent = parent;
 
-        return structConstruct;
+        return structType;
     }
 
     AstPtrResult<Block> Parser::parseBlock(const std::shared_ptr<Construct>& parent) {
@@ -507,12 +508,14 @@ namespace ionlang {
 
         this->tokenStream.skip();
 
+        // TODO: CRITICAL x2! Parent should be 'method' (below).
         // TODO: Parsing prototype WILL fail on constructors/destructors, as well as all others except function/Normal (they don't have fn keyword).
-        AstPtrResult<Prototype> prototypeResult = this->parsePrototype(parentModule);
+        AstPtrResult<Prototype> prototypeResult = this->parsePrototype(structType);
 
         IONLANG_PARSER_ASSERT(util::hasValue(prototypeResult))
 
-        AstPtrResult<Block> bodyResult = this->parseBlock(function);
+        // TODO: CRITICAL x2! CRITICAL x3! Parent should be 'method' (below). Reason CRITICAL is that block emitting (might) depend on parent.
+        AstPtrResult<Block> bodyResult = this->parseBlock(structType);
 
         IONLANG_PARSER_ASSERT(util::hasValue(bodyResult))
 

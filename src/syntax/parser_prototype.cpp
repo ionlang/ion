@@ -86,7 +86,7 @@ namespace ionlang {
         return attributes;
     }
 
-    AstPtrResult<Prototype> Parser::parsePrototype(const std::shared_ptr<Module>& parent) {
+    AstPtrResult<Prototype> Parser::parsePrototype(const std::shared_ptr<Construct>& parent) {
         // TODO: Parent module not used.
 
         this->beginSourceLocationMapping();

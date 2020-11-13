@@ -57,7 +57,11 @@ namespace ionlang {
 
         mangledName << localParentAsChild->forceGetUnboxedParent()->name
             << IONLANG_MANGLE_SEPARATOR
-            << this->returnType->id.value_or(this->returnType->forceGetValue()->typeName)
+
+            << this->returnType->id.value_or(std::make_shared<Identifier>(
+                this->returnType->forceGetValue()->typeName
+            ))
+
             << IONLANG_MANGLE_SEPARATOR
             << this->name;
 
@@ -65,7 +69,10 @@ namespace ionlang {
 
         for (const auto& [name, type] : argumentListNativeMap) {
             mangledName << IONLANG_MANGLE_SEPARATOR
-                << type->id.value_or(type->forceGetValue()->typeName)
+                << type->id.value_or(std::make_shared<Identifier>(
+                    type->forceGetValue()->typeName
+                ))
+
                 << IONLANG_MANGLE_SEPARATOR
                 << name;
         }
