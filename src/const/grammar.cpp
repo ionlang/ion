@@ -50,7 +50,11 @@ namespace ionlang {
         {"export", TokenKind::KeywordExport},
         {"implements", TokenKind::KeywordImplements},
         {"interface", TokenKind::KeywordInterface},
+
+        // TODO: Consider removing in place of a symbol (don't use a keyword for just one small thing).
         {"attaches", TokenKind::KeywordAttaches},
+
+        {"enum", TokenKind::KeywordEnum},
 
         // Statement keywords.
         {const_name::statementReturn, TokenKind::KeywordReturn},

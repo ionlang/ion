@@ -146,9 +146,9 @@ namespace ionlang {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
 
         std::shared_ptr<AssignmentStmt> assignmentStatement = AssignmentStmt::make(
-            std::make_shared<Resolvable<VariableDeclStmt>>(
+            Resolvable<VariableDeclStmt>::make(
                 ResolvableKind::NearestVariableOrArgument,
-                *id,
+                std::make_shared<Identifier>(*id),
                 parent
             ),
 

@@ -190,9 +190,9 @@ namespace ionlang {
             IONLANG_PARSER_ASSERT(name.has_value())
 
             // TODO: Parsing variable ref. only! Not taking in what kind in params!
-            return std::make_shared<Resolvable<T>>(
+            return Resolvable<T>::make(
                 ResolvableKind::NearestVariableOrArgument,
-                *name,
+                std::make_shared<Identifier>(*name),
                 owner
             );
         }

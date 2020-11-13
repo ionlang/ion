@@ -39,8 +39,16 @@ TEST(NameResolutionPassTest, Run) {
     );
 
     auto assignmentStmt = AssignmentStmt::make(
-        Resolvable<VariableDeclStmt>::make(ResolvableKind::NearestVariableOrArgument, id, functionBody),
-        IntegerLiteral::make(std::make_shared<IntegerType>(IntegerKind::Int32), 1)->flattenExpression()
+        Resolvable<VariableDeclStmt>::make(
+            ResolvableKind::NearestVariableOrArgument,
+            std::make_shared<Identifier>(id),
+            functionBody
+        ),
+
+        IntegerLiteral::make(
+            std::make_shared<IntegerType>(IntegerKind::Int32),
+            1
+        )->flattenExpression()
     );
 
     statementBuilder->appendStatement(assignmentStmt);

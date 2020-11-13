@@ -150,6 +150,8 @@ namespace ionlang {
 
         KeywordAttaches,
 
+        KeywordEnum,
+
         TypeOpaque,
 
         TypeVoid,
