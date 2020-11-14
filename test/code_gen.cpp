@@ -55,8 +55,8 @@ TEST(CodeGenTest, VisitIfStatement) {
     });
 
     // Set the block and if statement's parents.
-    consequentBlock->parent = ifStatement;
-    ifStatement->parent = function->body;
+    consequentBlock->setParent(ifStatement);
+    ifStatement->setParent(function->body);
 
     // Visit the function.
     irLoweringPass->visitFunction(function);
@@ -97,7 +97,7 @@ TEST(CodeGenTest, VisitVariableDecl) {
     });
 
     // Set the variable declaration parent.
-    variableDecl->parent = function->body;
+    variableDecl->setParent(function->body);
 
     // Visit the function.
     irLoweringPass->visitFunction(function);

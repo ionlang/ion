@@ -8,7 +8,7 @@ namespace ionlang {
         std::shared_ptr<AssignmentStmt> result =
             std::make_shared<AssignmentStmt>(variableDeclStatementRef, value);
 
-        value->parent = result;
+        value->setParent(result);
 
         return result;
     }

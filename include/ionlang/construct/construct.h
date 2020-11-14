@@ -105,7 +105,7 @@ namespace ionlang {
             std::shared_ptr<TConstruct> construct =
                 std::make_shared<TConstruct>(std::forward<TArgs>(args)...);
 
-            construct->parent = parent;
+            construct->setParent(parent);
 
             // TODO: Consider having a virtual default-empty 'acceptChild(<ConstructTypeHere> child)' which inserts it into a corresponding list (if any)
 
@@ -133,8 +133,9 @@ namespace ionlang {
         [[nodiscard]] std::optional<std::string> findConstructName();
     };
 
-    template<typename T = Construct>
-    // TODO: Used with partial types.
-//        requires std::derived_from<T, Construct>
-    using Scoped = ionshared::Scoped<T, ConstructKind>;
+    typedef ionshared::Scoped<Construct, ConstructKind> Scoped;
+
+    struct ScopedConstruct : virtual Construct, virtual Scoped {
+        void setParent(std::optional<std::shared_ptr<Construct>> parent) noexcept override;
+    };
 }

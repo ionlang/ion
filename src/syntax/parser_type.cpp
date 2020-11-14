@@ -5,8 +5,8 @@
 namespace ionlang {
     // TODO: Consider using Ref<> to register pending type reference if user-defined type is parsed?
     AstPtrResult<Resolvable<Type>> Parser::parseType(const std::shared_ptr<Construct>& parent) {
-        std::shared_ptr<TypeQualifiers> qualifiers =
-            std::make_shared<TypeQualifiers>();
+        std::shared_ptr<TypeQualifierSet> qualifiers =
+            std::make_shared<TypeQualifierSet>();
 
         // TODO: Simplify to support const mut &*type.
 
@@ -38,14 +38,6 @@ namespace ionlang {
             qualifiers->add(TypeQualifier::Reference);
         }
 
-        // 4th qualifier: pointer.
-        if (this->is(TokenKind::SymbolHash)) {
-            this->tokenStream.skip();
-            qualifiers->add(TypeQualifier::Pointer);
-        }
-
-        // TODO: What about **?
-
         // Retrieve the current token.
         Token token = this->tokenStream.get();
 
@@ -76,6 +68,29 @@ namespace ionlang {
                 this->parseStructType(parent, qualifiers)
             )->staticCast<Resolvable<Type>>();
         }
+        // TODO: Review this else branch.
+        else {
+            throw std::runtime_error("Unexpected token");
+        }
+
+        // 4th qualifier: pointer.
+        if (this->is(TokenKind::OperatorMultiplication)) {
+            this->tokenStream.skip();
+            qualifiers->add(TypeQualifier::Pointer);
+        }
+
+        // TODO: What about ** (nested pointers)?
+
+        // TODO: Ensure that at this point type is defined (via visual inspection of code-flow routes).
+        // 5th qualifier: nullable.
+        if (this->is(TokenKind::SymbolQuestionMark)) {
+            this->tokenStream.skip();
+
+            util::getResultValue(type)
+                ->forceGetValue()
+                ->qualifiers
+                ->add(TypeQualifier::Nullable);
+        }
 
         // TODO: Add support for missing types.
 
@@ -94,28 +109,28 @@ namespace ionlang {
 
         std::shared_ptr<VoidType> voidType = std::make_shared<VoidType>();
 
-        voidType->parent = parent;
+        voidType->setParent(parent);
 
         return voidType;
     }
 
     AstPtrResult<BooleanType> Parser::parseBooleanType(
         const std::shared_ptr<Construct>& parent,
-        const std::shared_ptr<TypeQualifiers>& qualifiers
+        const std::shared_ptr<TypeQualifierSet>& qualifiers
     ) {
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::TypeBool))
 
         std::shared_ptr<BooleanType> booleanType =
             std::make_shared<BooleanType>(qualifiers);
 
-        booleanType->parent = parent;
+        booleanType->setParent(parent);
 
         return booleanType;
     }
 
     AstPtrResult<IntegerType> Parser::parseIntegerType(
         const std::shared_ptr<Construct>& parent,
-        const std::shared_ptr<TypeQualifiers>& qualifiers
+        const std::shared_ptr<TypeQualifierSet>& qualifiers
     ) {
         TokenKind currentTokenKind = this->tokenStream.get().kind;
 
@@ -146,14 +161,14 @@ namespace ionlang {
             qualifiers
         );
 
-        integerType->parent = parent;
+        integerType->setParent(parent);
 
         return integerType;
     }
 
     AstPtrResult<Resolvable<StructType>> Parser::parseStructType(
         const std::shared_ptr<Construct>& parent,
-        const std::shared_ptr<TypeQualifiers>& qualifiers
+        const std::shared_ptr<TypeQualifierSet>& qualifiers
     ) {
         IONLANG_PARSER_ASSERT(this->expect(TokenKind::Identifier))
 
@@ -168,7 +183,7 @@ namespace ionlang {
                 parent
             );
 
-        structType->parent = parent;
+        structType->setParent(parent);
 
         return structType;
     }

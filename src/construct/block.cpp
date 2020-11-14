@@ -5,13 +5,13 @@
 namespace ionlang {
     std::shared_ptr<Block> Block::make(
         const std::vector<std::shared_ptr<Statement>>& statements,
-        const ionshared::PtrSymbolTable<VariableDeclStmt>& symbolTable
+        const ionshared::PtrSymbolTable<Construct>& symbolTable
     ) noexcept {
         std::shared_ptr<Block> result =
             std::make_shared<Block>(statements, symbolTable);
 
         for (const auto& statement : statements) {
-            statement->parent = result;
+            statement->setParent(result);
         }
 
         return result;
@@ -19,10 +19,10 @@ namespace ionlang {
 
     Block::Block(
         std::vector<std::shared_ptr<Statement>> statements,
-        const ionshared::PtrSymbolTable<VariableDeclStmt>& symbolTable
+        const ionshared::PtrSymbolTable<Construct>& symbolTable
     ) :
         Construct(ConstructKind::Block),
-        ionshared::Scoped<VariableDeclStmt, ConstructKind>(symbolTable),
+        ionshared::Scoped<Construct, ConstructKind>(symbolTable),
         statements(std::move(statements)) {
         //
     }
@@ -121,7 +121,7 @@ namespace ionlang {
     std::shared_ptr<Block> Block::slice(size_t from, std::optional<size_t> to) {
         std::shared_ptr<Block> newBlock = Block::make();
 
-        newBlock->parent = this->parent;
+        newBlock->setParent(this->getParent());
 
         /**
          * NOTE: Index boundary checks are performed when relocation
@@ -183,7 +183,7 @@ namespace ionlang {
 
             childrenOfBlockQueue.pop();
 
-            std::shared_ptr<Construct> parent = *childOfBlock->parent;
+            std::shared_ptr<Construct> parent = *childOfBlock->getParent();
 
             if (parent->constructKind == ConstructKind::Function) {
                 parentFunction = parent->dynamicCast<Function>();

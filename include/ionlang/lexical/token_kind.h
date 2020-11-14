@@ -100,6 +100,11 @@ namespace ionlang {
          */
         SymbolScope,
 
+        /**
+         * ?
+         */
+        SymbolQuestionMark,
+
         KeywordFunction,
 
         KeywordExtern,
@@ -144,11 +149,9 @@ namespace ionlang {
 
         KeywordExport,
 
-        KeywordImplements,
+        KeywordAbstract,
 
-        KeywordInterface,
-
-        KeywordAttaches,
+        KeywordVirtual,
 
         KeywordEnum,
 

@@ -13,18 +13,21 @@ namespace ionlang {
 
     enum struct ResolvableKind {
         /**
-         * The nearest variable declaration, argument, or
-         * global variable.
+         * The nearest variable declaration, argument, or global
+         * variable.
          */
-        NearestVariableOrArgument,
+        VariableLike,
 
         /**
          * A reference to a function or extern.
          */
-        Prototype,
+        FunctionLike,
 
         PrototypeReturnType,
 
+        /**
+         * A struct declaration.
+         */
         StructType
     };
 
@@ -94,6 +97,20 @@ namespace ionlang {
 //            this->value->get().accept(visitor); What about this? Still need to visit Resolvable tho.
         }
 
+        /**
+         * Cache a parent construct to be applied once the resolvable
+         * is resolved, or if it is already resolved, apply it to the
+         * value immediately. Will also update the resolvable's parent.
+         */
+        void setParent(std::optional<std::shared_ptr<Construct>> parent) noexcept override {
+            if (this->isResolved()) {
+                this->value->get()->setParent(parent);
+            }
+
+            BaseConstruct::setParent(parent);
+            this->cachedParent = parent;
+        }
+
         [[nodiscard]] std::shared_ptr<T> operator*() {
             if (!this->isResolved()) {
                 throw std::runtime_error("Value is not resolved but being accessed");
@@ -143,24 +160,10 @@ namespace ionlang {
             this->value = value;
 
             if (ionshared::util::hasValue(this->cachedParent)) {
-                value->parent = *this->cachedParent;
+                value->setParent(*this->cachedParent);
             }
 
             return true;
-        }
-
-        /**
-         * Cache a parent construct to be applied once the resolvable
-         * is resolved, or if it is already resolved, apply it to the
-         * value immediately. Will also update the resolvable's parent.
-         */
-        void setTransitiveParent(std::shared_ptr<Construct> parent) {
-            if (this->isResolved()) {
-                this->value->get()->parent = parent;
-            }
-
-            this->parent = parent;
-            this->cachedParent = parent;
         }
 
         std::shared_ptr<Resolvable<>> flattenResolvable() {

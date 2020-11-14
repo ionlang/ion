@@ -40,7 +40,7 @@ TEST(NameResolutionPassTest, Run) {
 
     auto assignmentStmt = AssignmentStmt::make(
         Resolvable<VariableDeclStmt>::make(
-            ResolvableKind::NearestVariableOrArgument,
+            ResolvableKind::VariableLike,
             std::make_shared<Identifier>(id),
             functionBody
         ),

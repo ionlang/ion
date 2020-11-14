@@ -19,11 +19,11 @@ namespace ionlang {
         }
 
         [[nodiscard]] std::shared_ptr<TParent> forceGetUnboxedParent() {
-            if (!ionshared::util::hasValue(this->parent)) {
+            if (!ionshared::util::hasValue(this->getParent())) {
                 throw std::runtime_error("Parent is nullptr");
             }
 
-            return this->parent->get()->template dynamicCast<TParent>();
+            return this->getParent()->get()->template dynamicCast<TParent>();
         }
     };
 }

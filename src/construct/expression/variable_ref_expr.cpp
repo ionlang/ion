@@ -7,7 +7,7 @@ namespace ionlang {
             ExpressionKind::VariableReference,
 
             // TODO: What if variableDecl Resolvable was resolved when being passed in? Then ->name would be std::nullopt.
-            Resolvable<Type>::make(ResolvableKind::NearestVariableOrArgument, *variableDecl->id, nullptr)
+            Resolvable<Type>::make(ResolvableKind::VariableLike, *variableDecl->id, nullptr)
         ),
 
         variableDecl(std::move(variableDecl)) {

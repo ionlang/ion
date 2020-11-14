@@ -9,8 +9,8 @@ namespace ionlang {
         std::shared_ptr<VariableDeclStmt> result =
             std::make_shared<VariableDeclStmt>(type, id, value);
 
-        type->parent = result;
-        value->parent = result;
+        type->setParent(result);
+        value->setParent(result);
 
         return result;
     }

@@ -7,7 +7,7 @@ namespace ionlang {
         std::shared_ptr<Extern> result =
             std::make_shared<Extern>(prototype);
 
-        prototype->parent = result;
+        prototype->setParent(result);
 
         return result;
     }

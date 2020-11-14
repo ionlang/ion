@@ -124,7 +124,7 @@ namespace ionlang {
         //
     }
 
-    void Pass::visitScopeAnchor(std::shared_ptr<Scoped<>> construct) {
+    void Pass::visitScopeAnchor(std::shared_ptr<Scoped> construct) {
         //
     }
 

@@ -16,10 +16,10 @@ namespace ionlang {
 
         // TODO: What about type?
 
-        leftSideValue->parent = result;
+        leftSideValue->setParent(result);
 
         if (ionshared::util::hasValue(rightSideValue)) {
-            rightSideValue->get()->parent = result;
+            rightSideValue->get()->setParent(result);
         }
 
         return result;

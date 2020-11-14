@@ -93,7 +93,7 @@ namespace ionlang {
 
         virtual void visitVariableDeclStmt(std::shared_ptr<VariableDeclStmt> construct);
 
-        virtual void visitScopeAnchor(std::shared_ptr<Scoped<>> construct);
+        virtual void visitScopeAnchor(std::shared_ptr<Scoped> construct);
 
         virtual void visitGlobal(std::shared_ptr<Global> construct);
 

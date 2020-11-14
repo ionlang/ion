@@ -9,10 +9,10 @@ namespace ionlang {
         std::shared_ptr<Global> result =
             std::make_shared<Global>(type, name, value);
 
-        type->parent = result;
+        type->setParent(result);
 
         if (ionshared::util::hasValue(value)) {
-            value->get()->parent = result;
+            value->get()->setParent(result);
         }
 
         return result;

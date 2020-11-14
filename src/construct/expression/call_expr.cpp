@@ -10,10 +10,10 @@ namespace ionlang {
         std::shared_ptr<CallExpr> result =
             std::make_shared<CallExpr>(calleeResolvable, arguments, type);
 
-        calleeResolvable->parent = result;
+        calleeResolvable->setParent(result);
 
         for (const auto& argument : arguments) {
-            argument->parent = result;
+            argument->setParent(result);
         }
 
         return result;

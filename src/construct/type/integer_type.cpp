@@ -5,7 +5,7 @@ namespace ionlang {
     IntegerType::IntegerType(
         IntegerKind kind,
         bool isSigned,
-        std::shared_ptr<TypeQualifiers> qualifiers
+        std::shared_ptr<TypeQualifierSet> qualifiers
     ) :
         Type(util::resolveIntegerKindName(kind), TypeKind::Integer, std::move(qualifiers)),
         integerKind(kind),

@@ -9,11 +9,11 @@ namespace ionlang {
         std::shared_ptr<IfStmt> result =
             std::make_shared<IfStmt>(condition, consequentBlock, alternativeBlock);
 
-        condition->parent = result;
-        consequentBlock->parent = result;
+        condition->setParent(result);
+        consequentBlock->setParent(result);
 
         if (ionshared::util::hasValue(alternativeBlock)) {
-            alternativeBlock->get()->parent = result;
+            alternativeBlock->get()->setParent(result);
         }
 
         return result;

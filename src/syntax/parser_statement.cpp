@@ -9,7 +9,7 @@ namespace ionlang {
         AstPtrResult<Statement> statement;
 
         // TODO: Symbol table is not being used. Variable decls should be registered?
-        ionshared::PtrSymbolTable<VariableDeclStmt> symbolTable = parent->symbolTable;
+        ionshared::PtrSymbolTable<Construct> symbolTable = parent->symbolTable;
 
         TokenKind currentTokenKind = this->tokenStream.get().kind;
 
@@ -39,10 +39,8 @@ namespace ionlang {
             AstPtrResult<Expression<>> expression = this->parseExpression(parent);
 
             IONLANG_PARSER_ASSERT(util::hasValue(expression))
-
             statement = ExprWrapperStmt::make(util::getResultValue(expression));
-            util::getResultValue(statement)->parent = parent;
-
+            util::getResultValue(statement)->setParent(parent);
             IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
         }
 
@@ -89,13 +87,13 @@ namespace ionlang {
             alternativeBlock
         );
 
-        ifStatement->parent = parent;
+        ifStatement->setParent(parent);
 
         // Finally, fill in the gaps.
-        consequentBlock->parent = ifStatement;
+        consequentBlock->setParent(ifStatement);
 
         if (util::hasValue(alternativeBlockResult)) {
-            util::getResultValue(alternativeBlockResult)->parent = ifStatement;
+            util::getResultValue(alternativeBlockResult)->setParent(ifStatement);
         }
 
         return ifStatement;
@@ -125,7 +123,7 @@ namespace ionlang {
             finalValue
         );
 
-        returnStatement->parent = parent;
+        returnStatement->setParent(parent);
 
         return returnStatement;
     }
@@ -147,7 +145,7 @@ namespace ionlang {
 
         std::shared_ptr<AssignmentStmt> assignmentStatement = AssignmentStmt::make(
             Resolvable<VariableDeclStmt>::make(
-                ResolvableKind::NearestVariableOrArgument,
+                ResolvableKind::VariableLike,
                 std::make_shared<Identifier>(*id),
                 parent
             ),
@@ -155,7 +153,7 @@ namespace ionlang {
             util::getResultValue(value)
         );
 
-        assignmentStatement->parent = parent;
+        assignmentStatement->setParent(parent);
 
         return assignmentStatement;
     }
@@ -199,21 +197,18 @@ namespace ionlang {
             util::getResultValue(valueResult)
         );
 
-        variableDecl->parent = parent;
+        variableDecl->setParent(parent);
 
         //        /**
         //         * Variable declaration construct owns the type. Assign
         //         * the type's parent.
         //         */
         //        if (!isTypeInferred) {
-        //            finalType->parent = variableDecl;
+        //            finalType->setParent(variableDecl);
         //        }
 
-        // Register the statement on the resulting block's symbol table.
         parent->symbolTable->set(variableDecl->name, variableDecl);
-
         IONLANG_PARSER_ASSERT(this->skipOver(TokenKind::SymbolSemiColon))
-
         this->finishSourceLocationMapping(variableDecl);
 
         return variableDecl;

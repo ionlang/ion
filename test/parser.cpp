@@ -174,7 +174,7 @@ TEST(ParserTest, ParseEmptyFunction) {
 
     AstPtrResult<Function> functionResult = parser.parseFunction(nullptr);
 
-    EXPECT_TRUE(util::hasValue(functionResult));
+    ASSERT_TRUE(util::hasValue(functionResult));
 
     std::shared_ptr<Function> function = util::getResultValue(functionResult);
 
@@ -196,7 +196,7 @@ TEST(ParserTest, ParseFunction) {
 
     AstPtrResult<Function> functionResult = parser.parseFunction(nullptr);
 
-    EXPECT_TRUE(util::hasValue(functionResult));
+    ASSERT_TRUE(util::hasValue(functionResult));
 
     std::shared_ptr<Function> function = util::getResultValue(functionResult);
 
@@ -222,7 +222,7 @@ TEST(ParserTest, ParseExtern) {
 
     AstPtrResult<Extern> externResult = parser.parseExtern(nullptr);
 
-    EXPECT_TRUE(util::hasValue(externResult));
+    ASSERT_TRUE(util::hasValue(externResult));
 
     std::shared_ptr<Prototype> prototype = util::getResultValue(externResult)->prototype;
 
@@ -244,7 +244,7 @@ TEST(ParserTest, ParseBinaryOperationExpr) {
     AstPtrResult<Expression<>> operationExprResult =
         parser.parseExpression(nullptr);
 
-    EXPECT_TRUE(util::hasValue(operationExprResult));
+    ASSERT_TRUE(util::hasValue(operationExprResult));
 
     EXPECT_EQ(
         util::getResultValue(operationExprResult)->expressionKind,
@@ -256,7 +256,7 @@ TEST(ParserTest, ParseBinaryOperationExpr) {
 
     EXPECT_EQ(binaryOperationExpr->operation, IntrinsicOperatorKind::Addition);
     EXPECT_EQ(binaryOperationExpr->leftSideValue->expressionKind, ExpressionKind::IntegerLiteral);
-    EXPECT_TRUE(ionshared::util::hasValue(binaryOperationExpr->rightSideValue));
+    ASSERT_TRUE(ionshared::util::hasValue(binaryOperationExpr->rightSideValue));
 
     std::shared_ptr<Expression<>> rightSide = *binaryOperationExpr->rightSideValue;
 

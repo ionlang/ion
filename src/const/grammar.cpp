@@ -22,8 +22,7 @@ namespace ionlang {
          * NOTE: Identifier regex MUST be placed last, otherwise it will gain
          * precedence over other regexes, for example booleans.
          */
-        {const_regex::identifier, TokenKind::Identifier},
-
+        {const_regex::identifier, TokenKind::Identifier}
     });
 
     const ionshared::BiMap<std::string, TokenKind> Grammar::keywords(std::map<std::string, TokenKind>{
@@ -44,17 +43,15 @@ namespace ionlang {
         {"type", TokenKind::KeywordType},
         {"attribute", TokenKind::KeywordAttribute},
         {"extends", TokenKind::KeywordExtends},
+        {"export", TokenKind::KeywordExport},
+        {"abstract", TokenKind::KeywordAbstract},
+        {"virtual", TokenKind::KeywordVirtual},
+        {"enum", TokenKind::KeywordEnum},
+
+        // Visibility modifier keywords.
         {"public", TokenKind::KeywordPublic},
         {"protected", TokenKind::KeywordProtected},
         {"private", TokenKind::KeywordPrivate},
-        {"export", TokenKind::KeywordExport},
-        {"implements", TokenKind::KeywordImplements},
-        {"interface", TokenKind::KeywordInterface},
-
-        // TODO: Consider removing in place of a symbol (don't use a keyword for just one small thing).
-        {"attaches", TokenKind::KeywordAttaches},
-
-        {"enum", TokenKind::KeywordEnum},
 
         // Statement keywords.
         {const_name::statementReturn, TokenKind::KeywordReturn},
@@ -102,7 +99,8 @@ namespace ionlang {
         {"&", TokenKind::SymbolAmpersand},
         {"@", TokenKind::SymbolAt},
         {"...", TokenKind::SymbolEllipsis},
-        {"::", TokenKind::SymbolScope}
+        {"::", TokenKind::SymbolScope},
+        {"?", TokenKind::SymbolQuestionMark}
     });
 
     const ionshared::BiMap<std::string, TokenKind> Grammar::intrinsicOperators({

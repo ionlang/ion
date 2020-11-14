@@ -12,13 +12,13 @@ namespace ionlang {
         auto fieldsNativeMap = fields->unwrap();
 
         for (const auto& [name, type] : fieldsNativeMap) {
-            type->parent = result;
+            type->setParent(result);
         }
 
         auto methodsNativeMap = methods->unwrap();
 
         for (const auto& [name, method] : methodsNativeMap) {
-            method->parent = result;
+            method->setParent(result);
         }
 
         return result;

@@ -12,7 +12,9 @@ namespace ionlang {
 
         Reference,
 
-        Pointer
+        Pointer,
+
+        Nullable
     };
 
     enum struct TypeKind : uint32_t {
@@ -27,21 +29,21 @@ namespace ionlang {
         Boolean
     };
 
-    typedef ionshared::Set<TypeQualifier> TypeQualifiers;
+    typedef ionshared::Set<TypeQualifier> TypeQualifierSet;
 
     struct Type : Construct {
         const std::string typeName;
 
         const TypeKind typeKind;
 
-        std::shared_ptr<TypeQualifiers> qualifiers;
+        std::shared_ptr<TypeQualifierSet> qualifiers;
 
         Type(
             std::string name,
             TypeKind kind,
 
-            std::shared_ptr<TypeQualifiers> qualifiers =
-                std::make_shared<TypeQualifiers>()
+            std::shared_ptr<TypeQualifierSet> qualifiers =
+                std::make_shared<TypeQualifierSet>()
         ) noexcept;
     };
 }

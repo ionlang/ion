@@ -8,10 +8,10 @@ namespace ionlang {
         std::shared_ptr<StructDefExpr> result =
             std::make_shared<StructDefExpr>(type, values);
 
-        type->setTransitiveParent(result);
+        type->setParent(result);
 
         for (const auto& value : values) {
-            value->parent = result;
+            value->setParent(result);
         }
 
         return result;

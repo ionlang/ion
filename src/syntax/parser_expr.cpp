@@ -159,7 +159,7 @@ namespace ionlang {
 
         std::shared_ptr<CallExpr> callExpr = CallExpr::make(
             Resolvable<>::make(
-                ResolvableKind::Prototype,
+                ResolvableKind::FunctionLike,
                 util::getResultValue(calleeId),
                 parent
             ),
@@ -233,7 +233,7 @@ namespace ionlang {
         );
 
         // TODO: Is this proper parent?
-        cast->parent = parent;
+        cast->setParent(parent);
 
         this->finishSourceLocationMapping(cast);
 

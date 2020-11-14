@@ -20,7 +20,7 @@ namespace ionlang {
 
         [[nodiscard]] static std::shared_ptr<ionir::Type> processTypeQualifiers(
             std::shared_ptr<ionir::Type> type,
-            const std::shared_ptr<TypeQualifiers>& qualifiers
+            const std::shared_ptr<TypeQualifierSet>& qualifiers
         );
 
         ionshared::PtrSymbolTable<ionir::Module> modules;

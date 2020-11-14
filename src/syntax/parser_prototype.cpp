@@ -6,8 +6,8 @@ namespace ionlang {
     AstPtrResult<ArgumentList> Parser::parseArgumentList(const std::shared_ptr<Construct>& parent) {
         this->beginSourceLocationMapping();
 
-        ionshared::PtrSymbolTable<Resolvable<Type>> symbolTable =
-            ionshared::util::makePtrSymbolTable<Resolvable<Type>>();
+        ionshared::PtrSymbolTable<Construct> symbolTable =
+            ionshared::util::makePtrSymbolTable<Construct>();
 
         bool isVariable = false;
 
@@ -49,7 +49,7 @@ namespace ionlang {
         std::shared_ptr<ArgumentList> argumentList =
             ArgumentList::make(symbolTable, isVariable);
 
-        argumentList->parent = parent;
+        argumentList->setParent(parent);
 
         return argumentList;
     }
@@ -123,7 +123,7 @@ namespace ionlang {
             util::getResultValue(returnType)
         );
 
-        prototype->parent = parent;
+        prototype->setParent(parent);
         this->finishSourceLocationMapping(prototype);
 
         return prototype;
@@ -142,7 +142,7 @@ namespace ionlang {
         std::shared_ptr<Extern> externConstruct =
             Extern::make(util::getResultValue(prototype));
 
-        externConstruct->parent = parent;
+        externConstruct->setParent(parent);
         this->finishSourceLocationMapping(externConstruct);
 
         return externConstruct;
@@ -168,8 +168,8 @@ namespace ionlang {
             nullptr
         );
 
-        function->parent = parent;
-        function->prototype->parent = function;
+        function->setParent(parent);
+        function->prototype->setParent(function);
 
         AstPtrResult<Block> bodyResult = this->parseBlock(function);
 

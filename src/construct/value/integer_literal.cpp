@@ -8,7 +8,7 @@ namespace ionlang {
         std::shared_ptr<IntegerLiteral> result =
             std::make_shared<IntegerLiteral>(type, value);
 
-        type->parent = result;
+        type->setParent(result);
 
         return result;
     }

@@ -5,7 +5,7 @@ namespace ionlang {
     Type::Type(
         std::string name,
         TypeKind kind,
-        std::shared_ptr<TypeQualifiers> qualifiers
+        std::shared_ptr<TypeQualifierSet> qualifiers
     ) noexcept :
         Construct(ConstructKind::Type),
         typeName(name),

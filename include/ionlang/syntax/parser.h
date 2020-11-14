@@ -99,22 +99,22 @@ namespace ionlang {
         AstPtrResult<BooleanType> parseBooleanType(
             const std::shared_ptr<Construct>& parent,
 
-            const std::shared_ptr<TypeQualifiers>& qualifiers =
-                std::make_shared<TypeQualifiers>()
+            const std::shared_ptr<TypeQualifierSet>& qualifiers =
+                std::make_shared<TypeQualifierSet>()
         );
 
         AstPtrResult<IntegerType> parseIntegerType(
             const std::shared_ptr<Construct>& parent,
 
-            const std::shared_ptr<TypeQualifiers>& qualifiers =
-                std::make_shared<TypeQualifiers>()
+            const std::shared_ptr<TypeQualifierSet>& qualifiers =
+                std::make_shared<TypeQualifierSet>()
         );
 
         AstPtrResult<Resolvable<StructType>> parseStructType(
             const std::shared_ptr<Construct>& parent,
 
-            const std::shared_ptr<TypeQualifiers>& qualifiers =
-                std::make_shared<TypeQualifiers>()
+            const std::shared_ptr<TypeQualifierSet>& qualifiers =
+                std::make_shared<TypeQualifierSet>()
         );
 
         AstPtrResult<ArgumentList> parseArgumentList(const std::shared_ptr<Construct>& parent);
@@ -191,7 +191,7 @@ namespace ionlang {
 
             // TODO: Parsing variable ref. only! Not taking in what kind in params!
             return Resolvable<T>::make(
-                ResolvableKind::NearestVariableOrArgument,
+                ResolvableKind::VariableLike,
                 std::make_shared<Identifier>(*name),
                 owner
             );

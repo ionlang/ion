@@ -11,8 +11,8 @@ namespace ionlang {
         std::shared_ptr<Prototype> result =
             std::make_shared<Prototype>(name, argumentList, returnType);
 
-        argumentList->parent = result;
-        returnType->parent = result;
+        argumentList->setParent(result);
+        returnType->setParent(result);
 
         return result;
     }
@@ -67,10 +67,21 @@ namespace ionlang {
 
         auto argumentListNativeMap = this->argumentList->symbolTable->unwrap();
 
-        for (const auto& [name, type] : argumentListNativeMap) {
+        for (const auto& [name, construct] : argumentListNativeMap) {
+            if (construct->constructKind != ConstructKind::Resolvable) {
+                continue;
+            }
+
+            /**
+             * NOTE: Dynamic cast will fail if the resolvable's value type
+             * isn't type (or anything compatible with it).
+             */
+            std::shared_ptr<Resolvable<Type>> typeResolvable =
+                construct->dynamicCast<Resolvable<Type>>();
+
             mangledName << IONLANG_MANGLE_SEPARATOR
-                << type->id.value_or(std::make_shared<Identifier>(
-                    type->forceGetValue()->typeName
+                << typeResolvable->id.value_or(std::make_shared<Identifier>(
+                    typeResolvable->forceGetValue()->typeName
                 ))
 
                 << IONLANG_MANGLE_SEPARATOR

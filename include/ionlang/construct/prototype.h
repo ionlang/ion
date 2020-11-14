@@ -11,7 +11,7 @@ namespace ionlang {
     /**
      * Prototype's parent is either a function or extern construct.
      */
-    struct Prototype : Construct, ionshared::Named {
+    struct Prototype : ScopedConstruct, ionshared::Named {
         static std::shared_ptr<Prototype> make(
             const std::string& name,
             const std::shared_ptr<ArgumentList>& argumentList,

@@ -8,8 +8,8 @@ namespace ionlang {
         std::shared_ptr<Function> result =
             std::make_shared<Function>(prototype, body);
 
-        prototype->parent = result;
-        body->parent = result;
+        prototype->setParent(result);
+        body->setParent(result);
 
         return result;
     }
@@ -30,8 +30,8 @@ namespace ionlang {
 
     Ast Function::getChildNodes() {
         return {
-            this->prototype->nativeCast(),
-            this->body->nativeCast()
+            this->prototype,
+            this->body
         };
     }
 }

@@ -7,7 +7,7 @@ namespace ionlang {
         std::shared_ptr<BlockWrapperStmt> result =
             std::make_shared<BlockWrapperStmt>(block);
 
-        block->parent = result;
+        block->setParent(result);
 
         return result;
     }

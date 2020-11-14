@@ -169,7 +169,7 @@ namespace ionlang {
             util::getResultValue(valueResult)
         );
 
-        global->parent = parent;
+        global->setParent(parent);
         this->finishSourceLocationMapping(global);
 
         return global;
@@ -257,7 +257,7 @@ namespace ionlang {
             methods
         );
 
-        structType->parent = parent;
+        structType->setParent(parent);
 
         return structType;
     }
@@ -268,7 +268,7 @@ namespace ionlang {
 
         std::shared_ptr<Block> block = Block::make();
 
-        block->parent = parent;
+        block->setParent(parent);
 
         while (!this->is(TokenKind::SymbolBraceR)) {
             AstPtrResult<Statement> statement = this->parseStatement(block);
@@ -530,7 +530,7 @@ namespace ionlang {
             util::getResultValue(bodyResult)
         );
 
-        method->parent = structType;
+        method->setParent(structType);
         this->finishSourceLocationMapping(method);
 
         return method;

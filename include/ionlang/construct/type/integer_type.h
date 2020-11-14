@@ -26,8 +26,8 @@ namespace ionlang {
             IntegerKind kind,
             bool isSigned = true,
 
-            std::shared_ptr<TypeQualifiers> qualifiers =
-                std::make_shared<TypeQualifiers>()
+            std::shared_ptr<TypeQualifierSet> qualifiers =
+                std::make_shared<TypeQualifierSet>()
         );
 
         void accept(Pass& pass) override;

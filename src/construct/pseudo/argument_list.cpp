@@ -2,7 +2,7 @@
 
 namespace ionlang {
     std::shared_ptr<ArgumentList> ArgumentList::make(
-        const ionshared::PtrSymbolTable<Resolvable<Type>>& symbolTable,
+        const ionshared::PtrSymbolTable<Construct>& symbolTable,
         bool isVariable
     ) noexcept {
         std::shared_ptr<ArgumentList> result =
@@ -10,19 +10,19 @@ namespace ionlang {
 
         auto itemsNativeMap = symbolTable->unwrap();
 
-        for (const auto& [name, type] : itemsNativeMap) {
-            type->setTransitiveParent(result);
+        for (const auto& [name, construct] : itemsNativeMap) {
+            construct->setParent(result);
         }
 
         return result;
     }
 
     ArgumentList::ArgumentList(
-        const ionshared::PtrSymbolTable<Resolvable<Type>>& symbolTable,
+        const ionshared::PtrSymbolTable<Construct>& symbolTable,
         bool isVariable
     ) :
         Construct(ConstructKind::ArgumentList),
-        ionshared::Scoped<Resolvable<Type>, ConstructKind>(symbolTable),
+        ionshared::Scoped<Construct, ConstructKind>(symbolTable),
         isVariable(isVariable) {
         //
     }

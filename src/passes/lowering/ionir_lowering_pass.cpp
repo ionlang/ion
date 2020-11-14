@@ -25,7 +25,7 @@ namespace ionlang {
 
     std::shared_ptr<ionir::Type> IonIrLoweringPass::processTypeQualifiers(
         std::shared_ptr<ionir::Type> type,
-        const std::shared_ptr<TypeQualifiers>& qualifiers
+        const std::shared_ptr<TypeQualifierSet>& qualifiers
     ) {
         std::shared_ptr<ionir::TypeQualifiers> irTypeQualifiers =
             std::make_shared<ionir::TypeQualifiers>();
@@ -170,7 +170,7 @@ namespace ionlang {
             std::vector<std::shared_ptr<ionir::BasicBlock>>{}
         );
 
-        irFunction->parent = irModuleBuffer;
+        irFunction->setParent(irModuleBuffer);
         this->irBuffers.functions.push(irFunction);
         this->visit(construct->body);
         this->irBuffers.functions.forcePop();
@@ -201,7 +201,7 @@ namespace ionlang {
         std::shared_ptr<ionir::Extern> irExtern =
             ionir::Extern::make(irPrototype);
 
-        irExtern->parent = irModuleBuffer;
+        irExtern->setParent(irModuleBuffer);
 
         /**
          * Register the IonIR extern on the module buffer's symbol table.
@@ -223,12 +223,23 @@ namespace ionlang {
         auto argumentListNativeMap = construct->argumentList->symbolTable->unwrap();
 
         // TODO: Should Args be a construct, and be visited?
-        for (const auto& [name, type] : argumentListNativeMap) {
+        for (const auto& [name, constructValue] : argumentListNativeMap) {
+            if (constructValue->constructKind != ConstructKind::Resolvable) {
+                continue;
+            }
+
+            /**
+             * NOTE: Dynamic cast will fail if the resolvable's value's
+             * type isn't type (or anything compatible).
+             */
+            PtrResolvable<Type> typeResolvable =
+                constructValue->dynamicCast<Resolvable<Type>>();
+
             irArguments->items->set(
                 name,
 
                 std::make_pair(
-                    this->safeEarlyVisitOrLookup<ionir::Type>(**type),
+                    this->safeEarlyVisitOrLookup<ionir::Type>(**typeResolvable),
                     name
                 )
             );
@@ -241,7 +252,7 @@ namespace ionlang {
                 irReturnType
             );
 
-        irPrototype->parent = this->irBuffers.modules.forceGetTopItem();
+        irPrototype->setParent(this->irBuffers.modules.forceGetTopItem());
         this->symbolTable.set(construct, irPrototype);
     }
 
@@ -254,7 +265,7 @@ namespace ionlang {
 
         std::shared_ptr<ionir::BasicBlock> irBasicBlock = ionir::BasicBlock::make();
 
-        irBasicBlock->parent = irFunctionBuffer;
+        irBasicBlock->setParent(irFunctionBuffer);
         this->irBuffers.basicBlocks.push(irBasicBlock);
 
         std::vector<std::shared_ptr<Statement>> statements = construct->statements;
@@ -436,7 +447,7 @@ namespace ionlang {
         std::shared_ptr<ionir::StructType> irStruct =
             ionir::StructType::make(construct->typeName, irFields);
 
-        irStruct->parent = this->irBuffers.modules.forceGetTopItem();
+        irStruct->setParent(this->irBuffers.modules.forceGetTopItem());
 
         irModuleBuffer->context->getGlobalScope()->set(
             construct->typeName,
@@ -483,11 +494,11 @@ namespace ionlang {
         else {
             // TODO: Symbol table not being migrated.
             successorBlock = Block::make();
-            successorBlock->parent = parentBlock->parent;
+            successorBlock->setParent(parentBlock->getParent());
         }
 
         // TODO: Hotfix to avoid function body (thus overriding bufferFunction's body).
-        successorBlock->parent = construct;
+        successorBlock->setParent(construct);
 
         std::shared_ptr<ionir::BasicBlock> irSuccessorBasicBlock =
             this->safeEarlyVisitOrLookup<ionir::BasicBlock>(successorBlock);

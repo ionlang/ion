@@ -126,8 +126,8 @@ namespace ionlang {
         std::shared_ptr<IntegerLiteral> integerLiteral =
             IntegerLiteral::make(integerType, value);
 
-        integerType->parent = integerLiteral;
-        integerLiteral->parent = parent;
+        integerType->setParent(integerLiteral);
+        integerLiteral->setParent(parent);
         this->finishSourceLocationMapping(integerLiteral);
 
         return integerLiteral;
@@ -162,7 +162,7 @@ namespace ionlang {
         std::shared_ptr<BooleanLiteral> booleanLiteral =
             std::make_shared<BooleanLiteral>(boolValue);
 
-        booleanLiteral->parent = parent;
+        booleanLiteral->setParent(parent);
         this->finishSourceLocationMapping(booleanLiteral);
 
         return booleanLiteral;
@@ -193,7 +193,7 @@ namespace ionlang {
         std::shared_ptr<CharLiteral> charLiteral =
             std::make_shared<CharLiteral>(stringValue[0]);
 
-        charLiteral->parent = parent;
+        charLiteral->setParent(parent);
         this->finishSourceLocationMapping(charLiteral);
 
         return charLiteral;
@@ -213,7 +213,7 @@ namespace ionlang {
         std::shared_ptr<StringLiteral> stringLiteral =
             std::make_shared<StringLiteral>(value);
 
-        stringLiteral->parent = parent;
+        stringLiteral->setParent(parent);
         this->finishSourceLocationMapping(stringLiteral);
 
         return stringLiteral;

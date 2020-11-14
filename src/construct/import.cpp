@@ -7,7 +7,7 @@ namespace ionlang {
         std::shared_ptr<Import> result =
             std::make_shared<Import>(id);
 
-        id->parent = result;
+        id->setParent(result);
 
         return result;
     }

@@ -10,8 +10,8 @@ namespace ionlang {
         std::shared_ptr<Method> result =
             std::make_shared<Method>(kind, structType, prototype, body);
 
-        prototype->parent = result;
-        body->parent = result;
+        prototype->setParent(result);
+        body->setParent(result);
 
         return result;
     }

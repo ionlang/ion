@@ -68,18 +68,9 @@ namespace ionlang::test::bootstrap {
             Resolvable<Type>::make(returnType)
         );
 
-        // The parent will be filled in below.
         std::shared_ptr<Block> body = Block::make(statements);
 
         // TODO: Provide module parent for function.
-        std::shared_ptr<Function> function = Function::make(prototype, body);
-
-        // Fill in the body's parent.
-        body->parent = function;
-
-        // Fill in the prototype's parent.
-        prototype->parent = function;
-
-        return function;
+        return Function::make(prototype, body);
     }
 }

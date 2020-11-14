@@ -7,10 +7,10 @@
 #include <ionlang/construct/type.h>
 
 namespace ionlang {
-    struct ArgumentList : Construct, Scoped<Resolvable<Type>> {
+    struct ArgumentList : ScopedConstruct {
         static std::shared_ptr<ArgumentList> make(
-            const ionshared::PtrSymbolTable<Resolvable<Type>>& symbolTable =
-                ionshared::util::makePtrSymbolTable<Resolvable<Type>>(),
+            const ionshared::PtrSymbolTable<Construct>& symbolTable =
+                ionshared::util::makePtrSymbolTable<Construct>(),
 
             bool isVariable = false
         ) noexcept;
@@ -18,8 +18,8 @@ namespace ionlang {
         bool isVariable;
 
         explicit ArgumentList(
-            const ionshared::PtrSymbolTable<Resolvable<Type>>& symbolTable =
-                ionshared::util::makePtrSymbolTable<Resolvable<Type>>(),
+            const ionshared::PtrSymbolTable<Construct>& symbolTable =
+                ionshared::util::makePtrSymbolTable<Construct>(),
 
             bool isVariable = false
         );

@@ -8,8 +8,8 @@ namespace ionlang {
         std::shared_ptr<CastExpr> result =
             std::make_shared<CastExpr>(type, value);
 
-        type->setTransitiveParent(result);
-        value->parent = result;
+        type->setParent(result);
+        value->setParent(result);
 
         return result;
     }

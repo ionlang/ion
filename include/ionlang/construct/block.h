@@ -15,17 +15,15 @@ namespace ionlang {
 
     struct StatementBuilder;
 
-    struct VariableDeclStmt;
-
     struct Function;
 
     // TODO: Must be verified to contain a single terminal instruction at the end?
-    struct Block : Construct, Scoped<VariableDeclStmt> {
+    struct Block : ScopedConstruct {
         static std::shared_ptr<Block> make(
             const std::vector<std::shared_ptr<Statement>>& statements = {},
 
-            const ionshared::PtrSymbolTable<VariableDeclStmt>& symbolTable =
-            ionshared::util::makePtrSymbolTable<VariableDeclStmt>()
+            const ionshared::PtrSymbolTable<Construct>& symbolTable =
+            ionshared::util::makePtrSymbolTable<Construct>()
         ) noexcept;
 
         // TODO: When statements are mutated, the symbol table must be cleared and re-populated.
@@ -34,8 +32,8 @@ namespace ionlang {
         explicit Block(
             std::vector<std::shared_ptr<Statement>> statements = {},
 
-            const ionshared::PtrSymbolTable<VariableDeclStmt>& symbolTable =
-                ionshared::util::makePtrSymbolTable<VariableDeclStmt>()
+            const ionshared::PtrSymbolTable<Construct>& symbolTable =
+                ionshared::util::makePtrSymbolTable<Construct>()
         );
 
         void accept(Pass& visitor) override;

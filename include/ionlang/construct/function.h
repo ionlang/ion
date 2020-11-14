@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ionshared/misc/helpers.h>
-#include <ionlang/tracking/local_var_descriptor.h>
 #include "construct.h"
 #include "prototype.h"
 #include "module.h"

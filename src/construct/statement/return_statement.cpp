@@ -8,7 +8,7 @@ namespace ionlang {
             std::make_shared<ReturnStmt>(value);
 
         if (ionshared::util::hasValue(value)) {
-            value->get()->parent = result;
+            value->get()->setParent(result);
         }
 
         return result;

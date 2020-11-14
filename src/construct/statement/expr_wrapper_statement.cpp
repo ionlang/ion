@@ -7,7 +7,7 @@ namespace ionlang {
         std::shared_ptr<ExprWrapperStmt> result =
             std::make_shared<ExprWrapperStmt>(expression);
 
-        expression->parent = result;
+        expression->setParent(result);
 
         return result;
     }
